@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Assignment {
+  assignment_id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  user_property_id    String?   @db.ObjectId
+  project_property_id String?   @db.ObjectId
+  task_property_id    String?   @db.ObjectId
+  createdBy           String?   @db.ObjectId
+  modifiedBy          String?   @db.ObjectId
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime? @updatedAt
+  status              Boolean?
+  startAt             DateTime?
+  endAt               DateTime?
+  deletedAt           DateTime?
+  deletedMark         Boolean   @default(false)
+}

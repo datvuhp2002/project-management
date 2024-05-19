@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  gateway:
+    build: ./gateway
+    image: datvudinhtrong/gateway
+    container_name: gateway
+    ports:
+      - "3050:3050"
+    depends_on:
+      - userservices
+      - projectservices
+      - assignmentservices
+      - activityservices
+      - departmentservices
+      - taskservices
+      
+  userservices:
+    build: ./userservices
+    image: datvudinhtrong/userservices
+    container_name: userservices
+    environment:
+      - PORT=3056
+      - EMAIL_PASS="ndnv btjq khen jugp"
+    ports:
+      - "3056:3056"
+
+  departmentservices:
+    build: ./departmentservices
+    image: datvudinhtrong/departmentservices
+    container_name: departmentservices
+    ports:
+      - "3057:3057"
+
+  assignmentservices:
+    build: ./assignmentservices
+    image: datvudinhtrong/assignmentservices
+    container_name: assignmentservices
+    environment:
+      - PORT=3058
+    ports:
+      - "3058:3058"
+
+  projectservices:
+    build: ./projectservices
+    image: datvudinhtrong/projectservices
+    container_name: projectservices
+    environment:
+      - PORT=3059
+    ports:  
+      - "3059:3059"
+
+  taskservices:
+    build: ./taskservices
+    image: datvudinhtrong/taskservices
+    container_name: taskservices
+    environment:
+      - PORT=3060
+    ports:
+      - "3060:3060"
+
+  activityservices:
+    build: ./activityservices
+    image: datvudinhtrong/activityservices
+    container_name: activityservices
+    environment:
+      - PORT=3061
+    ports:
+      - "3061:3061"

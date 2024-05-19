@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  project_id      String           @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  projectCode     String           @unique
+  description     String?
+  startAt         DateTime         @default(now())
+  endAt           DateTime
+  turnover        String?
+  document        String[]
+  investor        String?
+  createdBy       String?          @db.ObjectId
+  modifiedBy      String?          @db.ObjectId
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime?        @updatedAt
+  status          Boolean?         @default(true)
+  deletedAt       DateTime?
+  deletedMark     Boolean          @default(false)
+  ProjectProperty ProjectProperty?
+}
+
+model Client {
+  client_id       String            @id @default(auto()) @map("_id") @db.ObjectId
+  fullname        String
+  email           String
+  avatar          String?
+  address         String?
+  phone           String?
+  createdBy       String?           @db.ObjectId
+  modifiedBy      String?           @db.ObjectId
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime?         @updatedAt
+  deletedAt       DateTime?
+  deletedMark     Boolean           @default(false)
+  ProjectProperty ProjectProperty[]
+}
+
+model ProjectProperty {
+  project_property_id String    @id @default(auto()) @map("_id") @db.ObjectId
+  project_ownership   Project   @relation(fields: [project_id], references: [project_id])
+  project_id          String    @unique @db.ObjectId
+  client_ownership    Client?   @relation(fields: [client_id], references: [client_id])
+  department_id       String?   @db.ObjectId
+  client_id           String?   @db.ObjectId
+  createdBy           String?   @db.ObjectId
+  modifiedBy          String?   @db.ObjectId
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime? @updatedAt
+  deletedAt           DateTime?
+  deletedMark         Boolean   @default(false)
+}
