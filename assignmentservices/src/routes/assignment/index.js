@@ -5,7 +5,7 @@ const asyncHandler = require("../../helpers/asyncHandler");
 const router = express.Router();
 
 // get all assignments
-router.get("/getAll", asyncHandler(AssignmentController.getAll));
+router.get("/admin/getAll", asyncHandler(AssignmentController.getAll));
 // get all staff from project
 router.get(
   "/getAllUserPropertyFromProject/:id",

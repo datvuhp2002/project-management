@@ -80,28 +80,6 @@ class ActivityController {
       data: await ActivityService.restore(req.params.id),
     }).send(res);
   };
-  uploadFileFromLocal = async (req, res, next) => {
-    const { file } = req;
-    if (!file) {
-      throw new BadRequestError("File is missing");
-    }
-    new SuccessResponse({
-      message: "Tải file lên thành công",
-      data: await ActivityService.uploadFile(req.params.id, file),
-    }).send(res);
-  };
-  getFileImage = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Tải file lên thành công",
-      data: await ActivityService.getFileImage(req.body),
-    }).send(res);
-  };
-  deleteFile = async (req, res, next) => {
-    new SuccessResponse({
-      message: "xoá file thành công",
-      data: await ActivityService.deleteFile(req.params.id, req.body),
-    }).send(res);
-  };
 }
 
 module.exports = new ActivityController();

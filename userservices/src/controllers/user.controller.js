@@ -168,7 +168,7 @@ class UserController {
     const { file } = req;
     if (!file) {
       throw new BadRequestError("File is missing");
-    }
+    } 
     new SuccessResponse({
       message: "Tải ảnh đại diện lên thành công",
       data: getInfoData({

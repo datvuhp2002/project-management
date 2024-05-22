@@ -398,7 +398,7 @@ class UserService {
   // delete avatar in cloud
   static deleteAvatarInCloud = async (avatar, user_id) => {
     // Return colors in the response
-    prisma.user.update({ where: { user_id }, data: { avatar: null } });
+    await prisma.user.update({ where: { user_id }, data: { avatar: null } });
     return await cloudinary.uploader.destroy(avatar);
   };
   static queryUser = async ({

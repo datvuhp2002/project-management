@@ -227,10 +227,20 @@ const projectServicesRoutes = {
   },
 };
 const assignmentServicesRoutes = {
-  "/getAll": {
-    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAll`,
+  "/admin/getAll": {
+    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["ADMIN"],
+  },
+  "/admin/trash": {
+    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/trash`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
+  "/admin/restore": {
+    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/restore`,
+    authRequired: true,
+    permissions: ["ADMIN"],
   },
   "/getAllUserPropertyFromProject": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllUserPropertyFromProject`,
@@ -246,11 +256,6 @@ const assignmentServicesRoutes = {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/removeStaffFromProject`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
-  },
-  "/admin/trash": {
-    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/trash`,
-    authRequired: true,
-    permissions: null,
   },
   "/create": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/create`,
@@ -270,13 +275,9 @@ const assignmentServicesRoutes = {
   "/delete": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/delete`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["ADMIN","MANAGER"],
   },
-  "/admin/restore": {
-    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/restore`,
-    authRequired: true,
-    permissions: ["ADMIN"],
-  },
+
 };
 const clientRoutes = {
   "/admin/getAll": {
@@ -291,6 +292,11 @@ const clientRoutes = {
   },
   "/admin/restore": {
     target: `${process.env.CLIENT_REQUEST_URL}/admin/restore`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },  
+  "/admin/delete": {
+    target: `${process.env.CLIENT_REQUEST_URL}/admin/delete`,
     authRequired: true,
     permissions: ["ADMIN"],
   },
@@ -314,11 +320,7 @@ const clientRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/delete": {
-    target: `${process.env.CLIENT_REQUEST_URL}/delete`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
-  },
+
   "/uploadAvatarFromLocal": {
     target: `${process.env.CLIENT_REQUEST_URL}/uploadAvatarFromLocal`,
     authRequired: true,
@@ -444,11 +446,6 @@ const activityServicesRoutes = {
     permissions: null,
   },
 
-  "/deleteFile": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/deleteFile`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
-  },
 };
 module.exports = {
   emailRoutes,

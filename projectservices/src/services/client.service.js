@@ -83,11 +83,8 @@ class ClientService {
       previousPage,
     });
   };
-  static findByName = async (name) => {
-    return await prisma.client.findFirst({ where: { name } });
-  };
   static findById = async ({ id }) => {
-    return await prisma.client.findFirst({ where: { role_id: id } });
+    return await prisma.client.findFirst({ where: { client_id: id }, select:this.select });
   };
   static update = async (client_id, data, modifiedBy) => {
     if (data.avatar) {

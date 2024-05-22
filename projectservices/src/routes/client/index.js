@@ -11,6 +11,8 @@ router.get("/admin/getAll", asyncHandler(ClientController.getAll));
 router.put("/admin/restore/:id", asyncHandler(ClientController.restore));
 // list clients has been deleted
 router.get("/admin/trash", asyncHandler(ClientController.trash));
+// delete client
+router.delete("/admin/delete/:id", asyncHandler(ClientController.delete));
 // get list of clients from project
 router.get(
   "/getAllClientFromProject/:id",
@@ -22,8 +24,7 @@ router.post("/create", asyncHandler(ClientController.create));
 router.post("/detail/:id", asyncHandler(ClientController.detail));
 // update
 router.put("/update/:id", asyncHandler(ClientController.update));
-// delete client
-router.delete("/delete/:id", asyncHandler(ClientController.delete));
+
 // upload avatar on cloud
 router.post(
   "/uploadAvatarFromLocal/:id",
