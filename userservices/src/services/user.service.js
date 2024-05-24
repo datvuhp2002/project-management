@@ -1,9 +1,7 @@
 "use strict";
 
-const { getInfoData } = require("../utils");
 const prisma = require("../prisma");
 const RoleService = require("./role.service");
-const UserProperty = require("./user.property.service");
 const UserPropertyService = require("./user.property.service");
 const { sendEmailToken } = require("./email.service");
 const bcrypt = require("bcrypt");
@@ -126,6 +124,7 @@ class UserService {
   ) => {
     return await prisma.userProperty.updateMany({
       where: {
+        department_id,
         OR: list_user_ids.map((user_id) => ({ user_id: user_id })),
       },
       data: {
@@ -339,11 +338,13 @@ class UserService {
         );
       }
     }
-    return await prisma.user.update({
+    const updateUser = await prisma.user.update({
       where: { user_id: id },
       data,
       select: this.select,
     });
+    if(updateUser) return true;
+    throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại")
   };
   // delete user account
   static delete = async (user_id) => {

@@ -36,6 +36,7 @@ class AccessService {
       );
       return {
         tokens,
+        role: userData.role.name ,
       };
     }
   };

@@ -265,7 +265,7 @@ const assignmentServicesRoutes = {
   "/update": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
-    permissions: null,
+    permissions: ["ADMIN","MANAGER"],
   },
   "/detail": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/detail`,
@@ -409,9 +409,14 @@ const activityServicesRoutes = {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
-  },
+  },  
   "/admin/getAllActivitiesByUserProperty": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/getAllActivitiesByUserProperty`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
+  "/admin/delete": {
+    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/delete`,
     authRequired: true,
     permissions: ["ADMIN"],
   },
@@ -419,11 +424,6 @@ const activityServicesRoutes = {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYourProperty`,
     authRequired: true,
     permissions: null,
-  },
-  "/admin/delete": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/delete`,
-    authRequired: true,
-    permissions: ["ADMIN"],
   },
   "/getAllActivitiesFromTask": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesFromTask`,

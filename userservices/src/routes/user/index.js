@@ -13,7 +13,7 @@ router.get("/findByEmail/:email", asyncHandler(UserController.findByEmail));
 // Lấy ra hết tất cả user
 router.get("/admin/getAll", asyncHandler(UserController.getAll));
 // get all user in department
-router.get(
+router.post(
   "/getAllStaffInDepartment",
   asyncHandler(UserController.getAllStaffInDepartment)
 );

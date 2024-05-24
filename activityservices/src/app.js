@@ -3,6 +3,7 @@ const express = require("express");
 const compression = require("compression");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
+const cors = require("cors")
 
 const app = express();
 
@@ -11,7 +12,8 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
-app.use(express.urlencoded({ extend: true }));
+app.use(cors())
+app.use(express.urlencoded({ extended: true }));
 // init db
 require(`./dbs/init.dbs`);
 // init routes
@@ -22,7 +24,6 @@ app.use((err, req, res, next) => {
   return res.status(status).json({
     status: "Error",
     code: status,
-    stack: err.stack,
     message: err.message || "Internal Server Error",
   });
 });

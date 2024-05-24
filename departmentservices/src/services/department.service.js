@@ -21,7 +21,7 @@ class DepartmentService {
     const department = await prisma.department.create({
       data: { name, description, createdBy },
       select: this.select,
-    });
+    })
     if (department) return department;
     return {
       code: 200,
@@ -124,7 +124,6 @@ class DepartmentService {
       select: this.select,
     });
   };
-
   static queryDepartment = async ({
     query,
     items_per_page,
