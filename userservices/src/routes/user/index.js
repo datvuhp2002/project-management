@@ -12,6 +12,10 @@ router.put("/change-password", asyncHandler(UserController.changePassword));
 router.get("/findByEmail/:email", asyncHandler(UserController.findByEmail));
 // Lấy ra hết tất cả user
 router.get("/admin/getAll", asyncHandler(UserController.getAll));
+router.get(
+  "/getListOfStaffDoesNotHaveDepartment",
+  asyncHandler(UserController.getListOfStaffDoesNotHaveDepartment)
+);
 // get all user in department
 router.post(
   "/getAllStaffInDepartment",
@@ -54,7 +58,7 @@ router.put("/admin/update/:id", asyncHandler(UserController.updateStaff));
 // GET account information
 router.get("/detail", asyncHandler(UserController.detail));
 // GET staff account information (ADMIN only)
-router.get("/admin/detail/:id", asyncHandler(UserController.detailUser));
+router.get("/information/:id", asyncHandler(UserController.information));
 // Xoá một người dùng theo id
 router.delete("/admin/delete/:id", asyncHandler(UserController.delete));
 // Khôi phục một người dùng đã bị xoá

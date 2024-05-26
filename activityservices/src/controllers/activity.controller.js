@@ -13,6 +13,15 @@ class ActivityController {
       ),
     }).send(res);
   };
+  getAllActivitiesByYear = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Danh sách hoạt động trong năm thành công",
+      data: await ActivityService.getAllActivitiesByYear(
+        req.query,
+        req.params.id
+      ),
+    }).send(res);
+  };
   getAll = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách hoạt động thành công",

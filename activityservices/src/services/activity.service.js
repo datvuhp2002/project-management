@@ -19,6 +19,7 @@ class ActivityService {
         activity_property_id: true,
         user_property_id: true,
         activity_id: true,
+        task_property_id: true,
       },
     },
   };
@@ -182,6 +183,51 @@ class ActivityService {
       return null;
     }
     return null;
+  };
+  static getAllActivitiesByYear = async (
+    { year = new Date().getFullYear() },
+    task_property_id
+  ) => {
+    const startOfYear = new Date(year, 0, 1);
+    const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+
+    const whereClause = {
+      AND: [
+        {
+          ActivityProperty: {
+            task_property_id: {
+              equals: task_property_id,
+            },
+          },
+        },
+        {
+          createdAt: {
+            gte: startOfYear,
+            lte: endOfYear,
+          },
+        },
+      ],
+    };
+
+    const activities = await prisma.activity.findMany({
+      where: whereClause,
+      orderBy: {
+        createdAt: "asc",
+      },
+      select: this.select,
+    });
+
+    // Tạo một đối tượng để tổ chức dữ liệu theo ngày
+    const activitiesByDate = {};
+    activities.forEach((activity) => {
+      const createdAtDate = activity.createdAt.toISOString().split("T")[0]; // Lấy ngày tạo
+      if (!activitiesByDate[createdAtDate]) {
+        activitiesByDate[createdAtDate] = [];
+      }
+      activitiesByDate[createdAtDate].push(activity);
+    });
+
+    return activitiesByDate;
   };
 
   static queryActivity = async ({

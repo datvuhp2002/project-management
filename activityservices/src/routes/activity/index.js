@@ -13,6 +13,10 @@ router.put("/admin/restore/:id", asyncHandler(ActivityController.restore));
 // Lấy ra hết tất cả activity
 router.get("/admin/getAll", asyncHandler(ActivityController.getAll));
 router.get(
+  "/getAllActivitiesByYear/:id",
+  asyncHandler(ActivityController.getAllActivitiesByYear)
+);
+router.get(
   "/admin/getAllActivitiesByUserProperty/:id",
   asyncHandler(ActivityController.getAllActivitiesByUserProperty)
 );

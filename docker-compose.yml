@@ -1,5 +1,28 @@
+version: '3'
 
 services:
+  # zookeeper:
+  #   image: bitnami/zookeeper:latest
+  #   container_name: zookeeper
+  #   ports:
+  #     - "2181:2181"
+  #   environment:
+  #     ALLOW_ANONYMOUS_LOGIN: "yes"
+  #   networks:
+  #     - kafka-network
+
+  # kafka:
+  #   image: bitnami/kafka:latest
+  #   container_name: kafkaMQ
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     ALLOW_PLAINTEXT_LISTENER: "yes"
+  #     KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #     KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+  #   networks:
+  #     - kafka-network
+
   gateway:
     build: ./gateway
     image: datvudinhtrong/gateway
@@ -13,6 +36,8 @@ services:
       - activityservices
       - departmentservices
       - taskservices
+    # networks:
+    #   - kafka-network
       
   userservices:
     build: ./userservices
@@ -24,6 +49,8 @@ services:
       - CLOUDINARY_API_SECRET = Ec2Fdj1v2voufkhhkX-CkhOZnj8
     ports:
       - "3056:3056"
+    # networks:
+    #   - kafka-network
 
   departmentservices:
     build: ./departmentservices
@@ -31,6 +58,8 @@ services:
     container_name: departmentservices
     ports:
       - "3057:3057"
+    # networks:
+    #   - kafka-network
 
   assignmentservices:
     build: ./assignmentservices
@@ -40,6 +69,8 @@ services:
       - PORT=3058
     ports:
       - "3058:3058"
+    # networks:
+    #   - kafka-network
 
   projectservices:
     build: ./projectservices
@@ -50,6 +81,8 @@ services:
       - CLOUDINARY_API_SECRET = Ec2Fdj1v2voufkhhkX-CkhOZnj8
     ports:  
       - "3059:3059"
+    # networks:
+    #   - kafka-network
 
   taskservices:
     build: ./taskservices
@@ -60,6 +93,8 @@ services:
       - CLOUDINARY_API_SECRET = Ec2Fdj1v2voufkhhkX-CkhOZnj8
     ports:
       - "3060:3060"
+    # networks:
+    #   - kafka-network
 
   activityservices:
     build: ./activityservices
@@ -69,3 +104,9 @@ services:
       - PORT=3061
     ports:
       - "3061:3061"
+    # networks:
+    #   - kafka-network
+
+# networks:
+#   kafka-network:
+#     driver: bridge

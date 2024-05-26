@@ -9,12 +9,16 @@ const router = express.Router();
 
 // signIn
 router.post("/login", asyncHandler(accessController.login));
+
 // AUTHENTICATION
 router.use(authentication);
 router.get(
   "/handleRefreshToken",
   asyncHandler(accessController.handleRefreshToken)
 );
-router.use(permissionsAuthentication("ADMIN"));
+router.get(
+  "/reportForDepartment/:id",
+  asyncHandler(accessController.reportForDepartment)
+);
 
 module.exports = router;

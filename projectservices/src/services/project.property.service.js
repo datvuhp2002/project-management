@@ -28,6 +28,14 @@ class ProjectPropertyService {
       },
     });
   };
+  static removeClientFromProject = async (project_id, client_id) => {
+    const update = await prisma.projectProperty.update({
+      where:{project_id, client_id},
+      data:{
+        client_id: null
+      }
+    })
+  }
   static delete = async (project_id) => {
     return await prisma.projectProperty.update({
       where: { project_id },

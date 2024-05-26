@@ -4,6 +4,7 @@ const prisma = require("../prisma");
 const RoleService = require("./role.service");
 const UserPropertyService = require("./user.property.service");
 const { sendEmailToken } = require("./email.service");
+const { getDepartmentName } = require("../utils/kafka/producer");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -12,6 +13,8 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
+const runConsumer = require("../utils/kafka/consumer");
+
 class UserService {
   static select = {
     user_id: true,
@@ -23,13 +26,22 @@ class UserService {
     birthday: true,
     createdAt: true,
     createdBy: true,
-    UserProperty: true,
+    UserProperty: {
+      select: {
+        user_property_id: true,
+        department_id: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    },
   };
   // create new user
-  static create = async (
-    { username, email, password, role_id, department_id },
-    createdBy
-  ) => {
+  static create = async (dataUser, createdBy) => {
+    const { username, email, password, role_id, department_id, anotherField } =
+      dataUser;
     // check Email exists
     const holderUser = await prisma.user.findFirst({ where: { email } });
     if (holderUser) {
@@ -43,6 +55,7 @@ class UserService {
         email,
         password: passwordHash,
         createdBy,
+        ...anotherField,
       },
     });
     if (newUser) {
@@ -88,7 +101,7 @@ class UserService {
   static findUserByRole = async (role) => {
     const role_data = await RoleService.findByName(role);
     if (!role_data) throw new BadRequestError("Role không tồn tại");
-    const users = await UserProperty.findUserByRole(role_data.role_id);
+    const users = await UserPropertyService.findUserByRole(role_data.role_id);
     return users.map((user) => user.user_id);
   };
   // find user property by role
@@ -105,7 +118,23 @@ class UserService {
       include: { UserProperty: { include: { role: true } } },
     });
   };
-
+  // static verifyUser = async (email, password) => {
+  //   const userData = await this.findByEmail(email);
+  //   console.log(userData);
+  //   const match = await bcrypt.compare(password, userData.password);
+  //   if (!match) {
+  //     return false;
+  //   } else {
+  //     const { user_id: userId } = userData;
+  //     const { user_property_id: userProperty } = userData.UserProperty;
+  //     return {
+  //       userId,
+  //       email,
+  //       userProperty,
+  //       role: userData.UserProperty.role.name,
+  //     };
+  //   }
+  // };
   // add user into department
   static addUserIntoDepartment = async ({ list_user_ids }, department_id) => {
     return await prisma.userProperty.updateMany({
@@ -272,6 +301,37 @@ class UserService {
       previousPage,
     });
   };
+  static getListOfStaffDoesNotHaveDepartment = async ({
+    items_per_page,
+    page,
+    search,
+    nextPage,
+    previousPage,
+    role = "STAFF",
+  }) => {
+    let query = [];
+    console.log(role);
+    query.push({
+      user_id: {
+        in: await this.findUserByRole(role),
+      },
+    });
+    query.push({
+      UserProperty: {
+        department_id: null,
+      },
+      deletedMark: false,
+    });
+    return await this.queryUser({
+      query: query,
+      items_per_page,
+      page,
+      search,
+      nextPage,
+      previousPage,
+    });
+  };
+
   // get all staffs has been delete
   static trash = async ({
     items_per_page,
@@ -303,24 +363,16 @@ class UserService {
   };
   // staff information
   static detail = async (id) => {
-    return await prisma.user.findUnique({
+    const detailUser = await prisma.user.findUnique({
       where: { user_id: id },
       select: this.select,
     });
-  };
-  // user information
-  static detailUser = async (id) => {
-    return await prisma.user.findUnique({
-      where: { user_id: id },
-      select: this.select,
-    });
-  };
-  // staff information for admin
-  static information = async (id) => {
-    return await prisma.user.findUnique({
-      where: { user_id: id },
-      select: this.select,
-    });
+    if (detailUser) {
+      console.log(
+        await getDepartmentName(detailUser.UserProperty.department_id)
+      );
+    }
+    return detailUser;
   };
   // update user information
   static update = async ({ id, data }) => {
@@ -338,13 +390,17 @@ class UserService {
         );
       }
     }
+    const { department_id, ...updateUserData } = data;
+    if (department_id) {
+      await UserPropertyService.update(id, { department_id });
+    }
     const updateUser = await prisma.user.update({
       where: { user_id: id },
-      data,
+      data: updateUserData,
       select: this.select,
     });
-    if(updateUser) return true;
-    throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại")
+    if (updateUser) return true;
+    throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
   };
   // delete user account
   static delete = async (user_id) => {

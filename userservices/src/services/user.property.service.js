@@ -42,6 +42,11 @@ class UserPropertyService {
     });
     return users_id;
   };
+  static update = async (user_id,data) => {
+    const updateUserProperty = await prisma.userProperty.update({where:{user_id}, data});
+    if(!updateUserProperty) throw new BadRequestError("Đã sảy ra lỗi, vui lòng thử lại");
+    return true
+  }
   static findUserByRoleAndDepartment = async (role_id) => {
     const users_id = await prisma.userProperty.findMany({
       where: { role_id },

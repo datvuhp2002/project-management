@@ -70,7 +70,7 @@ class DepartmentController {
   };
   restore = async (req, res, next) => {
     new SuccessResponse({
-      message: "Khôi phục thành công phòng ban",
+      message: "Khôi phục thànœh công phòng ban",
       data: await DepartmentService.restore(req.params.id),
     }).send(res);
   };

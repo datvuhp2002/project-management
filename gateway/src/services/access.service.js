@@ -2,9 +2,14 @@
 
 const bcrypt = require("bcrypt");
 const crypto = require("node:crypto");
-
+const sendMessage = require("../utils/message_queue/kafka/producer");
 const { generateAccessToken, createTokenPair } = require("../auth/authUtils");
-const { getUserByEmail } = require("../utils");
+const {
+  getUserByEmail,
+  getAllProjectInDepartment,
+  addTasksToProjects,
+  addTasksAndActivitiesToProjects,
+} = require("../utils");
 const {
   BadRequestError,
   AuthFailureError,
@@ -20,8 +25,14 @@ class AccessService {
     4 - generate Token
     5 - get data return login
   */
-  static login = async ({ email, password, refreshToken = null }) => {
-    // 1
+  static reportForDepartment = async (department_id) => {
+    const listProject = await getAllProjectInDepartment(department_id);
+    const listProjectWithTask = await addTasksToProjects(listProject);
+    return listProjectWithTask;
+  };
+
+  static login = async ({ email, password }) => {
+    // await sendMessage("find-by-email", { email, password });
     const userData = await getUserByEmail(email);
     const match = await bcrypt.compare(password, userData.user.password);
     if (!match) {
@@ -36,7 +47,7 @@ class AccessService {
       );
       return {
         tokens,
-        role: userData.role.name ,
+        role: userData.role.name,
       };
     }
   };

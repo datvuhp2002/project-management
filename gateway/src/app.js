@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const compression = require("compression");
+const consumeMessages = require("./utils/message_queue/kafka/consumer");
 
 const axios = require("axios");
 const { default: helmet } = require("helmet");
@@ -18,16 +19,15 @@ const {
   taskServicesRoutes,
   activityServicesRoutes,
 } = require("./config");
-const cors = require("cors")
+const cors = require("cors");
 const app = express();
-
 // init middleware
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 // init routes
 app.use(router);
@@ -40,6 +40,10 @@ registerRouterServices("/projects", projectServicesRoutes, app);
 registerRouterServices("/clients", clientRoutes, app);
 registerRouterServices("/tasks", taskServicesRoutes, app);
 registerRouterServices("/activities", activityServicesRoutes, app);
+// const topics = Object.values(userServicesRoutes).map(
+//   (route) => `gateway-${route.topic}`
+// );
+// consumeMessages(topics).catch(console.error);
 // handle errors
 app.use((err, req, res, next) => {
   const status = err.status || 500;

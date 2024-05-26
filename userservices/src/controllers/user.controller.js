@@ -6,6 +6,7 @@ const { uploadImageFromUrl } = require("../services/upload.services");
 const { BadRequestError } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
 const { getInfoData } = require("../utils/index");
+
 class UserController {
   forgetPassword = async (req, res, next) => {
     new SuccessResponse({
@@ -52,14 +53,16 @@ class UserController {
       data: await UserService.getAll(req.query),
     }).send(res);
   };
+  getListOfStaffDoesNotHaveDepartment = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy ra danh nhân viên chưa có phòng ban thành công",
+      data: await UserService.getListOfStaffDoesNotHaveDepartment(req.query),
+    }).send(res);
+  };
   getAllStaffInDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách người dùng thành công",
-      data: await UserService.getAllStaffInDepartment(
-        req.query,
-        req.body,
-        req.headers.user
-      ),
+      data: await UserService.getAllStaffInDepartment(req.query, req.body),
     }).send(res);
   };
   getAllStaffInDepartmentForAdmin = async (req, res, next) => {
@@ -90,12 +93,7 @@ class UserController {
       data: await UserService.detail(req.headers.user),
     }).send(res);
   };
-  detailUser = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Thông tin người dùng",
-      data: await UserService.detailUser(req.params.id),
-    }).send(res);
-  };
+
   information = async (req, res, next) => {
     new SuccessResponse({
       message: "Thông tin người dùng",
@@ -168,7 +166,7 @@ class UserController {
     const { file } = req;
     if (!file) {
       throw new BadRequestError("File is missing");
-    } 
+    }
     new SuccessResponse({
       message: "Tải ảnh đại diện lên thành công",
       data: getInfoData({
