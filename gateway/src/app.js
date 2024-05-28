@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const compression = require("compression");
-const consumeMessages = require("./utils/message_queue/kafka/consumer");
 
 const axios = require("axios");
 const { default: helmet } = require("helmet");

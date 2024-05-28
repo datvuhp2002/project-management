@@ -4,7 +4,7 @@ const compression = require("compression");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
-const runConsumer = require("./utils/kafka/consumer");
+const { stack } = require("./routes");
 const app = express();
 
 // init middleware
@@ -24,6 +24,7 @@ app.use((err, req, res, next) => {
   return res.status(status).json({
     status: "Error",
     code: status,
+    stack: err.stack,
     message: err.message || "Internal Server Error",
   });
 });

@@ -4,7 +4,6 @@ const prisma = require("../prisma");
 const RoleService = require("./role.service");
 const UserPropertyService = require("./user.property.service");
 const { sendEmailToken } = require("./email.service");
-const { getDepartmentName } = require("../utils/kafka/producer");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -13,7 +12,6 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
-const runConsumer = require("../utils/kafka/consumer");
 
 class UserService {
   static select = {
@@ -26,6 +24,7 @@ class UserService {
     birthday: true,
     createdAt: true,
     createdBy: true,
+    deletedMark: true,
     UserProperty: {
       select: {
         user_property_id: true,
@@ -57,6 +56,7 @@ class UserService {
         createdBy,
         ...anotherField,
       },
+      select: this.select,
     });
     if (newUser) {
       const userProperty = await UserPropertyService.create({
@@ -73,10 +73,7 @@ class UserService {
         return false;
       }
     }
-    return {
-      code: 200,
-      data: null,
-    };
+    return newUser;
   };
   static forgetPassword = async ({ email = null, captcha = null }) => {
     const holderUser = await prisma.user.findFirst({ where: { email } });
@@ -318,7 +315,7 @@ class UserService {
     });
     query.push({
       UserProperty: {
-        department_id: null,
+        department_id: null || undefined,
       },
       deletedMark: false,
     });
@@ -331,7 +328,27 @@ class UserService {
       previousPage,
     });
   };
-
+  static getDetailManagerAndTotalStaffInDepartment = async ({
+    department_id,
+    manager_id,
+  }) => {
+    const totalStaffInDePartment = await this.getAllStaffInDepartment(
+      {},
+      { department_id }
+    );
+    let managerInformation = await this.detail(manager_id);
+    if (managerInformation) {
+      if (managerInformation.avatar) {
+        managerInformation.avatar = await this.getAvatar(
+          managerInformation.avatar
+        );
+      }
+    }
+    return {
+      total_staff: totalStaffInDePartment.total,
+      manager: managerInformation,
+    };
+  };
   // get all staffs has been delete
   static trash = async ({
     items_per_page,
@@ -363,15 +380,11 @@ class UserService {
   };
   // staff information
   static detail = async (id) => {
+    if (id === null || id === undefined) return null;
     const detailUser = await prisma.user.findUnique({
       where: { user_id: id },
       select: this.select,
     });
-    if (detailUser) {
-      console.log(
-        await getDepartmentName(detailUser.UserProperty.department_id)
-      );
-    }
     return detailUser;
   };
   // update user information
@@ -390,9 +403,12 @@ class UserService {
         );
       }
     }
-    const { department_id, ...updateUserData } = data;
+    const { department_id, role_id, ...updateUserData } = data;
     if (department_id) {
       await UserPropertyService.update(id, { department_id });
+    }
+    if (role_id) {
+      await UserPropertyService.update(id, { role_id });
     }
     const updateUser = await prisma.user.update({
       where: { user_id: id },

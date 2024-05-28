@@ -2,7 +2,6 @@
 
 const bcrypt = require("bcrypt");
 const crypto = require("node:crypto");
-const sendMessage = require("../utils/message_queue/kafka/producer");
 const { generateAccessToken, createTokenPair } = require("../auth/authUtils");
 const {
   getUserByEmail,

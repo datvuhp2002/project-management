@@ -27,6 +27,7 @@ class TaskService {
   static create = async (data, modifiedBy) => {
     const newTask = await prisma.task.create({
       data: { ...data, modifiedBy },
+      select: this.select,
     });
     if (newTask) {
       const newTaskProperty = await TaskPropertyService.create({
@@ -38,10 +39,7 @@ class TaskService {
       await prisma.task.delete({ where: { task_id: newTask.task_id } });
       return false;
     }
-    return {
-      code: 200,
-      data: null,
-    };
+    return newTask;
   };
   // get All tasks by task property
   static getAllTaskByTaskProperty = async (

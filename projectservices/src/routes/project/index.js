@@ -15,7 +15,7 @@ router.get(
 router.put("/admin/restore/:id", asyncHandler(ProjectController.restore));
 
 // Xoá một project theo id
-router.delete("/admin/delete/:id", asyncHandler(ProjectController.delete));
+router.delete("/delete/:id", asyncHandler(ProjectController.delete));
 
 // Lấy ra hết tất cả project đã bị xoá
 router.get("/admin/trash", asyncHandler(ProjectController.trash));

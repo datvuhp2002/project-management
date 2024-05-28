@@ -7,24 +7,12 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
-
-const getDepartmentName = async (messages) => {
-  try {
-    await producer.connect();
-    await producer.send({
-      topic: "department-to-user", // Sử dụng cùng một topic với consumer
-      messages: [{ value: `${messages}` }],
-    });
-  } finally {
-    await producer.disconnect();
-  }
-};
 const runProducer = async (topic, message) => {
   try {
     await producer.connect();
     await producer.send({
       topic: topic,
-      messages: [{ value: message }],
+      messages: [{ value: JSON.stringify(message) }],
     });
   } catch (error) {
     console.error("Error in producing message:", error);
@@ -32,5 +20,4 @@ const runProducer = async (topic, message) => {
     await producer.disconnect();
   }
 };
-
-module.exports = { getDepartmentName, runProducer };
+module.exports = { runProducer };

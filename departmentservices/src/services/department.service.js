@@ -6,7 +6,8 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const { ObjectId } = require("mongodb");
+const { runProducer } = require("../message_queue/producer");
+const { runAndGetDataInConsumer } = require("../message_queue/consumer");
 class DepartmentService {
   static select = {
     department_id: true,
@@ -97,11 +98,21 @@ class DepartmentService {
     });
   };
   static update = async ({ id, data, userId }) => {
-    return await prisma.department.update({
+    const updateDepartment = await prisma.department.update({
       where: { department_id: id },
       data: { ...data, modifiedBy: userId },
       select: this.select,
     });
+    if (updateDepartment) {
+      if (data.manager_id) {
+        await runProducer("select-manager-to-department", {
+          id: data.manager_id,
+          data: { department_id: id },
+        });
+      }
+      return true;
+    }
+    return false;
   };
   // delete department
   static delete = async (department_id) => {
@@ -148,17 +159,21 @@ class DepartmentService {
         },
       ],
     };
+
     if (query && query.length > 0) {
       whereClause.AND = query;
     }
+
     const total = await prisma.department.count({
       where: whereClause,
     });
+
     if (items_per_page !== "ALL") {
       itemsPerPage = Number(items_per_page) || 10;
     } else {
       itemsPerPage = total;
     }
+
     const currentPage = Number(page) || 1;
     const skip = currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0;
     const departments = await prisma.department.findMany({
@@ -170,9 +185,24 @@ class DepartmentService {
         createdAt: "desc",
       },
     });
+
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
+
+    const department_list_id = departments.map((department) => ({
+      department_id: department.department_id,
+      manager_id: department.manager_id,
+    }));
+
+    await runProducer(
+      "get-all-user-in-department-and-detail-manager",
+      department_list_id
+    );
+    const userData = await runAndGetDataInConsumer();
+    departments.map((item, index) => {
+      item.information = userData[index];
+    });
     return {
       departments: departments,
       total,

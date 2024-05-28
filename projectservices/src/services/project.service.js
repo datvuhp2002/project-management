@@ -314,6 +314,5 @@ class ProjectService {
       itemsPerPage,
     };
   };
-  
 }
 module.exports = ProjectService;

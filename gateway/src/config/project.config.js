@@ -15,10 +15,10 @@ const projectServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/admin/delete": {
-    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/delete`,
+  "/delete": {
+    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/delete`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["ADMIN", "MANAGER"],
   },
   "/getAllProjectInDepartment": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllProjectInDepartment`,
