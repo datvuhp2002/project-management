@@ -20,4 +20,5 @@ const runProducer = async (topic, message) => {
     await producer.disconnect();
   }
 };
+runProducer("user-delete-manager", { message: "hehe" });
 module.exports = { runProducer };

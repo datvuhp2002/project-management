@@ -7,7 +7,7 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const { runProducer } = require("../message_queue/producer");
-const { runAndGetDataInConsumer } = require("../message_queue/consumer");
+const { runConsumerOnDemand } = require("../message_queue/consumer");
 class DepartmentService {
   static select = {
     department_id: true,
@@ -199,7 +199,8 @@ class DepartmentService {
       "get-all-user-in-department-and-detail-manager",
       department_list_id
     );
-    const userData = await runAndGetDataInConsumer();
+    const userData = await runConsumerOnDemand();
+    console.log(userData);
     departments.map((item, index) => {
       item.information = userData[index];
     });

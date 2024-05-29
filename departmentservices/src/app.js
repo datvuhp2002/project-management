@@ -5,6 +5,7 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { stack } = require("./routes");
+const { continuousConsumer } = require("./message_queue/consumer");
 const app = express();
 
 // init middleware
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 require(`./dbs/init.dbs`);
 // init routes
 app.use("", require("./routes"));
+
 // handle errors
 app.use((err, req, res, next) => {
   const status = err.status || 500;
@@ -28,6 +30,6 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
-// runConsumer().catch(console.error);
+continuousConsumer().catch(console.error);
 
 module.exports = app;

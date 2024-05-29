@@ -17,15 +17,16 @@ const runConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(departmentTopics),
-    fromBeginning: true,
+    fromBeginning: false,
   });
   await consumer.subscribe({
     topic: "department-to-user",
-    fromBeginning: true,
+    fromBeginning: false,
   });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const praseMessage = JSON.parse(message.value.toString());
+      console.log("Before handle :::", praseMessage);
       // Xử lý tin nhắn dựa vào topic
       switch (topic) {
         case departmentTopics.getAllUserInDepartmentAndDetailManager:
@@ -40,7 +41,6 @@ const runConsumer = async () => {
           const departmentRequestResults = await Promise.all(
             departmentRequestResultPromises
           );
-          console.log(departmentRequestResults);
           try {
             await runProducer("user-to-department", {
               departmentRequestResults,
@@ -59,5 +59,4 @@ const runConsumer = async () => {
     },
   });
 };
-runConsumer().catch(console.error());
 module.exports = { runConsumer };

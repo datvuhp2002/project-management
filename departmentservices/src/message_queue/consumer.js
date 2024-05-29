@@ -5,13 +5,31 @@ const kafka = new Kafka({
   brokers: ["localhost:9092"],
 });
 
-const runAndGetDataInConsumer = async () => {
-  const consumer = kafka.consumer({ groupId: "department-group" });
-
+const continuousConsumer = async () => {
+  const consumer = kafka.consumer({ groupId: "department-continuous-group" });
+  await consumer.connect();
+  await consumer.subscribe({
+    topic: "user-delete-manager",
+    fromBeginning: false,
+  });
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      const praseMessage = JSON.parse(message.value.toString());
+      console.log("Before handle :::", praseMessage);
+      // Xử lý tin nhắn dựa vào topic
+      switch (topic) {
+        default:
+          console.log("Topic không được xử lý:", topic);
+      }
+    },
+  });
+};
+const runConsumerOnDemand = async () => {
+  const consumer = kafka.consumer({ groupId: "department-on-demand-group" });
   await consumer.connect();
   await consumer.subscribe({
     topic: "user-to-department",
-    fromBeginning: true,
+    fromBeginning: false,
   });
 
   return new Promise((resolve, reject) => {
@@ -23,6 +41,7 @@ const runAndGetDataInConsumer = async () => {
             case "user-to-department":
               const result = JSON.parse(message.value.toString());
               resolve(result.departmentRequestResults);
+              consumer.disconnect();
               break;
             default:
               console.log("Topic không được xử lý:", topic);
@@ -33,4 +52,4 @@ const runAndGetDataInConsumer = async () => {
   });
 };
 
-module.exports = { runAndGetDataInConsumer };
+module.exports = { runConsumerOnDemand, continuousConsumer };

@@ -5,7 +5,6 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const { select } = require("./user.service");
 class UserPropertyService {
   static create = async ({ role_id, user_id, department_id }) => {
     const newUserProperty = await prisma.userProperty.create({
