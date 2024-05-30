@@ -1,5 +1,11 @@
+"use strict";
 const { Kafka } = require("kafkajs");
-
+const { convertObjectToArray } = require("../utils/index");
+const {
+  userTopicsOnDemand,
+  userTopicsContinuous,
+} = require("../configs/kafkaUserTopic");
+const DepartmentService = require("../services/department.service");
 const kafka = new Kafka({
   clientId: "department-services",
   brokers: ["localhost:9092"],
@@ -9,18 +15,27 @@ const continuousConsumer = async () => {
   const consumer = kafka.consumer({ groupId: "department-continuous-group" });
   await consumer.connect();
   await consumer.subscribe({
-    topic: "user-delete-manager",
+    topics: convertObjectToArray(userTopicsContinuous),
     fromBeginning: false,
   });
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      const praseMessage = JSON.parse(message.value.toString());
-      console.log("Before handle :::", praseMessage);
-      // Xử lý tin nhắn dựa vào topic
+    eachMessage: async ({ topic, partition, message, heartbeat }) => {
+      const parsedMessage = JSON.parse(message.value.toString());
+      console.log("Before handle :::", parsedMessage);
       switch (topic) {
+        case userTopicsContinuous.deleteUser:
+          if (parsedMessage !== null) {
+            console.log("After:::", parsedMessage);
+            return await DepartmentService.deleteManagerId(parsedMessage);
+          }
+          break;
         default:
           console.log("Topic không được xử lý:", topic);
       }
+      await consumer.commitOffsets([
+        { topic, partition, offset: (Number(message.offset) + 1).toString() },
+      ]);
+      await heartbeat();
     },
   });
 };
@@ -28,24 +43,17 @@ const runConsumerOnDemand = async () => {
   const consumer = kafka.consumer({ groupId: "department-on-demand-group" });
   await consumer.connect();
   await consumer.subscribe({
-    topic: "user-to-department",
+    topics: convertObjectToArray(userTopicsOnDemand),
     fromBeginning: false,
   });
-
   return new Promise((resolve, reject) => {
     consumer
       .run({
         eachMessage: async ({ topic, partition, message }) => {
-          console.log(JSON.parse(message.value.toString()));
-          switch (topic) {
-            case "user-to-department":
-              const result = JSON.parse(message.value.toString());
-              resolve(result.departmentRequestResults);
-              consumer.disconnect();
-              break;
-            default:
-              console.log("Topic không được xử lý:", topic);
-          }
+          const parsedMessage = JSON.parse(message.value.toString());
+          console.log(parsedMessage);
+          resolve(parsedMessage);
+          consumer.disconnect();
         },
       })
       .catch(reject);

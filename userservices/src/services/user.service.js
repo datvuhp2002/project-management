@@ -12,6 +12,8 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
+const { runProducer } = require("../message_queue/producer");
+const { departmentProducerTopic } = require("../configs/kafkaDepartmentTopic");
 
 class UserService {
   static select = {
@@ -333,10 +335,10 @@ class UserService {
     manager_id,
   }) => {
     const totalStaffInDePartment = await this.getAllStaffInDepartment(
-      {},
+      { items_per_page: "ALL" },
       { department_id }
     );
-    let managerInformation = await this.detail(manager_id);
+    let managerInformation = await this.detailManager(manager_id);
     if (managerInformation) {
       if (managerInformation.avatar) {
         managerInformation.avatar = await this.getAvatar(
@@ -387,6 +389,14 @@ class UserService {
     });
     return detailUser;
   };
+  static detailManager = async (id) => {
+    if (id === null || id === undefined) return null;
+    const detailUser = await prisma.user.findUnique({
+      where: { user_id: id, deletedMark: false },
+      select: this.select,
+    });
+    return detailUser;
+  };
   // update user information
   static update = async ({ id, data }) => {
     if (data.avatar) {
@@ -420,6 +430,7 @@ class UserService {
   };
   // delete user account
   static delete = async (user_id) => {
+    const userProperty = await UserPropertyService.findUserByUser_Id(user_id);
     const deleteUser = await prisma.user.update({
       where: { user_id },
       select: this.select,
@@ -430,7 +441,16 @@ class UserService {
     });
     if (deleteUser) {
       const deleteUserProperty = await UserPropertyService.delete(user_id);
-      if (deleteUserProperty) return true;
+      if (deleteUserProperty) {
+        const roleUser = await RoleService.findById(deleteUserProperty.role_id);
+        if (roleUser.name === "ADMIN" || roleUser.name === "MANAGER") {
+          await runProducer(
+            departmentProducerTopic.deleteUser,
+            userProperty.department_id
+          );
+        }
+        return true;
+      }
       await this.restore(user_id);
     }
     await this.restore(user_id);
