@@ -68,7 +68,7 @@ class AccessService {
     };
   };
 
-
+  static 
 }
 
 module.exports = AccessService;

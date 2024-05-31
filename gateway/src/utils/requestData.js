@@ -1,22 +1,29 @@
-"use strict";
-const axios = require("axios");
-class RequestData {
-  static async fetchData(url, method = "GET", data = null) {
-    try {
-      const options = {
-        method,
-        url,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data,
-      };
-      const response = await axios(options);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-      throw error;
+import axios from "axios";
+export default function requestApi(
+  endpoint,
+  method,
+  body,
+  responseType = "json",
+  contentType = "application/json"
+) {
+  const headers = {
+    Accept: "application/json",
+    "Content-Type": contentType,
+    "Access-Control-Allow-Origin": "*",
+  };
+  const instance = axios.create({ headers });
+  instance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      return Promise.reject(error);
     }
-  }
+  );
+  return instance.request({
+    method: method,
+    url: `${process.env.REACT_APP_API_URL}${endpoint}`,
+    data: body,
+    responseType: responseType,
+  });
 }
-module.exports = RequestData;
