@@ -1,4 +1,7 @@
 "use strict";
-const projectProducerTopic = {};
+const projectProducerTopic = {
+  receiveProjectInformationFromAssignment:
+    "received-project-information-from-assignment",
+};
 
 module.exports = { projectProducerTopic };

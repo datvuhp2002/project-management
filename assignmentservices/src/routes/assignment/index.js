@@ -6,10 +6,22 @@ const router = express.Router();
 
 // get all assignments
 router.get("/admin/getAll", asyncHandler(AssignmentController.getAll));
+router.get(
+  "/getAllAssignmentForUser/:id",
+  asyncHandler(AssignmentController.getAllAssignmentForUser)
+);
+router.get(
+  "/getAllAssignmentForProject/:id",
+  asyncHandler(AssignmentController.getAllAssignmentForProject)
+);
 // get all staff from project
 router.get(
   "/getAllUserPropertyFromProject/:id",
   asyncHandler(AssignmentController.getAllUserPropertyFromProject)
+);
+router.get(
+  "/getAllAssignmentForTask/:id",
+  asyncHandler(AssignmentController.getAllAssignmentForTask)
 );
 router.get(
   "/getAllTaskPropertyFromProject/:id",

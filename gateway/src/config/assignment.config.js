@@ -20,6 +20,21 @@ const assignmentServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
+  "/getAllAssignmentForUser": {
+    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignmentForUser`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/getAllAssignmentForProject": {
+    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignmentForProject`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/getAllAssignmentForTask": {
+    target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignmentForTask`,
+    authRequired: true,
+    permissions: null,
+  },
   "/getAllTaskPropertyFromProject": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllTaskPropertyFromProject`,
     authRequired: true,

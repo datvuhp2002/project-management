@@ -1,11 +1,11 @@
 const {
-  assignmentTopicsContinuous,
-} = require("./consumer/assigment.consumer.topic.config");
+  projectTopicsContinuous,
+} = require("./consumer/project.consumer.topic.config");
 const {
-  assignmentProducerTopic,
-} = require("./producer/assignment.producer.topic.config");
+  projectProducerTopic,
+} = require("./producer/project.producer.topic.config");
 
 module.exports = {
-  assignmentTopicsContinuous,
-  assignmentProducerTopic,
+  projectTopicsContinuous,
+  projectProducerTopic,
 };

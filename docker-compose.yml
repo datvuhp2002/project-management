@@ -1,6 +1,12 @@
 version: "3.8"
 
 services:
+  projectmanagerui:
+    build: ./projectmanagerui
+    image: datvudinhtrong/projectmanagerui
+    container_name: projectmanagerui
+    environment:
+      - PORT=3000
   gateway:
     build: ./gateway
     image: datvudinhtrong/gateway
@@ -16,7 +22,6 @@ services:
       - taskservices
     networks:
       - kafka-network
-
   userservices:
     build: ./userservices
     image: datvudinhtrong/userservices
@@ -26,6 +31,7 @@ services:
       - EMAIL_PASS="ndnv btjq khen jugp"
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=...
     ports:
       - "3056:3056"
     depends_on:
@@ -39,6 +45,7 @@ services:
     container_name: departmentservices
     environment:
       - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=...
     ports:
       - "3057:3057"
     depends_on:
@@ -53,6 +60,7 @@ services:
     environment:
       - PORT=3058
       - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=...
     ports:
       - "3058:3058"
     depends_on:
@@ -68,6 +76,7 @@ services:
       - PORT=3059
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=...
     ports:
       - "3059:3059"
     depends_on:
@@ -83,6 +92,7 @@ services:
       - PORT=3060
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=...
     ports:
       - "3060:3060"
     depends_on:
@@ -97,6 +107,7 @@ services:
     environment:
       - PORT=3061
       - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=...
     ports:
       - "3061:3061"
     depends_on:

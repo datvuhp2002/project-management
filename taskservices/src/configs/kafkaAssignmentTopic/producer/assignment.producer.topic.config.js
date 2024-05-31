@@ -1,7 +1,6 @@
 "use strict";
 const assignmentProducerTopic = {
-  getProjectInformationFromAssignment:
-    "get-project-information-from-assignment",
+  receivedTaskInformation: "received-task-information",
 };
 
 module.exports = { assignmentProducerTopic };

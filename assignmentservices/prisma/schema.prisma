@@ -22,7 +22,7 @@ model Assignment {
   modifiedBy          String?   @db.ObjectId
   createdAt           DateTime  @default(now())
   updatedAt           DateTime? @updatedAt
-  status              Boolean?
+  status              Boolean?  @default(false)
   startAt             DateTime?
   endAt               DateTime?
   deletedAt           DateTime?

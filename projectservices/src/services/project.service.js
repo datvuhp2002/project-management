@@ -5,13 +5,14 @@ const prisma = require("../prisma");
 const RoleService = require("./client.service");
 const ProjectPropertyService = require("./project.property.service");
 const cloudinary = require("../configs/cloudinary.config");
-
+const { runConsumerOnDemand } = require("../message_queue/consumer");
+const { runProducer } = require("../message_queue/producer");
 const {
   BadRequestError,
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const projectController = require("../controllers/project.controller");
+const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 class ProjectService {
   static select = {
     project_id: true,
@@ -63,10 +64,6 @@ class ProjectService {
     return {
       code: 201,
     };
-    return {
-      code: 200,
-      data: null,
-    };
   };
   // get all projects
   static getAll = async ({
@@ -80,36 +77,46 @@ class ProjectService {
     query.push({
       deletedMark: false,
     });
-    return await this.queryProject({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
   };
+
   // get all projects in department
   static getAllProjectInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage },
     { id }
   ) => {
     let query = [];
+    // Thêm điều kiện phòng ban và trạng thái xoá
     query.push({
       ProjectProperty: {
         department_id: id,
       },
       deletedMark: false,
     });
-    return await this.queryProject({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    // Gọi phương thức queryProject với các tham số đã truyền vào
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
   };
+
   // get all projects has been deleted
   static trash = async ({
     items_per_page,
@@ -122,14 +129,17 @@ class ProjectService {
     query.push({
       deletedMark: true,
     });
-    return await this.queryProject({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      false
+    );
   };
   // detail project
   static detail = async (project_id) => {
@@ -256,14 +266,10 @@ class ProjectService {
       throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
     }
   };
-  static queryProject = async ({
-    query,
-    items_per_page,
-    page,
-    search,
-    nextPage,
-    previousPage,
-  }) => {
+  static queryProject = async (
+    { query, items_per_page, page, search, nextPage, previousPage },
+    isNotTrash = true
+  ) => {
     const searchKeyword = search || "";
     let itemsPerPage = 10;
     let whereClause = {
@@ -305,6 +311,21 @@ class ProjectService {
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
+
+    if (isNotTrash) {
+      const project_list_id = projects.map((project) => ({
+        project_property_id: project.ProjectProperty.project_property_id,
+      }));
+      await runProducer(
+        assignmentProducerTopic.getProjectInformationFromAssignment,
+        project_list_id
+      );
+      const projectDataReceived = await runConsumerOnDemand();
+      projects.map((item, index) => {
+        item.information = projectDataReceived[index];
+      });
+    }
+
     return {
       data: projects,
       total,
