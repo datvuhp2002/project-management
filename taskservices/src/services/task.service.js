@@ -106,7 +106,6 @@ class TaskService {
       previousPage,
     });
   };
-
   // get all tasks has been deleted
   static trash = async ({
     items_per_page,

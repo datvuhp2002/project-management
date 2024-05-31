@@ -13,6 +13,7 @@ router.put("/admin/restore/:id", asyncHandler(ClientController.restore));
 router.get("/admin/trash", asyncHandler(ClientController.trash));
 // delete client
 router.delete("/admin/delete/:id", asyncHandler(ClientController.delete));
+router.get("/detail/:id", asyncHandler(ClientController.detail));
 // get list of clients from project
 router.get(
   "/getAllClientFromProject/:id",

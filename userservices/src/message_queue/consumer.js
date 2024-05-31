@@ -7,6 +7,10 @@ const {
 const UserService = require("../services/user.service");
 const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
+const {
+  assignmentTopicsContinuous,
+  assignmentProducerTopic,
+} = require("../configs/kafkaAssignmentTopic");
 
 const kafka = new Kafka({
   clientId: "user-services",
@@ -22,6 +26,10 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(departmentTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(assignmentTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -61,20 +69,28 @@ const continuousConsumer = async () => {
           });
           await UserService.update({ id, data });
           break;
-        case departmentTopicsContinuous.getDetailDepartment:
+        case assignmentTopicsContinuous.getUserInformation:
           console.log(parsedMessage);
-          await runProducer(
-            departmentProducerTopic.detailDepartment,
-            await UserService.getDetailManagerAndTotalStaffInDepartment(
-              parsedMessage,
-              true
-            )
+          const assignmentRequestResultPromises = parsedMessage.map(
+            async (item) => {
+              return await UserService.getStaffInformationByUserProperty(item);
+            }
           );
+          const assignmentRequestResults = await Promise.all(
+            assignmentRequestResultPromises
+          );
+          try {
+            runProducer(
+              assignmentProducerTopic.receivedUserInformation,
+              assignmentRequestResults
+            );
+          } catch (err) {
+            console.log(err.message);
+          }
           break;
         default:
           console.log("Topic không được xử lý:", topic);
       }
-
       await heartbeat();
     },
   });

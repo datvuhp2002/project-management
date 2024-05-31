@@ -238,7 +238,6 @@ class UserService {
     { items_per_page, page, search, nextPage, previousPage, role = null },
     { user_property_ids }
   ) => {
-    console.log(user_property_ids);
     let query = [];
     if (role) {
       const listUserPropertyByRole = await this.findUserPropertyByRole(role);
@@ -270,6 +269,16 @@ class UserService {
       nextPage,
       previousPage,
     });
+  };
+  static getStaffInformationByUserProperty = async (user_property_id) => {
+    if (user_property_id == null || user_property_id == undefined) return null;
+    const userInformation = await prisma.user.findFirst({
+      where: { UserProperty: { user_property_id } },
+    });
+    if (userInformation) {
+      return userInformation;
+    }
+    return null;
   };
   // get all staffs
   static getAll = async ({

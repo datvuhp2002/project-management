@@ -18,6 +18,12 @@ class ClientController {
       data: await ClientService.create(req.body, req.headers.user),
     }).send(res);
   };
+  detail = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Chi tiết khách hàng",
+      data: await ClientService.detail(req.params.id),
+    }).send(res);
+  };
   getAll = async (req, res, next) => {
     new SuccessResponse({
       message: "Danh sách khách hàng",

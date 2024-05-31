@@ -11,6 +11,9 @@ const { getUserByUserPropertyIds } = require("../utils");
 const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
 const { runProducer } = require("../message_queue/producer");
 const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
+const {
+  userProducerTopic,
+} = require("../configs/kafkaUserTopic/producer/user.producer.topic.config");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -211,7 +214,6 @@ class AssignmentService {
         .map((assignment) => assignment.user_property_id)
         .filter((id) => id !== null);
       const uniqueUserPropertyIds = [...new Set(userPropertyIds)];
-      await runProducer();
       return uniqueUserPropertyIds;
     }
     return null;
@@ -343,8 +345,20 @@ class AssignmentService {
       const taskInformationData = await runConsumerOnDemand();
       console.log("received Data:::", taskInformationData);
       assignments.map((item, index) => {
-        item.information = taskInformationData[index];
+        item.task_information = taskInformationData[index];
       });
+
+      if (taskInformationData) {
+        const user_list_id = assignments.map(
+          (assignment) => assignment.user_property_id
+        );
+        await runProducer(userProducerTopic.getUserInformation, user_list_id);
+        const userInformationData = await runConsumerOnDemand();
+        console.log(userInformationData);
+        assignments.map((item, index) => {
+          item.user_information = userInformationData[index];
+        });
+      }
     }
     return {
       assignments: assignments,
@@ -378,12 +392,10 @@ class AssignmentService {
         listOfAssignmentIsNotDone.assignments.map(
           (assignment) => assignment.task_property_id
         );
-      const uniqueTaskPropertyIdsIsDone = [...new Set(taskPropertyIdsIsDone)];
-
-      const uniqueTaskPropertyIdsIsNotDone = [
-        ...new Set(taskPropertyIdsIsNotDone),
-      ];
-
+      // const uniqueTaskPropertyIdsIsDone = [...new Set(taskPropertyIdsIsDone)];
+      // const uniqueTaskPropertyIdsIsNotDone = [
+      //   ...new Set(taskPropertyIdsIsNotDone),
+      // ];
       return {
         total_task_is_done: taskPropertyIdsIsDone.length,
         total_task_is_not_done: taskPropertyIdsIsNotDone.length,
