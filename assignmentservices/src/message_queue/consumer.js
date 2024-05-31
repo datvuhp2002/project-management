@@ -3,56 +3,60 @@ const {
   projectTopicsContinuous,
   projectProducerTopic,
 } = require("../configs/kafkaProjectTopic");
-const ProjectServices = require("../services/project.service");
+const AssignmentServices = require("../services/assignment.service");
 const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
 
 const kafka = new Kafka({
-  clientId: "project-services",
+  clientId: "assignment-services",
   brokers: ["localhost:9092"],
 });
 
 const continuousConsumer = async () => {
-  const consumer = kafka.consumer({ groupId: "project-continuous-group" });
+  const consumer = kafka.consumer({ groupId: "assignment-continuous-group" });
   await consumer.connect();
+  await consumer.subscribe({
+    topics: convertObjectToArray(projectTopicsContinuous),
+    fromBeginning: false,
+  });
   await consumer.run({
-    eachMessage: async ({ topic, partition, message, heartbeat }) => {
+    eachMessage: async ({ topic, partition, message }) => {
       const parsedMessage = JSON.parse(message.value.toString());
       switch (topic) {
+        case projectTopicsContinuous.getProjectInformationFromAssignment:
+          const projectRequestResultPromises = await parsedMessage.map(
+            async (item) => {
+              const list_user_property =
+                await AssignmentServices.getAllUserPropertyFromProject(
+                  item.project_property_id
+                );
+              const list_task_property =
+                await AssignmentServices.getTotalTaskPropertyWithStatusFromProject(
+                  item.project_property_id
+                );
+              return {
+                total_user: list_user_property.length,
+                total_task: list_task_property,
+              };
+            }
+          );
+          const projectRequestResults = await Promise.all(
+            projectRequestResultPromises
+          );
+          try {
+            await runProducer(
+              projectProducerTopic.receiveProjectInformationFromAssignment,
+              projectRequestResults
+            );
+          } catch (err) {
+            console.log(err);
+          }
+          break;
         default:
           console.log("Topic không được xử lý:", topic);
       }
     },
   });
 };
-const runConsumerOnDemand = async () => {
-  const consumer = kafka.consumer({ groupId: "project-on-demand-group" });
-  await consumer.connect();
-  await consumer.subscribe({
-    topics: convertObjectToArray(projectTopicsOnDemand),
-    fromBeginning: false,
-  });
 
-  return new Promise((resolve, reject) => {
-    consumer
-      .run({
-        eachMessage: async ({
-          topic,
-          partition,
-          message,
-          commitOffsetsIfNecessary,
-        }) => {
-          console.log(JSON.parse(message.value.toString()));
-          switch (topic) {
-            case "abc":
-              consumer.disconnect();
-              break;
-            default:
-              console.log("Topic không được xử lý:", topic);
-          }
-        },
-      })
-      .catch(reject);
-  });
-};
-module.exports = { continuousConsumer, runConsumerOnDemand };
+module.exports = { continuousConsumer };

@@ -2,11 +2,12 @@
 const { Kafka } = require("kafkajs");
 
 const kafka = new Kafka({
-  clientId: "assignment-services",
+  clientId: "task-services",
   brokers: ["localhost:9092"],
 });
 
 const producer = kafka.producer();
+
 const runProducer = async (topic, message) => {
   try {
     await producer.connect();
@@ -20,4 +21,5 @@ const runProducer = async (topic, message) => {
     await producer.disconnect();
   }
 };
+
 module.exports = { runProducer };

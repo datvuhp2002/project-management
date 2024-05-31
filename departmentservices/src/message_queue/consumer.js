@@ -32,9 +32,7 @@ const continuousConsumer = async () => {
         default:
           console.log("Topic không được xử lý:", topic);
       }
-      await consumer.commitOffsets([
-        { topic, partition, offset: (Number(message.offset) + 1).toString() },
-      ]);
+
       await heartbeat();
     },
   });

@@ -24,9 +24,9 @@ class TaskService {
     },
   };
   // create a new task
-  static create = async (data, modifiedBy) => {
+  static create = async (data, createdBy) => {
     const newTask = await prisma.task.create({
-      data: { ...data, modifiedBy },
+      data: { ...data, createdBy },
       select: this.select,
     });
     if (newTask) {
@@ -65,6 +65,25 @@ class TaskService {
       nextPage,
       previousPage,
     });
+  };
+  static getListDetailTaskByTaskProperty = async ({ task_property_id }) => {
+    console.log("TASK:::", task_property_id);
+    if (task_property_id === null || task_property_id === undefined)
+      return null;
+    let query = [];
+    query.push({
+      TaskProperty: {
+        task_property_id,
+      },
+    });
+    query.push({
+      deletedMark: false,
+    });
+    const result = await this.queryTask({
+      query: query,
+      items_per_page: "ALL",
+    });
+    return result.data;
   };
   // get all tasks
   static getAll = async ({
@@ -229,14 +248,7 @@ class TaskService {
   }) => {
     const currentPage = Number(page) || 1;
     const searchKeyword = search || "";
-
     let itemsPerPage = 10;
-    if (items_per_page !== "ALL") {
-      itemsPerPage = Number(items_per_page) || 10;
-    } else {
-      itemsPerPage = total;
-    }
-    const skip = currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0;
     let whereClause = {
       OR: [
         {
@@ -250,10 +262,15 @@ class TaskService {
     if (query && query.length > 0) {
       whereClause.AND = query;
     }
-
     const total = await prisma.task.count({
       where: whereClause,
     });
+    if (items_per_page !== "ALL") {
+      itemsPerPage = Number(items_per_page) || 10;
+    } else {
+      itemsPerPage = total;
+    }
+    const skip = currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0;
 
     const tasks = await prisma.task.findMany({
       take: itemsPerPage,

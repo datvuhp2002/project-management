@@ -1,7 +1,10 @@
 "use strict";
 const assignmentTopicsContinuous = {
-  receivedProjectInformation: "received-project-information",
+  abc: "abc",
 };
 
-const assignmentTopicsOnDemand = {};
+const assignmentTopicsOnDemand = {
+  receiveProjectInformationFromAssignment:
+    "received-project-information-from-assignment",
+};
 module.exports = { assignmentTopicsContinuous, assignmentTopicsOnDemand };

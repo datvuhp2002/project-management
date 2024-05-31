@@ -1,4 +1,9 @@
 "use strict";
-const assignmentTopicsContinuous = {};
+const projectTopicsContinuous = {
+  getProjectInformationFromAssignment:
+    "get-project-information-from-assignment",
+};
 
-module.exports = { assignmentTopicsContinuous };
+module.exports = {
+  projectTopicsContinuous,
+};

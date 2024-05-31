@@ -86,5 +86,4 @@ class ProjectController {
     }).send(res);
   };
 }
-
 module.exports = new ProjectController();

@@ -21,6 +21,51 @@ class AssignmentController {
       data: await AssignmentService.getAll(req.query),
     }).send(res);
   };
+  /**
+   * @param {status} is done or not,
+   * @param {page},
+   * @param search,
+   */
+  getAllAssignmentForUser = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy tất cả phân công của nhân viên thành công",
+      data: await AssignmentService.getAllAssignmentForUser(
+        req.query,
+        req.params.id
+      ),
+    }).send(res);
+  };
+  /**
+   * @param {isAssignment} check task is assignment or not
+   * @param {status} is done or not,
+   * @param {page},
+   * @param search,
+   */
+  getAllAssignmentForProject = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy tất cả phân công của dự án thành công",
+      data: await AssignmentService.getAllAssignmentForProject(
+        req.query,
+        req.params.id
+      ),
+    }).send(res);
+  };
+  /**
+   *
+   * @param {isAssignment} check task is assignment or not
+   * @param {status} is done or not,
+   * @param {page},
+   * @param search,
+   */
+  getAllAssignmentForTask = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy danh sách nhiệm vụ thành công",
+      data: await AssignmentService.getAllAssignmentForTask(
+        req.query,
+        req.params.id
+      ),
+    }).send(res);
+  };
   getAllUserPropertyFromProject = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy tất cả thuộc tính nhân viên trong dự án thành công",
@@ -29,6 +74,7 @@ class AssignmentController {
       ),
     }).send(res);
   };
+
   getAllTaskPropertyFromProject = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy tất cả thuộc tính nhiệm vụ trong dự án thành công",

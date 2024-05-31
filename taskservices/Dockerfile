@@ -15,7 +15,6 @@ RUN npm install
 COPY . .
 RUN npx prisma generate
 
-ENV DATABASE_URL="mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/taskService?retryWrites=true&w=majority&appName=Cluster0"
 ENV CLOUDINARY_API_SECRET = Ec2Fdj1v2voufkhhkX-CkhOZnj8
 # Expose the port the app runs on
 EXPOSE 3060
