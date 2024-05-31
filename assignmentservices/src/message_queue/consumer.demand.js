@@ -1,5 +1,6 @@
 const { Kafka } = require("kafkajs");
 const { assignmentTopicsOnDemand } = require("../configs/kafkaAssignmentTopic");
+const { userTopicsOnDemand } = require("../configs/kafkaUserTopic");
 const { convertObjectToArray } = require("../utils");
 
 const kafka = new Kafka({
@@ -12,6 +13,10 @@ const runConsumerOnDemand = async () => {
   await consumer.connect();
   await consumer.subscribe({
     topics: convertObjectToArray(assignmentTopicsOnDemand),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(userTopicsOnDemand),
     fromBeginning: false,
   });
   return new Promise((resolve, reject) => {

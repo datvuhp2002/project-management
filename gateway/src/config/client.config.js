@@ -25,6 +25,11 @@ const clientRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
+  "/detail": {
+    target: `${process.env.CLIENT_REQUEST_URL}/detail`,
+    authRequired: true,
+    permissions: null,
+  },
   "/create": {
     target: `${process.env.CLIENT_REQUEST_URL}/create`,
     authRequired: true,

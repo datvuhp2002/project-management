@@ -38,7 +38,7 @@ const assignmentServicesRoutes = {
   "/getAllTaskPropertyFromProject": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllTaskPropertyFromProject`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/removeStaffFromProject": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/removeStaffFromProject`,

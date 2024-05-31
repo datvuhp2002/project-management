@@ -27,7 +27,7 @@ const userServicesRoutes = {
     topic: "get-all-staff-by-user-property",
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUserProperty`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/admin/getAllStaffInDepartment": {
     topic: "admin-get-all-staff-in-department",

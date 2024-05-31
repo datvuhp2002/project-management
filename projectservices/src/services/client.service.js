@@ -13,6 +13,9 @@ class ClientService {
     modifiedBy: true,
     ProjectProperty: true,
   };
+  static detail = async (client_id) => {
+    return await prisma.client.findUnique({ where: { client_id } });
+  };
   static create = async (data, createdBy) => {
     return await prisma.client.create({
       data: { ...data, createdBy },
@@ -84,7 +87,10 @@ class ClientService {
     });
   };
   static findById = async ({ id }) => {
-    return await prisma.client.findFirst({ where: { client_id: id }, select:this.select });
+    return await prisma.client.findFirst({
+      where: { client_id: id },
+      select: this.select,
+    });
   };
   static update = async (client_id, data, modifiedBy) => {
     if (data.avatar) {

@@ -1,3 +1,6 @@
 "use strict";
-const userProducerTopic = {};
+const userProducerTopic = {
+  getListUserFromProject: "get-list-user-from-project",
+  getUserInformation: "get-user-information",
+};
 module.exports = { userProducerTopic };
