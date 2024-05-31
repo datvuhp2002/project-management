@@ -8,6 +8,7 @@ const {
 } = require("../core/error.response");
 const { runProducer } = require("../message_queue/producer");
 const { runConsumerOnDemand } = require("../message_queue/consumer");
+const { userProducerTopic } = require("../configs/kafkaUserTopic");
 class DepartmentService {
   static select = {
     department_id: true,
@@ -42,14 +43,17 @@ class DepartmentService {
         deletedMark: false,
       },
     ];
-    return await this.queryDepartment({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryDepartment(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
   };
   // get all department had been deleted
   static trash = async ({
@@ -64,14 +68,17 @@ class DepartmentService {
         deletedMark: true,
       },
     ];
-    return await this.queryDepartment({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryDepartment(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      false
+    );
   };
   // department information
   static detail = async (id) => {
@@ -98,6 +105,9 @@ class DepartmentService {
     });
   };
   static update = async ({ id, data, userId }) => {
+    const department = await prisma.department.findUnique({
+      where: { department_id: id },
+    });
     const updateDepartment = await prisma.department.update({
       where: { department_id: id },
       data: { ...data, modifiedBy: userId },
@@ -105,13 +115,23 @@ class DepartmentService {
     });
     if (updateDepartment) {
       if (data.manager_id) {
-        await runProducer("select-manager-to-department", {
+        await runProducer(userProducerTopic.selectManagerToDepartment, {
+          old_manager_id: department.manager_id,
           id: data.manager_id,
           data: { department_id: id },
         });
       }
       return true;
     }
+    return false;
+  };
+  static deleteManagerId = async (department_id) => {
+    console.log("Department_id:::", department_id);
+    const deleteManagerId = await prisma.department.update({
+      where: { department_id },
+      data: { manager_id: null },
+    });
+    if (deleteManagerId) return true;
     return false;
   };
   // delete department
@@ -135,14 +155,10 @@ class DepartmentService {
       select: this.select,
     });
   };
-  static queryDepartment = async ({
-    query,
-    items_per_page,
-    page,
-    search,
-    nextPage,
-    previousPage,
-  }) => {
+  static queryDepartment = async (
+    { query, items_per_page, page, search, nextPage, previousPage },
+    isNotTrash = true
+  ) => {
     const searchKeyword = search || "";
     let itemsPerPage = 10;
     let whereClause = {
@@ -190,20 +206,22 @@ class DepartmentService {
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
 
-    const department_list_id = departments.map((department) => ({
-      department_id: department.department_id,
-      manager_id: department.manager_id,
-    }));
+    if (isNotTrash) {
+      const department_list_id = departments.map((department) => ({
+        department_id: department.department_id,
+        manager_id: department.manager_id,
+      }));
 
-    await runProducer(
-      "get-all-user-in-department-and-detail-manager",
-      department_list_id
-    );
-    const userData = await runConsumerOnDemand();
-    console.log(userData);
-    departments.map((item, index) => {
-      item.information = userData[index];
-    });
+      await runProducer(
+        userProducerTopic.getAllUserInDepartmentAndDetailManager,
+        department_list_id
+      );
+      const userData = await runConsumerOnDemand();
+      console.log("User DATA:::", userData);
+      departments.map((item, index) => {
+        item.information = userData[index];
+      });
+    }
     return {
       departments: departments,
       total,

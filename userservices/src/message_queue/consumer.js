@@ -1,40 +1,42 @@
 const { Kafka } = require("kafkajs");
 const gatewayTopics = require("../configs/gateway.topic.config");
-const departmentTopics = require("../configs/department.topic.config");
+const {
+  departmentTopicsContinuous,
+  departmentProducerTopic,
+} = require("../configs/kafkaDepartmentTopic");
 const UserService = require("../services/user.service");
 const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
+
 const kafka = new Kafka({
   clientId: "user-services",
   brokers: ["localhost:9092"],
 });
-const consumer = kafka.consumer({ groupId: "user-group" });
-const runConsumer = async () => {
+
+const continuousConsumer = async () => {
+  const consumer = kafka.consumer({ groupId: "user-continuous-group" });
   await consumer.connect();
   await consumer.subscribe({
-    topics: gatewayTopics,
+    topics: convertObjectToArray(gatewayTopics),
     fromBeginning: true,
   });
   await consumer.subscribe({
-    topics: convertObjectToArray(departmentTopics),
+    topics: convertObjectToArray(departmentTopicsContinuous),
     fromBeginning: false,
   });
-  await consumer.subscribe({
-    topic: "department-to-user",
-    fromBeginning: false,
-  });
+
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      const praseMessage = JSON.parse(message.value.toString());
-      console.log("Before handle :::", praseMessage);
-      // Xử lý tin nhắn dựa vào topic
+    eachMessage: async ({ topic, partition, message, heartbeat }) => {
+      const parsedMessage = JSON.parse(message.value.toString());
       switch (topic) {
-        case departmentTopics.getAllUserInDepartmentAndDetailManager:
+        case departmentTopicsContinuous.getAllUserInDepartmentAndDetailManager:
           const departmentData = JSON.parse(message.value.toString());
+          console.log("Message receive:::", departmentData);
           const departmentRequestResultPromises = departmentData.map(
             async (item) => {
               return await UserService.getDetailManagerAndTotalStaffInDepartment(
-                item
+                item,
+                false
               );
             }
           );
@@ -42,21 +44,69 @@ const runConsumer = async () => {
             departmentRequestResultPromises
           );
           try {
-            await runProducer("user-to-department", {
-              departmentRequestResults,
-            });
+            await runProducer(
+              departmentProducerTopic.informationDepartment,
+              departmentRequestResults
+            );
           } catch (err) {
             console.log(err);
           }
           break;
-        case departmentTopics.selectManagerToDepartment:
-          console.log(praseMessage);
-          console.log(await UserService.update(praseMessage));
+        case departmentTopicsContinuous.selectManagerToDepartment:
+          console.log(parsedMessage);
+          const { old_manager_id, id, data } = parsedMessage;
+          await UserService.update({
+            id: old_manager_id,
+            data: { department_id: null },
+          });
+          await UserService.update({ id, data });
+          break;
+        case departmentTopicsContinuous.getDetailDepartment:
+          console.log(parsedMessage);
+          await runProducer(
+            departmentProducerTopic.detailDepartment,
+            await UserService.getDetailManagerAndTotalStaffInDepartment(
+              parsedMessage,
+              true
+            )
+          );
           break;
         default:
           console.log("Topic không được xử lý:", topic);
       }
+
+      await heartbeat();
     },
   });
 };
-module.exports = { runConsumer };
+const runConsumerOnDemand = async () => {
+  const consumer = kafka.consumer({ groupId: "user-on-demand-group" });
+  await consumer.connect();
+  await consumer.subscribe({
+    topics: convertObjectToArray(userTopicsOnDemand),
+    fromBeginning: false,
+  });
+
+  return new Promise((resolve, reject) => {
+    consumer
+      .run({
+        eachMessage: async ({
+          topic,
+          partition,
+          message,
+          commitOffsetsIfNecessary,
+        }) => {
+          console.log(JSON.parse(message.value.toString()));
+          switch (topic) {
+            case "abc":
+              consumer.disconnect();
+              break;
+            default:
+              console.log("Topic không được xử lý:", topic);
+          }
+        },
+      })
+      .catch(reject);
+  });
+};
+module.exports = { continuousConsumer, runConsumerOnDemand };

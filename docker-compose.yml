@@ -25,8 +25,11 @@ services:
       - PORT=3056
       - EMAIL_PASS="ndnv btjq khen jugp"
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "3056:3056"
+    depends_on:
+      - kafka
     networks:
       - kafka-network
 
@@ -34,8 +37,12 @@ services:
     build: ./departmentservices
     image: datvudinhtrong/departmentservices
     container_name: departmentservices
+    environment:
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "3057:3057"
+    depends_on:
+      - kafka
     networks:
       - kafka-network
 
@@ -45,8 +52,11 @@ services:
     container_name: assignmentservices
     environment:
       - PORT=3058
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "3058:3058"
+    depends_on:
+      - kafka
     networks:
       - kafka-network
 
@@ -57,8 +67,11 @@ services:
     environment:
       - PORT=3059
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "3059:3059"
+    depends_on:
+      - kafka
     networks:
       - kafka-network
 
@@ -69,8 +82,11 @@ services:
     environment:
       - PORT=3060
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "3060:3060"
+    depends_on:
+      - kafka
     networks:
       - kafka-network
 
@@ -80,8 +96,11 @@ services:
     container_name: activityservices
     environment:
       - PORT=3061
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "3061:3061"
+    depends_on:
+      - kafka
     networks:
       - kafka-network
 
@@ -100,9 +119,16 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - "9200:9200"
     networks:
       - kafka-network
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
 
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -122,10 +148,13 @@ services:
     environment:
       ALLOW_PLAINTEXT_LISTENER: "yes"
       KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafkaMQ:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
     networks:
       - kafka-network
-
+    depends_on:
+      - zookeeper
 volumes:
   esdata:
     driver: local

@@ -6,6 +6,9 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 class UserPropertyService {
+  static findUserByUser_Id = async (user_id) => {
+    return await prisma.userProperty.findUnique({ where: { user_id } });
+  };
   static create = async ({ role_id, user_id, department_id }) => {
     const newUserProperty = await prisma.userProperty.create({
       data: {
