@@ -9,6 +9,7 @@ const { permissionsAuthentication } = require("../auth/checkAuth");
 const router = express.Router();
 
 router.use("/gateway/api/access", require("./access"));
+router.use("/users",require("./user"))
 const registerRouterServices = (basePath, routes, app) => {
   for (const route in routes) {
     const { target, authRequired, permissions } = routes[route];

@@ -1,5 +1,7 @@
+"use strict";   
+// const axios = require("axios");
 import axios from "axios";
-export default function requestApi(
+function requestApi(
   endpoint,
   method,
   body,
@@ -27,3 +29,4 @@ export default function requestApi(
     responseType: responseType,
   });
 }
+export default requestApi();

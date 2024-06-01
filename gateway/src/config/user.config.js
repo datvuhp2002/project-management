@@ -13,7 +13,7 @@ const userServicesRoutes = {
   },
   "/findByEmail": {
     topic: "find-by-email",
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/findByEmail`,
+    target:`${process.env.USER_SERVICES_REQUEST_URL}/findByEmail` ,
     authRequired: false,
     permissions: null,
   },
