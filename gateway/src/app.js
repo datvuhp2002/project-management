@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(router);
 registerRouterServices("/email", emailRoutes, app);
 registerRouterServices("/roles", roleRoutes, app);
-// registerRouterServices("/users", userServicesRoutes, app);
+registerRouterServices("/users", userServicesRoutes, app);
 registerRouterServices("/departments", departmentServicesRoutes, app);
 registerRouterServices("/assignments", assignmentServicesRoutes, app);
 registerRouterServices("/projects", projectServicesRoutes, app);
