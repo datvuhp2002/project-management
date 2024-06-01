@@ -14,7 +14,7 @@ const {
 
 const kafka = new Kafka({
   clientId: "user-services",
-  brokers: ["localhost:9092"],
+  brokers: [process.env.KAFKA_BROKER],
 });
 
 const continuousConsumer = async () => {
@@ -98,10 +98,10 @@ const continuousConsumer = async () => {
 const runConsumerOnDemand = async () => {
   const consumer = kafka.consumer({ groupId: "user-on-demand-group" });
   await consumer.connect();
-  await consumer.subscribe({
-    topics: convertObjectToArray(userTopicsOnDemand),
-    fromBeginning: false,
-  });
+  // await consumer.subscribe({
+  //   topics: convertObjectToArray(userTopicsOnDemand),
+  //   fromBeginning: false,
+  // });
 
   return new Promise((resolve, reject) => {
     consumer

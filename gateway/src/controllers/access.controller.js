@@ -9,10 +9,18 @@ class AccessController {
       data: await AccessService.login(req.body),
     }).send(res);
   };
+
   reportForDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Báo cáo thành công",
       data: await AccessService.reportForDepartment(req.params.id),
+    }).send(res);
+  };
+
+  reportForProject = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Báo cáo thành công",
+      data: await AccessService.reportForProject(req.params.id),
     }).send(res);
   };
 

@@ -1,120 +1,6 @@
 version: "3.8"
 
 services:
-  projectmanagerui:
-    build: ./projectmanagerui
-    image: datvudinhtrong/projectmanagerui
-    container_name: projectmanagerui
-    environment:
-      - PORT=3000
-  gateway:
-    build: ./gateway
-    image: datvudinhtrong/gateway
-    container_name: gateway
-    ports:
-      - "3050:3050"
-    depends_on:
-      - userservices
-      - projectservices
-      - assignmentservices
-      - activityservices
-      - departmentservices
-      - taskservices
-    networks:
-      - kafka-network
-  userservices:
-    build: ./userservices
-    image: datvudinhtrong/userservices
-    container_name: userservices
-    environment:
-      - PORT=3056
-      - EMAIL_PASS="ndnv btjq khen jugp"
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafka:9092
-      - DATABASE_URL=...
-    ports:
-      - "3056:3056"
-    depends_on:
-      - kafka
-    networks:
-      - kafka-network
-
-  departmentservices:
-    build: ./departmentservices
-    image: datvudinhtrong/departmentservices
-    container_name: departmentservices
-    environment:
-      - KAFKA_BROKER=kafka:9092
-      - DATABASE_URL=...
-    ports:
-      - "3057:3057"
-    depends_on:
-      - kafka
-    networks:
-      - kafka-network
-
-  assignmentservices:
-    build: ./assignmentservices
-    image: datvudinhtrong/assignmentservices
-    container_name: assignmentservices
-    environment:
-      - PORT=3058
-      - KAFKA_BROKER=kafka:9092
-      - DATABASE_URL=...
-    ports:
-      - "3058:3058"
-    depends_on:
-      - kafka
-    networks:
-      - kafka-network
-
-  projectservices:
-    build: ./projectservices
-    image: datvudinhtrong/projectservices
-    container_name: projectservices
-    environment:
-      - PORT=3059
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafka:9092
-      - DATABASE_URL=...
-    ports:
-      - "3059:3059"
-    depends_on:
-      - kafka
-    networks:
-      - kafka-network
-
-  taskservices:
-    build: ./taskservices
-    image: datvudinhtrong/taskservices
-    container_name: taskservices
-    environment:
-      - PORT=3060
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafka:9092
-      - DATABASE_URL=...
-    ports:
-      - "3060:3060"
-    depends_on:
-      - kafka
-    networks:
-      - kafka-network
-
-  activityservices:
-    build: ./activityservices
-    image: datvudinhtrong/activityservices
-    container_name: activityservices
-    environment:
-      - PORT=3061
-      - KAFKA_BROKER=kafka:9092
-      - DATABASE_URL=...
-    ports:
-      - "3061:3061"
-    depends_on:
-      - kafka
-    networks:
-      - kafka-network
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
     container_name: elasticsearch
@@ -123,6 +9,7 @@ services:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
       - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -133,13 +20,16 @@ services:
       - "9200:9200"
     networks:
       - kafka-network
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.10.0
     container_name: kibana
     ports:
-      - 5601:5601
+      - "5601:5601"
     depends_on:
       - elasticsearch
+    networks:
+      - kafka-network
 
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -150,7 +40,6 @@ services:
       ALLOW_ANONYMOUS_LOGIN: "yes"
     networks:
       - kafka-network
-
   kafka:
     image: bitnami/kafka:latest
     container_name: kafkaMQ
@@ -162,10 +51,174 @@ services:
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafkaMQ:9092"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
-    networks:
-      - kafka-network
     depends_on:
       - zookeeper
+    networks:
+      - kafka-network
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/gateway
+    container_name: gateway
+    ports:
+      - "3050:3050"
+    environment:
+      - PORT=3050
+      - REQUEST_URL=http://gateway:3050
+      - USER_SERVICES_REQUEST_URL=http://userservices:3056/services/api/user
+      - DEPARTMENT_SERVICES_REQUEST_URL=http://departmentservices:3057/services/api/department
+      - ASSIGNMENT_SERVICES_REQUEST_URL=http://assignmentservices:3058/services/api/assignment
+      - PROJECT_SERVICES_REQUEST_URL=http://projectservices:3059/services/api/project
+      - CLIENT_REQUEST_URL=http://projectservices:3059/services/api/project/client
+      - TASK_SERVICES_REQUEST_URL=http://taskservices:3060/services/api/task
+      - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+    depends_on:
+      - userservices
+      - projectservices
+      - assignmentservices
+      - activityservices
+      - departmentservices
+      - taskservices
+    networks:
+      - kafka-network
+
+  userservices:
+    build:
+      context: ./userservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/userservices
+    container_name: userservices
+    environment:
+      - PORT=3056
+      - EMAIL_PASS=ndnvbtjqkhenjugp
+      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/userService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+    ports:
+      - "3056:3056"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+
+  departmentservices:
+    build:
+      context: ./departmentservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/departmentservices
+    container_name: departmentservices
+    environment:
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/departmentService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+    ports:
+      - "3057:3057"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+
+  assignmentservices:
+    build:
+      context: ./assignmentservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/assignmentservices
+    container_name: assignmentservices
+    environment:
+      - PORT=3058
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/assignmentService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+    ports:
+      - "3058:3058"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+
+  projectservices:
+    build:
+      context: ./projectservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    image: datvudinhtrong/projectservices
+    container_name: projectservices
+    environment:
+      - PORT=3059
+      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+    ports:
+      - "3059:3059"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+
+  taskservices:
+    build:
+      context: ./taskservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/taskservices
+    container_name: taskservices
+    environment:
+      - PORT=3060
+      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/taskService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+    ports:
+      - "3060:3060"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+
+  activityservices:
+    build:
+      context: ./activityservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/activityservices
+    container_name: activityservices
+    environment:
+      - PORT=3061
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/activityService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+    ports:
+      - "3061:3061"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+
 volumes:
   esdata:
     driver: local

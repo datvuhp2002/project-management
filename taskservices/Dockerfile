@@ -15,7 +15,6 @@ RUN npm install
 COPY . .
 RUN npx prisma generate
 
-ENV CLOUDINARY_API_SECRET = Ec2Fdj1v2voufkhhkX-CkhOZnj8
 # Expose the port the app runs on
 EXPOSE 3060
 

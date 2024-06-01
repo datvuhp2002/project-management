@@ -7,18 +7,22 @@ const {
 } = require("../core/error.response");
 class TaskPropertyService {
   static create = async (data) => {
-    const newTaskProperty = await prisma.taskProperty.create({
-      data: { ...data },
-    });
-    if (newTaskProperty) {
-      return {
-        code: 201,
-      };
+    try {
+      const newTaskProperty = await prisma.taskProperty.create({
+        data,
+      });
+    } catch (err) {
+      console.log(err.message);
     }
-    return {
-      code: 200,
-      metadata: null,
-    };
+    // if (newTaskProperty) {
+    //   return {
+    //     code: 201,
+    //   };
+    // }
+    // return {
+    //   code: 200,
+    //   metadata: null,
+    // };
   };
   static update = async (data, Task_id) => {
     return await prisma.TaskProperty.update({

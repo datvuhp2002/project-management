@@ -43,7 +43,7 @@ const getAllProjectInDepartment = async (department_id) => {
       { responseType: "json" }
     );
     if (!response.data) {
-      throw new BadRequestError("Người dùng không tồn tại");
+      throw new BadRequestError("Dự án không tồn tại");
     }
     return response.data.data.data;
   } catch (error) {
@@ -99,7 +99,29 @@ const addTasksToProjects = async (projects) => {
     throw new BadRequestError("Failed to add tasks to projects");
   }
 };
-
+const addTasksToProject = async (project) => {
+  try {
+    console.log(project);
+    const tasks = await getAllTasksPropertyForProject(
+      project.ProjectProperty.project_property_id
+    );
+    const taskWithActivities = await addActivitiesToTasks(tasks);
+    return { ...project, tasks: taskWithActivities };
+  } catch (error) {
+    console.error("Error adding tasks to projects:", error);
+    throw new BadRequestError("Failed to add tasks to projects");
+  }
+};
+const detailProject = async (project_id) => {
+  try {
+    const projectInformation = await axios.get(
+      `${process.env.PROJECT_SERVICES_REQUEST_URL}/detail/${project_id}`
+    );
+    return projectInformation;
+  } catch (error) {
+    throw new BadRequestError("Failed to get project information");
+  }
+};
 const getUserByEmail = async (email) => {
   try {
     const response = await axios.get(
@@ -124,4 +146,6 @@ module.exports = {
   getAllProjectInDepartment,
   getAllTasksPropertyForProject,
   addTasksToProjects,
+  detailProject,
+  addTasksToProject,
 };

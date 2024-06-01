@@ -1,18 +1,15 @@
 "use strict";
 const { Kafka } = require("kafkajs");
 const { convertObjectToArray } = require("../utils/index");
-const {
-  userTopicsOnDemand,
-  userTopicsContinuous,
-} = require("../configs/kafkaUserTopic");
+const { userTopicsContinuous } = require("../configs/kafkaUserTopic");
 const DepartmentService = require("../services/department.service");
 const kafka = new Kafka({
   clientId: "department-services",
-  brokers: ["localhost:9092"],
+  brokers: [process.env.KAFKA_BROKER],
 });
+const consumer = kafka.consumer({ groupId: "department-continuous-group" });
 
 const continuousConsumer = async () => {
-  const consumer = kafka.consumer({ groupId: "department-continuous-group" });
   await consumer.connect();
   await consumer.subscribe({
     topics: convertObjectToArray(userTopicsContinuous),
@@ -37,25 +34,5 @@ const continuousConsumer = async () => {
     },
   });
 };
-const runConsumerOnDemand = async () => {
-  const consumer = kafka.consumer({ groupId: "department-on-demand-group" });
-  await consumer.connect();
-  await consumer.subscribe({
-    topics: convertObjectToArray(userTopicsOnDemand),
-    fromBeginning: false,
-  });
-  return new Promise((resolve, reject) => {
-    consumer
-      .run({
-        eachMessage: async ({ topic, partition, message }) => {
-          const parsedMessage = JSON.parse(message.value.toString());
-          console.log(parsedMessage);
-          resolve(parsedMessage);
-          consumer.disconnect();
-        },
-      })
-      .catch(reject);
-  });
-};
 
-module.exports = { runConsumerOnDemand, continuousConsumer };
+module.exports = { continuousConsumer };

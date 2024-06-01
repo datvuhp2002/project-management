@@ -5,7 +5,7 @@ const prisma = require("../prisma");
 const RoleService = require("./client.service");
 const ProjectPropertyService = require("./project.property.service");
 const cloudinary = require("../configs/cloudinary.config");
-const { runConsumerOnDemand } = require("../message_queue/consumer");
+const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
 const { runProducer } = require("../message_queue/producer");
 const {
   BadRequestError,
@@ -113,7 +113,7 @@ class ProjectService {
         nextPage,
         previousPage,
       },
-      true
+      false
     );
   };
 
@@ -321,6 +321,7 @@ class ProjectService {
         project_list_id
       );
       const projectDataReceived = await runConsumerOnDemand();
+      console.log("receive message:::", projectDataReceived);
       projects.map((item, index) => {
         item.information = projectDataReceived[index];
       });

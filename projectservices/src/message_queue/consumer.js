@@ -1,13 +1,11 @@
 const { Kafka } = require("kafkajs");
 const {
   assignmentTopicsContinuous,
-  assignmentTopicsOnDemand,
-  assignmentProducerTopic,
 } = require("../configs/kafkaAssignmentTopic");
 const { convertObjectToArray } = require("../utils");
 const kafka = new Kafka({
   clientId: "project-services",
-  brokers: ["localhost:9092"],
+  brokers: [process.env.KAFKA_BROKER],
 });
 
 const continuousConsumer = async () => {
@@ -33,29 +31,5 @@ const continuousConsumer = async () => {
     },
   });
 };
-const runConsumerOnDemand = async () => {
-  const consumer = kafka.consumer({ groupId: "projects-on-demand-group" });
 
-  await consumer.connect();
-  await consumer.subscribe({
-    topics: convertObjectToArray(assignmentTopicsOnDemand),
-    fromBeginning: false,
-  });
-
-  return new Promise((resolve, reject) => {
-    consumer
-      .run({
-        eachMessage: async ({ topic, partition, message }) => {
-          const parsedMessage = JSON.parse(message.value.toString());
-          consumer.commitOffsets([
-            { topic, partition, offset: message.offset },
-          ]);
-          resolve(parsedMessage);
-          consumer.disconnect();
-        },
-      })
-      .catch(reject);
-  });
-};
-
-module.exports = { continuousConsumer, runConsumerOnDemand };
+module.exports = { continuousConsumer };

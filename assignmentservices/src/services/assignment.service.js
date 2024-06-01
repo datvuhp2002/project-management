@@ -8,8 +8,13 @@ const {
 } = require("../core/error.response");
 const { ObjectId } = require("mongodb");
 const { getUserByUserPropertyIds } = require("../utils");
-const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
 const { runProducer } = require("../message_queue/producer");
+const {
+  runConsumerTaskOnDemand,
+} = require("../message_queue/consumer.task.demand");
+const {
+  runConsumerUserOnDemand,
+} = require("../message_queue/consumer.user.demand");
 const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
 const {
   userProducerTopic,
@@ -330,7 +335,7 @@ class AssignmentService {
         createdAt: "desc",
       },
     });
-
+    console.log(assignments);
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
@@ -338,28 +343,48 @@ class AssignmentService {
       const assignment_list_id = assignments.map((assignment) => ({
         task_property_id: assignment.task_property_id,
       }));
+
+      const user_list_id = assignments.map(
+        (assignment) => assignment.user_property_id
+      );
+
+      // Tạo các Promise cho các producers và consumers
       await runProducer(
         taskProducerTopic.getTaskInformation,
         assignment_list_id
       );
-      const taskInformationData = await runConsumerOnDemand();
-      console.log("received Data:::", taskInformationData);
-      assignments.map((item, index) => {
-        item.task_information = taskInformationData[index];
-      });
+      await runProducer(userProducerTopic.getUserInformation, user_list_id);
+      const taskInformationData = await runConsumerTaskOnDemand();
+      const userInformationData = await runConsumerUserOnDemand();
 
-      if (taskInformationData) {
-        const user_list_id = assignments.map(
-          (assignment) => assignment.user_property_id
-        );
-        await runProducer(userProducerTopic.getUserInformation, user_list_id);
-        const userInformationData = await runConsumerOnDemand();
-        console.log(userInformationData);
-        assignments.map((item, index) => {
+      console.log("received Task Data:::", taskInformationData);
+      console.log("received User Data:::", userInformationData);
+
+      if (Array.isArray(taskInformationData)) {
+        assignments.forEach((item, index) => {
+          item.task_information = taskInformationData[index];
+        });
+      } else {
+        console.error("Error: Invalid task data received.");
+      }
+
+      if (Array.isArray(userInformationData)) {
+        assignments.forEach((item, index) => {
           item.user_information = userInformationData[index];
         });
+      } else {
+        console.error("Error: Invalid user data received.");
       }
+      return {
+        assignments: assignments,
+        total,
+        nextPage: nextPageNumber,
+        previousPage: previousPageNumber,
+        currentPage,
+        itemsPerPage,
+      };
     }
+
     return {
       assignments: assignments,
       total,

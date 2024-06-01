@@ -7,7 +7,7 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const { runProducer } = require("../message_queue/producer");
-const { runConsumerOnDemand } = require("../message_queue/consumer");
+const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
 const { userProducerTopic } = require("../configs/kafkaUserTopic");
 class DepartmentService {
   static select = {

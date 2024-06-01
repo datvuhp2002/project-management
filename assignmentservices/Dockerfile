@@ -15,7 +15,6 @@ RUN npm install
 # Copy the rest of the application to the working directory
 COPY . .
 RUN npx prisma generate
-ENV REQUEST_URL = "http://localhost:3050"
 # Expose the port the app runs on
 EXPOSE 3058
 
