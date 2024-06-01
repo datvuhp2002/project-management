@@ -20,5 +20,9 @@ router.get(
   "/reportForDepartment/:id",
   asyncHandler(accessController.reportForDepartment)
 );
+router.get(
+  "/reportForProject/:id",
+  asyncHandler(accessController.reportForProject)
+);
 
 module.exports = router;

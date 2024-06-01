@@ -9,7 +9,7 @@ const { convertObjectToArray } = require("../utils");
 
 const kafka = new Kafka({
   clientId: "assignment-services",
-  brokers: ["localhost:9092"],
+  brokers: [process.env.KAFKA_BROKER],
 });
 
 const continuousConsumer = async () => {
@@ -22,6 +22,7 @@ const continuousConsumer = async () => {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const parsedMessage = JSON.parse(message.value.toString());
+      console.log("Before handle:::", parsedMessage);
       switch (topic) {
         case projectTopicsContinuous.getProjectInformationFromAssignment:
           const projectRequestResultPromises = await parsedMessage.map(

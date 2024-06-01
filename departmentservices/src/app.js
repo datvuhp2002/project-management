@@ -4,8 +4,8 @@ const compression = require("compression");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
-const { stack } = require("./routes");
 const { continuousConsumer } = require("./message_queue/consumer");
+const { runConsumerOnDemand } = require("./message_queue/consumer.demand");
 const app = express();
 
 // init middleware
@@ -31,5 +31,15 @@ app.use((err, req, res, next) => {
   });
 });
 continuousConsumer().catch(console.error);
+(async () => {
+  try {
+    console.log("Starting consumer...");
+    await runConsumerOnDemand();
+    console.log("Consumer started successfully.");
+  } catch (error) {
+    console.error("Error starting consumer:", error);
+    process.exit(1); // Thoát ứng dụng với mã lỗi nếu không thể khởi động consumer
+  }
+})();
 
 module.exports = app;

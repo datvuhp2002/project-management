@@ -6,6 +6,8 @@ const {
   getUserByEmail,
   getAllProjectInDepartment,
   addTasksToProjects,
+  detailProject,
+  addTasksToProject,
   addTasksAndActivitiesToProjects,
 } = require("../utils");
 const {
@@ -26,6 +28,11 @@ class AccessService {
   static reportForDepartment = async (department_id) => {
     const listProject = await getAllProjectInDepartment(department_id);
     const listProjectWithTask = await addTasksToProjects(listProject);
+    return listProjectWithTask;
+  };
+  static reportForProject = async (project_id) => {
+    const listProject = await detailProject(project_id);
+    const listProjectWithTask = await addTasksToProject(listProject.data.data);
     return listProjectWithTask;
   };
 

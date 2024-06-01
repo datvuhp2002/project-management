@@ -1,7 +1,5 @@
 "use strict";
-const assignmentTopicsOnDemand = {
-  receivedTaskInformation: "received-task-information",
-};
+const assignmentTopicsOnDemand = {};
 module.exports = {
   assignmentTopicsOnDemand,
 };

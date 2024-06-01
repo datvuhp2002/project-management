@@ -27,19 +27,24 @@ class TaskService {
   static create = async (data, createdBy) => {
     const newTask = await prisma.task.create({
       data: { ...data, createdBy },
-      select: this.select,
     });
     if (newTask) {
-      const newTaskProperty = await TaskPropertyService.create({
-        task_id: newTask.task_id,
+      console.log(newTask.task_id);
+      const newTaskProperty = await prisma.taskProperty.create({
+        data: {
+          task_id: newTask.task_id,
+        },
       });
       if (newTaskProperty) {
-        return true;
+        return {
+          task: newTask,
+          task_property: newTaskProperty,
+        };
       }
+    } else {
       await prisma.task.delete({ where: { task_id: newTask.task_id } });
       return false;
     }
-    return newTask;
   };
   // get All tasks by task property
   static getAllTaskByTaskProperty = async (
