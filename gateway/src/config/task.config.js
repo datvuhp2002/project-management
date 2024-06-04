@@ -1,9 +1,16 @@
 "use strict";
+const customConsoleHandler = (req, res) => {
+  const responseData = req.processedData;
+  console.log('Data from server:', responseData);
+  responseData.gateway_message = "Đây là dữ liệu từ gateway"
+  res.send(responseData);
+};
 const taskServicesRoutes = {
-  "/admin/getAll": {
+  "/admin/get-all": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
+    customHandler: customConsoleHandler
   },
   "/admin/trash": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/trash`,
@@ -35,30 +42,31 @@ const taskServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/uploadFileFromLocal": {
+  "/upload-file-from-local": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/uploadFileFromLocal`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/getFileImage": {
+  "/get-file-image": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getFileImage`,
     authRequired: true,
     permissions: null,
   },
-  "/getFile": {
+  "/get-file": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getFile`,
     authRequired: true,
     permissions: null,
   },
-  "/deleteFile": {
+  "/delete-file": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/deleteFile`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/getAllTaskByTaskProperty": {
+  "/get-all-task-by-task-property": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskByTaskProperty`,
     authRequired: true,
     permissions: null,
+    customHandler: customConsoleHandler
   },
 };
 module.exports = taskServicesRoutes;

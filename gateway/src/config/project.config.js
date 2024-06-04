@@ -1,9 +1,16 @@
 "use strict";
+const customConsoleHandler = (req, res) => {
+  const responseData = req.processedData;
+  console.log('Data from server:', responseData);
+  responseData.gateway_message = "Đây là dữ liệu từ gateway"
+  res.send(responseData);
+};
 const projectServicesRoutes = {
-  "/admin/getAll": {
+  "/admin/get-all": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
+    customHandler: customConsoleHandler
   },
   "/admin/trash": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/trash`,
@@ -20,10 +27,11 @@ const projectServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/getAllProjectInDepartment": {
+  "/get-all-project-in-department": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllProjectInDepartment`,
     authRequired: true,
     permissions: null,
+    customHandler: customConsoleHandler
   },
   "/create": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/create`,
@@ -39,24 +47,24 @@ const projectServicesRoutes = {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/detail`,
     authRequired: true,
     permissions: null,
+    customHandler: customConsoleHandler
   },
-
-  "/uploadFileFromLocal": {
+  "/upload-file-from-local": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/uploadFileFromLocal`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/getFileImage": {
+  "/get-file-image": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getFileImage`,
     authRequired: true,
     permissions: null,
   },
-  "/getFile": {
+  "/get-file": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getFile`,
     authRequired: true,
     permissions: null,
   },
-  "/deleteFile": {
+  "/delete-file": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/deleteFile`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],

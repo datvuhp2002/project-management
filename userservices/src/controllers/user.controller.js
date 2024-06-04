@@ -21,6 +21,7 @@ class UserController {
     }).send(res);
   };
   create = async (req, res, next) => {
+    console.log("user servicess:::",req.headers.user)
     new CREATED({
       message: "Tạo nhân viên mới thành công",
       data: await UserService.create(req.body, req.headers.user),

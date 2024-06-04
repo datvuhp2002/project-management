@@ -1,9 +1,16 @@
 "use strict";
+const customConsoleHandler = (req, res) => {
+  const responseData = req.processedData;
+  console.log('Data from server:', responseData);
+  responseData.gateway_message = "Đây là dữ liệu từ gateway"
+  res.send(responseData);
+};
 const departmentServicesRoutes = {
-  "/admin/getAll": {
+  "/admin/get-all": {
     target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
+    customHandler: customConsoleHandler
   },
   "/admin/trash": {
     target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/admin/trash`,
