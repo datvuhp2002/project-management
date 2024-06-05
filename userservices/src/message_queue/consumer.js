@@ -61,12 +61,17 @@ const continuousConsumer = async () => {
           }
           break;
         case departmentTopicsContinuous.selectManagerToDepartment:
-          console.log(parsedMessage);
+          console.log(
+            `${departmentTopicsContinuous.selectManagerToDepartment}`,
+            parsedMessage
+          );
           const { old_manager_id, id, data } = parsedMessage;
-          await UserService.update({
-            id: old_manager_id,
-            data: { department_id: null },
-          });
+          if (old_manager_id !== null) {
+            await UserService.update({
+              id: old_manager_id,
+              data: { department_id: null },
+            });
+          }
           await UserService.update({ id, data });
           break;
         case assignmentTopicsContinuous.getUserInformation:
@@ -87,6 +92,17 @@ const continuousConsumer = async () => {
           } catch (err) {
             console.log(err.message);
           }
+          break;
+        case departmentTopicsContinuous.addStaffIntoDepartment:
+          console.log(
+            `${departmentTopicsContinuous.addStaffIntoDepartment}`,
+            parsedMessage
+          );
+          const { list_user_ids, department_id } = parsedMessage;
+          await UserService.addUserIntoDepartment(
+            { list_user_ids },
+            department_id
+          );
           break;
         default:
           console.log("Topic không được xử lý:", topic);

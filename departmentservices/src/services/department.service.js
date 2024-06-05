@@ -19,16 +19,47 @@ class DepartmentService {
     manager_id: true,
   };
   // create new department
-  static create = async ({ name, description }, createdBy) => {
+  static create = async (
+    { name, description, manager_id, list_user_ids },
+    createdBy
+  ) => {
     const department = await prisma.department.create({
-      data: { name, description, createdBy },
+      data: { name, description, createdBy, manager_id },
       select: this.select,
     });
-    if (department) return department;
-    return {
-      code: 200,
-      metadata: null,
-    };
+    if (department) {
+      if (manager_id) {
+        await runProducer(userProducerTopic.selectManagerToDepartment, {
+          old_manager_id: null,
+          id: manager_id,
+          data: { department_id: department.department_id },
+        });
+        const department_for_delete_old_manager_id =
+          await prisma.department.findFirst({
+            where: { manager_id },
+          });
+        console.log(department_for_delete_old_manager_id);
+        if (department_for_delete_old_manager_id) {
+          await prisma.department.update({
+            where: {
+              department_id: department_for_delete_old_manager_id.department_id,
+            },
+            data: {
+              manager_id: null,
+            },
+          });
+        }
+      }
+      if (list_user_ids) {
+        console.log(list_user_ids);
+        await runProducer(userProducerTopic.addStaffIntoDepartment, {
+          list_user_ids: list_user_ids,
+          department_id: department.department_id,
+        });
+      }
+      return department;
+    }
+    throw new BadRequestError("Tạo phòng ban không thành công");
   };
   // get all department instances
   static getAll = async ({
@@ -108,23 +139,37 @@ class DepartmentService {
     const department = await prisma.department.findUnique({
       where: { department_id: id },
     });
-    const updateDepartment = await prisma.department.update({
+    if (!department) {
+      throw new Error("Department not found");
+    }
+    // Nếu `manager_id` được cập nhật
+    if (data.manager_id) {
+      // Gọi producer để cập nhật manager
+      await runProducer(userProducerTopic.selectManagerToDepartment, {
+        old_manager_id: department.manager_id,
+        id: data.manager_id,
+        data: { department_id: id },
+      });
+      const department_data_old = await prisma.department.findFirst({
+        where: { manager_id: data.manager_id },
+      });
+      if (department_data_old) {
+        await prisma.department.update({
+          where: { department_id: department_data_old.department_id },
+          data: { manager_id: null },
+        });
+      }
+    }
+    return await prisma.department.update({
       where: { department_id: id },
       data: { ...data, modifiedBy: userId },
       select: this.select,
     });
-    if (updateDepartment) {
-      if (data.manager_id) {
-        await runProducer(userProducerTopic.selectManagerToDepartment, {
-          old_manager_id: department.manager_id,
-          id: data.manager_id,
-          data: { department_id: id },
-        });
-      }
-      return true;
-    }
-    return false;
+
+    // Trả về true nếu cập nhật thành công, false nếu không
+    return !!result;
   };
+
   static deleteManagerId = async (department_id) => {
     console.log("Department_id:::", department_id);
     const deleteManagerId = await prisma.department.update({

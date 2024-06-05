@@ -41,8 +41,10 @@ class UserService {
   };
   // create new user
   static create = async (dataUser, createdBy) => {
-    const { username, email, password, role_id, department_id, anotherField } =
+    const { username, email, password, role, department_id, anotherField } =
       dataUser;
+    if (!role) throw new BadRequestError("Role is not defined");
+    const role_data = await RoleService.findByName(role);
     // check Email exists
     const holderUser = await prisma.user.findFirst({ where: { email } });
     if (holderUser) {
@@ -62,14 +64,12 @@ class UserService {
     });
     if (newUser) {
       const userProperty = await UserPropertyService.create({
-        role_id,
+        role_id: role_data.role_id,
         user_id: newUser.user_id,
         department_id,
       });
       if (userProperty) {
-        return {
-          code: 201,
-        };
+        return newUser;
       } else {
         await this.prisma.user.delete({ where: { user_id: newUser.user_id } });
         return false;
@@ -423,10 +423,11 @@ class UserService {
       }
     }
     const { department_id, role_id, ...updateUserData } = data;
-    if (department_id) {
+    if (department_id !== undefined) {
+      console.log("before update user with id:::", id);
       await UserPropertyService.update(id, { department_id });
     }
-    if (role_id) {
+    if (role_id !== undefined) {
       await UserPropertyService.update(id, { role_id });
     }
     const updateUser = await prisma.user.update({

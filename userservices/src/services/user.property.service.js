@@ -45,6 +45,8 @@ class UserPropertyService {
     return users_id;
   };
   static update = async (user_id, data) => {
+    console.log("after update user with id", user_id);
+    if (!user_id) throw new BadRequestError("user_id is required");
     const updateUserProperty = await prisma.userProperty.update({
       where: { user_id },
       data,
