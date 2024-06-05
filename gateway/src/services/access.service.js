@@ -1,5 +1,4 @@
 "use strict";
-
 const bcrypt = require("bcrypt");
 const crypto = require("node:crypto");
 const { generateAccessToken, createTokenPair } = require("../auth/authUtils");
@@ -75,6 +74,8 @@ class AccessService {
       accessToken: token.accessToken,
     };
   };
+
+
 }
 
 module.exports = AccessService;

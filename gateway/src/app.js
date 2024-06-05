@@ -1,8 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const compression = require("compression");
-
-const axios = require("axios");
+const requestApi = require("./utils/requestData")
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
@@ -39,11 +38,6 @@ registerRouterServices("/projects", projectServicesRoutes, app);
 registerRouterServices("/clients", clientRoutes, app);
 registerRouterServices("/tasks", taskServicesRoutes, app);
 registerRouterServices("/activities", activityServicesRoutes, app);
-// const topics = Object.values(userServicesRoutes).map(
-//   (route) => `gateway-${route.topic}`
-// );
-// consumeMessages(topics).catch(console.error);
-// handle errors
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   return res.status(status).json({
