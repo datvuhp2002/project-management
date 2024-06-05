@@ -1,8 +1,8 @@
 "use strict";
 const customConsoleHandler = (req, res) => {
   const responseData = req.processedData;
-  console.log('Data from server:', responseData);
-  responseData.gateway_message = "Đây là dữ liệu từ gateway"
+  console.log("Data from server:", responseData);
+  responseData.gateway_message = "Đây là dữ liệu từ gateway";
   res.send(responseData);
 };
 const projectServicesRoutes = {
@@ -10,7 +10,6 @@ const projectServicesRoutes = {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
-    customHandler: customConsoleHandler
   },
   "/admin/trash": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/trash`,
@@ -31,7 +30,6 @@ const projectServicesRoutes = {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllProjectInDepartment`,
     authRequired: true,
     permissions: null,
-    customHandler: customConsoleHandler
   },
   "/create": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/create`,
@@ -47,7 +45,6 @@ const projectServicesRoutes = {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/detail`,
     authRequired: true,
     permissions: null,
-    customHandler: customConsoleHandler
   },
   "/upload-file-from-local": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/uploadFileFromLocal`,

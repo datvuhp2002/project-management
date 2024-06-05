@@ -1,8 +1,8 @@
 "use strict";
 const customConsoleHandler = (req, res) => {
   const responseData = req.processedData;
-  console.log('Data from server:', responseData);
-  responseData.gateway_message = "Đây là dữ liệu từ gateway"
+  console.log("Data from server:", responseData);
+  responseData.gateway_message = "Đây là dữ liệu từ gateway";
   res.send(responseData);
 };
 
@@ -11,7 +11,6 @@ const assignmentServicesRoutes = {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
-    customHandler: customConsoleHandler
   },
   "/admin/trash": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/trash`,
@@ -22,38 +21,31 @@ const assignmentServicesRoutes = {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/restore`,
     authRequired: true,
     permissions: ["ADMIN"],
-    customHandler: customConsoleHandler
   },
   "/get-all-user-property-from-project": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllUserPropertyFromProject`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
-    customHandler: customConsoleHandler 
-    
   },
   "/get-all-assignment-for-user": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignmentForUser`,
     authRequired: true,
     permissions: null,
-    customHandler: customConsoleHandler
   },
   "/get-all-assignment-for-project": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignmentForProject`,
     authRequired: true,
     permissions: null,
-    customHandler: customConsoleHandler
   },
   "/get-all-assignment-for-task": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignmentForTask`,
     authRequired: true,
     permissions: null,
-    customHandler: customConsoleHandler
   },
   "/get-all-task-property-from-project": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllTaskPropertyFromProject`,
     authRequired: true,
     permissions: null,
-    customHandler: customConsoleHandler
   },
   "/remove-staff-from-project": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/removeStaffFromProject`,
