@@ -1,9 +1,16 @@
 "use strict";
+const customConsoleHandler = (req, res) => {
+  const responseData = req.processedData;
+  console.log('Data from server:', responseData);
+  responseData.gateway_message = "Đây là dữ liệu từ gateway"
+  res.send(responseData);
+};
 const clientRoutes = {
-  "/admin/getAll": {
+  "/admin/get-all": {
     target: `${process.env.CLIENT_REQUEST_URL}/admin/getAll`,
     authRequired: true,
     permissions: ["ADMIN"],
+    customHandler: customConsoleHandler
   },
   "/admin/trash": {
     target: `${process.env.CLIENT_REQUEST_URL}/admin/trash`,
@@ -20,10 +27,11 @@ const clientRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/getAllClientFromProject": {
+  "/get-all-clientfrom-project": {
     target: `${process.env.CLIENT_REQUEST_URL}/getAllClientFromProject`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
+    customHandler: customConsoleHandler
   },
   "/detail": {
     target: `${process.env.CLIENT_REQUEST_URL}/detail`,
@@ -46,12 +54,12 @@ const clientRoutes = {
     permissions: ["ADMIN", "MANAGER"],
   },
 
-  "/uploadAvatarFromLocal": {
+  "/upload-avatar-from-local": {
     target: `${process.env.CLIENT_REQUEST_URL}/uploadAvatarFromLocal`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/getAvatar": {
+  "/get-avatar": {
     target: `${process.env.CLIENT_REQUEST_URL}/getAvatar`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],

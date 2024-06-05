@@ -1,5 +1,4 @@
 "use strict";
-
 const AccessService = require("../services/access.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response");
 class AccessController {
