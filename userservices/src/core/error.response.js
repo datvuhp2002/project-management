@@ -1,10 +1,10 @@
 "use strict";
 const httpStatusCode = require("../utils/httpStatusCode");
-
 class ErrorResponse extends Error {
   constructor(message, status) {
     super(message);
     this.status = status;
+    this.now = Date.now();
   }
 }
 

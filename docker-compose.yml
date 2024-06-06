@@ -40,6 +40,7 @@ services:
       ALLOW_ANONYMOUS_LOGIN: "yes"
     networks:
       - kafka-network
+
   kafka:
     image: bitnami/kafka:latest
     container_name: kafkaMQ
@@ -55,6 +56,7 @@ services:
       - zookeeper
     networks:
       - kafka-network
+
   gateway:
     build:
       context: ./gateway
@@ -77,6 +79,12 @@ services:
       - TASK_SERVICES_REQUEST_URL=http://taskservices:3060/services/api/task
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     depends_on:
       - userservices
       - projectservices
@@ -84,6 +92,7 @@ services:
       - activityservices
       - departmentservices
       - taskservices
+      - elasticsearch
     networks:
       - kafka-network
 
@@ -103,10 +112,18 @@ services:
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/userService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     ports:
       - "3056:3056"
     depends_on:
       - kafka
+      - elasticsearch
     networks:
       - kafka-network
 
@@ -123,10 +140,18 @@ services:
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/departmentService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     ports:
       - "3057:3057"
     depends_on:
       - kafka
+      - elasticsearch
     networks:
       - kafka-network
 
@@ -144,11 +169,18 @@ services:
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/assignmentService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     ports:
       - "3058:3058"
     depends_on:
       - kafka
+      - elasticsearch
     networks:
       - kafka-network
 
@@ -166,11 +198,18 @@ services:
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     ports:
       - "3059:3059"
     depends_on:
       - kafka
+      - elasticsearch
     networks:
       - kafka-network
 
@@ -189,11 +228,18 @@ services:
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/taskService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     ports:
       - "3060:3060"
     depends_on:
       - kafka
+      - elasticsearch
     networks:
       - kafka-network
 
@@ -211,14 +257,32 @@ services:
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/activityService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
-
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
     ports:
       - "3061:3061"
     depends_on:
       - kafka
+      - elasticsearch
     networks:
       - kafka-network
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.10.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - kafka-network
 volumes:
   esdata:
     driver: local

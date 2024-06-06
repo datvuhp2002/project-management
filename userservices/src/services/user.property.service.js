@@ -18,14 +18,9 @@ class UserPropertyService {
       },
     });
     if (newUserProperty) {
-      return {
-        code: 201,
-      };
+      return newUserProperty;
     }
-    return {
-      code: 200,
-      metadata: null,
-    };
+    return false;
   };
   static getAll = async () => {
     return await prisma.user.findMany({

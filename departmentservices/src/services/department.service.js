@@ -181,7 +181,12 @@ class DepartmentService {
   };
   // delete department
   static delete = async (department_id) => {
-    return await prisma.department.update({
+    const get_department = await prisma.department.findUnique({
+      where: {
+        department_id,
+      },
+    });
+    const delete_department = await prisma.department.update({
       where: { department_id },
       data: {
         deletedMark: true,
@@ -189,16 +194,38 @@ class DepartmentService {
       },
       select: this.select,
     });
+    if (!delete_department) {
+      await this.restore(department_id);
+      throw new BadRequestError("Xóa phòng ban không thành công");
+    } else {
+      if (get_department.manager_id) {
+        await runProducer(userProducerTopic.selectManagerToDepartment, {
+          old_manager_id: get_department.manager_id,
+          id: null,
+          data: null,
+        });
+      }
+      await runProducer(userProducerTopic.removeStaffOutOfDepartment, {
+        department_id: get_department.department_id,
+      });
+      return true;
+    }
+    throw new BadRequestError("Xoá phòng ban không thành công");
   };
   // restore department
   static restore = async (department_id) => {
-    return await prisma.department.update({
+    const restoreDepartment = await prisma.department.update({
       where: { department_id },
       data: {
         deletedMark: false,
       },
       select: this.select,
     });
+    if (!restoreDepartment) {
+      await this.delete(department_id);
+      throw new BadRequestError("Khôi phục phòng ban không thành công");
+    }
+    return true;
   };
   static queryDepartment = async (
     { query, items_per_page, page, search, nextPage, previousPage },

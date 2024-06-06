@@ -1,0 +1,35 @@
+filebeat.inputs:
+  - type: container
+    paths:
+      - /var/lib/docker/containers/*/*-json.log
+    processors:
+      - decode_json_fields:
+          fields: ["message"]
+          target: ""
+          overwrite_keys: true
+      - drop_event:
+          when:
+            not:
+              and:
+                - contains:
+                    message: "@timestamp"
+                - contains:
+                    message: "context"
+                - contains:
+                    message: "log.level"
+                - contains:
+                    message: "message"
+                - contains:
+                    message: "requestId"
+                - contains:
+                    message: "timestamp"
+filebeat.config:
+  prospectors:
+    path: /usr/share/filebeat/filebeat.yml
+  user: root
+  group: root
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: "elastic"
+  password: "lachongtechintern2024"

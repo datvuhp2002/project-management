@@ -5,6 +5,11 @@ const customConsoleHandler = (req, res) => {
   res.send(responseData);
 };
 const userServicesRoutes = {
+  "/admin/get-all": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAll`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
   "/forget-password": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/forget-password`,
     authRequired: false,
@@ -35,11 +40,7 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/admin/get-all": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAll`,
-    authRequired: true,
-    permissions: ["ADMIN"],
-  },
+
   "/admin/trash": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,

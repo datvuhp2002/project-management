@@ -125,7 +125,7 @@ const detailProject = async (project_id) => {
 const getUserByEmail = async (email) => {
   try {
     const response = await axios.get(
-      `${process.env.REQUEST_URL}/users/findByEmail/${email}`,
+      `${process.env.REQUEST_URL}/users/find-by-email/${email}`,
       { responseType: "json" }
     );
     if (!response.data) {
