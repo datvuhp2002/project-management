@@ -1,0 +1,2 @@
+2024-06-05 06:49:704 PM:-:info:-:/gateway/api/access/login:-:57b42137-5afb-4dc6-af20-0a3a7742da19:-:input params:-:POST:-::-:{"email":"admin@gmail.com","password":"zxczxc123"}
+2024-06-05 06:49:715 PM:-:info:-:/users/find-by-email/admin@gmail.com:-:2511abb4-f20f-4542-b2d6-aac952e5f33c:-:input params:-:GET:-::-:{}

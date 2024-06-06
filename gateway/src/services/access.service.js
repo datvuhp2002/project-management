@@ -37,7 +37,6 @@ class AccessService {
   };
 
   static login = async ({ email, password }) => {
-    // await sendMessage("find-by-email", { email, password });
     const userData = await getUserByEmail(email);
     const match = await bcrypt.compare(password, userData.user.password);
     if (!match) {
@@ -74,8 +73,6 @@ class AccessService {
       accessToken: token.accessToken,
     };
   };
-
-
 }
 
 module.exports = AccessService;

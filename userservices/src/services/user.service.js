@@ -40,17 +40,19 @@ class UserService {
     },
   };
   // create new user
-  static create = async (dataUser, createdBy) => {
-    const { username, email, password, role, department_id, anotherField } =
-      dataUser;
+  static create = async (
+    { username, email, password, role, department_id, ...rest },
+    createdBy
+  ) => {
     if (!role) throw new BadRequestError("Role is not defined");
     const role_data = await RoleService.findByName(role);
-    // check Email exists
+    if (!email) {
+      throw new BadRequestError("Error: Email is not defined");
+    }
     const holderUser = await prisma.user.findFirst({ where: { email } });
     if (holderUser) {
       throw new BadRequestError("Error: User Already registered");
     }
-    // Tìm role id
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = await prisma.user.create({
       data: {
@@ -58,10 +60,11 @@ class UserService {
         email,
         password: passwordHash,
         createdBy,
-        ...anotherField,
+        ...rest,
       },
       select: this.select,
     });
+
     if (newUser) {
       const userProperty = await UserPropertyService.create({
         role_id: role_data.role_id,
@@ -69,14 +72,15 @@ class UserService {
         department_id,
       });
       if (userProperty) {
-        return newUser;
+        return { user: newUser, user_property: userProperty };
       } else {
-        await this.prisma.user.delete({ where: { user_id: newUser.user_id } });
-        return false;
+        await prisma.user.delete({ where: { user_id: newUser.user_id } });
+        throw new BadRequestError("Đã sảy ra lỗi, vui lòng thử lại");
       }
     }
     return newUser;
   };
+
   static forgetPassword = async ({ email = null, captcha = null }) => {
     const holderUser = await prisma.user.findFirst({ where: { email } });
     if (!holderUser) {
@@ -154,6 +158,18 @@ class UserService {
       where: {
         department_id,
         OR: list_user_ids.map((user_id) => ({ user_id: user_id })),
+      },
+      data: {
+        department_id: null,
+      },
+    });
+  };
+  static removeStaffFromDepartmentHasBeenDeleted = async ({
+    department_id,
+  }) => {
+    return await prisma.userProperty.updateMany({
+      where: {
+        department_id,
       },
       data: {
         department_id: null,

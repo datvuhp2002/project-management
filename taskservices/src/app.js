@@ -6,6 +6,9 @@ const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
 const { runConsumerOnDemand } = require("./message_queue/consumer.demand");
+const { v4: uuidv4 } = require("uuid");
+const TaskLogger = require("./loggers/task.log");
+const initElasticsearch = require("./dbs/init.elasticsearch");
 
 const app = express();
 
@@ -16,6 +19,20 @@ app.use(compression());
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const requestId = req.headers.user;
+  req.requestId = requestId ? requestId : uuidv4();
+  TaskLogger.log(`input params:-:${req.method}:-:`, [
+    req.path,
+    { requestId: req.requestId },
+    req.method === "POST" ? req.body : req.query,
+  ]);
+  next();
+});
+// init elasticsearch
+initElasticsearch.init({
+  ELASTICSEARCH_IS_ENABLED: true,
+});
 // init db
 require(`./dbs/init.dbs`);
 // init routes
@@ -23,6 +40,18 @@ app.use("", require("./routes"));
 // handle errors
 app.use((err, req, res, next) => {
   const status = err.status || 500;
+  const resMessage = `${err.status}:-:${
+    Date.now() - err.now
+  }ms:-:Response:${JSON.stringify(err)}`;
+  TaskLogger.error(resMessage, [
+    req.path,
+    {
+      requestId: req.requestId,
+    },
+    {
+      message: err.message,
+    },
+  ]);
   return res.status(status).json({
     status: "Error",
     code: status,
@@ -38,7 +67,7 @@ continuousConsumer().catch(console.error);
     console.log("Consumer started successfully.");
   } catch (error) {
     console.error("Error starting consumer:", error);
-    process.exit(1); // Thoát ứng dụng với mã lỗi nếu không thể khởi động consumer
+    process.exit(1);
   }
 })();
 module.exports = app;

@@ -72,7 +72,9 @@ const continuousConsumer = async () => {
               data: { department_id: null },
             });
           }
-          await UserService.update({ id, data });
+          if (id !== null) {
+            await UserService.update({ id, data });
+          }
           break;
         case assignmentTopicsContinuous.getUserInformation:
           console.log(parsedMessage);
@@ -102,6 +104,11 @@ const continuousConsumer = async () => {
           await UserService.addUserIntoDepartment(
             { list_user_ids },
             department_id
+          );
+          break;
+        case departmentTopicsContinuous.removeStaffOutOfDepartment:
+          await UserService.removeStaffFromDepartmentHasBeenDeleted(
+            parsedMessage
           );
           break;
         default:

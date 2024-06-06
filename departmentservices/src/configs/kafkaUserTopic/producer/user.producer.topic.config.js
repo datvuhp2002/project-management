@@ -5,6 +5,7 @@ const userProducerTopic = {
   getDetailDepartment: "get-detail-department",
   selectManagerToDepartment: "select-manager-to-department",
   addStaffIntoDepartment: "add-staff-into-department",
+  removeStaffOutOfDepartment: "remove-staff-out-of-department",
 };
 
 module.exports = { userProducerTopic };

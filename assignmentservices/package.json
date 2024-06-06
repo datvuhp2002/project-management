@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/ecs-winston-format": "^1.5.3",
+    "@elastic/elasticsearch": "^7.10.0",
     "@prisma/client": "^5.14.0",
     "@prisma/extension-read-replicas": "^0.3.0",
     "cors": "^2.8.5",
@@ -22,7 +24,10 @@
     "kafkajs": "^2.2.4",
     "lodash": "^4.17.21",
     "mongodb": "^6.5.0",
-    "mongoose": "^8.2.4"
+    "mongoose": "^8.2.4",
+    "uuid": "^9.0.1",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "compression": "^1.7.4",
