@@ -7,7 +7,10 @@ const cors = require("cors");
 const ActivityLogger = require("./loggers/activity.log");
 const { v4: uuidv4 } = require("uuid");
 const initElasticsearch = require("./dbs/init.elasticsearch");
-
+const {
+  runUserConsumerOnDemand,
+} = require("./message_queue/consumer.user.demand");
+const { continuousConsumer } = require("./message_queue/consumer");
 const app = express();
 
 // init middleware
@@ -57,4 +60,15 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
+continuousConsumer().catch(console.error());
+(async () => {
+  try {
+    console.log("Starting consumer...");
+    await runUserConsumerOnDemand();
+    console.log("Consumer started successfully.");
+  } catch (error) {
+    console.error("Error starting consumer:", error);
+    process.exit(1);
+  }
+})();
 module.exports = app;

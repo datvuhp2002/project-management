@@ -6,27 +6,23 @@ const router = express.Router();
 
 // get all assignments
 router.get("/admin/getAll", asyncHandler(AssignmentController.getAll));
+
 router.get(
-  "/getAllAssignmentForUser/:id",
-  asyncHandler(AssignmentController.getAllAssignmentForUser)
+  "/getAllAssignment/:id",
+  asyncHandler(AssignmentController.getAllAssignment)
 );
-router.get(
-  "/getAllAssignmentForProject/:id",
-  asyncHandler(AssignmentController.getAllAssignmentForProject)
-);
+// can delete
 // get all staff from project
 router.get(
   "/getAllUserPropertyFromProject/:id",
   asyncHandler(AssignmentController.getAllUserPropertyFromProject)
 );
-router.get(
-  "/getAllAssignmentForTask/:id",
-  asyncHandler(AssignmentController.getAllAssignmentForTask)
-);
+// can delete
 router.get(
   "/getAllTaskPropertyFromProject/:id",
   asyncHandler(AssignmentController.getAllTaskPropertyFromProject)
 );
+
 router.delete(
   "/removeStaffFromProject/:id",
   asyncHandler(AssignmentController.removeStaffFromProject)

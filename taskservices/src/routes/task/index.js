@@ -24,6 +24,11 @@ router.put("/update/:id", asyncHandler(TaskController.update));
 // Lấy ra chi tiết task theo id
 router.get("/detail/:id", asyncHandler(TaskController.detail));
 
+router.get(
+  "/getAllTaskInProject/:id",
+  asyncHandler(TaskController.getAllTaskInProject)
+);
+
 // Xoá một task theo id
 router.delete("/admin/delete/:id", asyncHandler(TaskController.delete));
 

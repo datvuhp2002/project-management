@@ -71,6 +71,19 @@ class AssignmentService {
       true
     );
   };
+  static getAllAssignment = async (query, property_id) => {
+    switch (query.target) {
+      case "project":
+        return await this.getAllAssignmentForProject(query, property_id);
+        break;
+      case "task":
+        return await this.getAllAssignmentForTask(query, property_id);
+        break;
+      default:
+        return await this.getAllAssignmentForUser(query, property_id);
+        break;
+    }
+  };
   static getAllAssignmentForUser = async (
     { items_per_page, page, search, nextPage, previousPage, status },
     user_property_id

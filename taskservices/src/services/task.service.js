@@ -8,6 +8,11 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
+const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
+const {
+  runConsumerAssignmentOnDemand,
+} = require("../message_queue/consumer.assignment.demand");
+const { runProducer } = require("../message_queue/producer");
 class TaskService {
   static select = {
     task_id: true,
@@ -89,6 +94,15 @@ class TaskService {
       items_per_page: "ALL",
     });
     return result.data;
+  };
+  static getAllTaskInProject = async (query, project_property_id) => {
+    await runProducer(
+      assignmentProducerTopic.getListTaskPropertyFromProject,
+      project_property_id
+    );
+    const task_property_ids = await runConsumerAssignmentOnDemand();
+    console.log("list task property:", task_property_ids);
+    return await this.getAllTaskByTaskProperty(query, { task_property_ids });
   };
   // get all tasks
   static getAll = async ({
