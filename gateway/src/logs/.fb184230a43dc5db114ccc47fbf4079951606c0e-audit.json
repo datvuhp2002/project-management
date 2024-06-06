@@ -124,6 +124,21 @@
             "date": 1717617731126,
             "name": "src/logs/gateway-2024-06-06-03-02.error.log",
             "hash": "c9844bc7753240416a74a89c2560230dc1be1096fc4a4b26fadb02be610fe4b6"
+        },
+        {
+            "date": 1717683177544,
+            "name": "src\\logs\\gateway-2024-06-06-21-12.error.log",
+            "hash": "5684ff2e321efc8b5239484182208ce80fe671142fd64a0ee165e1c68e5bdbee"
+        },
+        {
+            "date": 1717683206260,
+            "name": "src\\logs\\gateway-2024-06-06-21-13.error.log",
+            "hash": "5f5b10eccc134c103c85f7f28bf43d496d81441d54a1437648e7c07f20f72be1"
+        },
+        {
+            "date": 1717687829429,
+            "name": "src\\logs\\gateway-2024-06-06-22-30.error.log",
+            "hash": "bbb61d74e076515fc48b01a9c065285b12e8bb6c41849c79966c8a433aa8b401"
         }
     ],
     "hashType": "sha256"
