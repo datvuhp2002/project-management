@@ -2,5 +2,7 @@
 const assignmentTopicsContinuous = {
   getTaskInformation: "get-task-information",
 };
-
-module.exports = { assignmentTopicsContinuous };
+const assignmentTopicsOnDemand = {
+  receivedTaskPropertyFromProject: "received-task-property-from-project",
+};
+module.exports = { assignmentTopicsContinuous, assignmentTopicsOnDemand };

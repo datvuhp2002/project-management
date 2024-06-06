@@ -4,6 +4,10 @@ const {
   departmentTopicsContinuous,
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
+const {
+  activityTopicsContinuous,
+  activityProducerTopic,
+} = require("../configs/kafkaActivityTopic");
 const UserService = require("../services/user.service");
 const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
@@ -30,6 +34,10 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(assignmentTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(activityTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -111,6 +119,24 @@ const continuousConsumer = async () => {
             parsedMessage
           );
           break;
+        case activityTopicsContinuous.getUserInformationForActivity:
+          const activityRequestResultPromises = parsedMessage.map(
+            async (item) => {
+              return await UserService.getStaffInformationByUserProperty(item);
+            }
+          );
+          const activityRequestResults = await Promise.all(
+            activityRequestResultPromises
+          );
+          try {
+            runProducer(
+              activityProducerTopic.receivedInformationActivity,
+              activityRequestResults
+            );
+          } catch (err) {
+            console.log(err.message);
+          }
+          break;
         default:
           console.log("Topic không được xử lý:", topic);
       }
@@ -118,34 +144,4 @@ const continuousConsumer = async () => {
     },
   });
 };
-const runConsumerOnDemand = async () => {
-  const consumer = kafka.consumer({ groupId: "user-on-demand-group" });
-  await consumer.connect();
-  // await consumer.subscribe({
-  //   topics: convertObjectToArray(userTopicsOnDemand),
-  //   fromBeginning: false,
-  // });
-
-  return new Promise((resolve, reject) => {
-    consumer
-      .run({
-        eachMessage: async ({
-          topic,
-          partition,
-          message,
-          commitOffsetsIfNecessary,
-        }) => {
-          console.log(JSON.parse(message.value.toString()));
-          switch (topic) {
-            case "abc":
-              consumer.disconnect();
-              break;
-            default:
-              console.log("Topic không được xử lý:", topic);
-          }
-        },
-      })
-      .catch(reject);
-  });
-};
-module.exports = { continuousConsumer, runConsumerOnDemand };
+module.exports = { continuousConsumer };

@@ -23,11 +23,6 @@ filebeat.inputs:
                     message: "requestId"
                 - contains:
                     message: "timestamp"
-filebeat.config:
-  prospectors:
-    path: /usr/share/filebeat/filebeat.yml
-  user: root
-  group: root
 
 output.elasticsearch:
   hosts: ["http://elasticsearch:9200"]

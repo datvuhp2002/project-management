@@ -1,7 +1,11 @@
 "use strict";
-const TaskTopicsOnDemand = {
+const taskTopicsOnDemand = {
   receivedTaskInformation: "received-task-information",
 };
+const taskTopicsContinuous = {
+  getListTaskPropertyFromProject: "get-list-task-property-from-project",
+};
 module.exports = {
-  TaskTopicsOnDemand,
+  taskTopicsOnDemand,
+  taskTopicsContinuous,
 };

@@ -53,16 +53,22 @@ class UserController {
       data: await UserService.getAll(req.query),
     }).send(res);
   };
-  getListOfStaffDoesNotHaveDepartment = async (req, res, next) => {
+  getListOfStaffDoNotHaveDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh nhân viên chưa có phòng ban thành công",
-      data: await UserService.getListOfStaffDoesNotHaveDepartment(req.query),
+      data: await UserService.getListOfStaffDoNotHaveDepartment(req.query),
     }).send(res);
   };
   getAllStaffInDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách người dùng thành công",
       data: await UserService.getAllStaffInDepartment(req.query, req.body),
+    }).send(res);
+  };
+  getAllStaffInProject = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy ra danh sách người dùng thành công",
+      data: await UserService.getAllStaffInProject(req.query, req.params.id),
     }).send(res);
   };
   getAllStaffInDepartmentForAdmin = async (req, res, next) => {
@@ -146,16 +152,6 @@ class UserController {
       ),
     }).send(res);
   };
-  uploadAvatar = async (req, res, next) => {
-    const { file } = req;
-    if (!file) {
-      throw new BadRequestError("File is missing");
-    }
-    new SuccessResponse({
-      message: "Cập nhật avatar thành công",
-      data: await UserService.uploadAvatar(file, req.headers.user),
-    }).send(res);
-  };
   uploadImageFromUrl = async (req, res, next) => {
     new SuccessResponse({
       message: "Tải avatar thành công",
@@ -169,9 +165,9 @@ class UserController {
     }
     new SuccessResponse({
       message: "Tải ảnh đại diện lên thành công",
-      data: getInfoData({
-        fields: ["path", "filename"],
-        object: file,
+      data: await UserService.update({
+        id: req.headers.user,
+        data: { avatar: file.filename },
       }),
     }).send(res);
   };

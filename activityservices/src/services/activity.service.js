@@ -7,6 +7,11 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
+const { runProducer } = require("../message_queue/producer");
+const { userProducerTopic } = require("../configs/kafkaUserTopic");
+const {
+  runUserConsumerOnDemand,
+} = require("../message_queue/consumer.user.demand");
 class ActivityService {
   static select = {
     activity_id: true,
@@ -63,14 +68,17 @@ class ActivityService {
     query.push({
       deletedMark: false,
     });
-    return await this.queryActivity({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryActivity(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
   };
   static getAll = async ({
     items_per_page,
@@ -83,14 +91,17 @@ class ActivityService {
     query.push({
       deletedMark: false,
     });
-    return await this.queryActivity({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryActivity(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
   };
   // get all activities from task
   static getAllActivitiesFromTask = async (
@@ -104,14 +115,17 @@ class ActivityService {
       },
       deletedMark: false,
     });
-    return await this.queryActivity({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryActivity(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
   };
   // get all activities has been deleted
   static trash = async ({
@@ -125,14 +139,17 @@ class ActivityService {
     query.push({
       deletedMark: true,
     });
-    return await this.queryActivity({
-      query: query,
-      items_per_page,
-      page,
-      search,
-      nextPage,
-      previousPage,
-    });
+    return await this.queryActivity(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      false
+    );
   };
   // detail activity
   static detail = async (activity_id) => {
@@ -216,7 +233,6 @@ class ActivityService {
       },
       select: this.select,
     });
-
     // Tạo một đối tượng để tổ chức dữ liệu theo ngày
     const activitiesByDate = {};
     activities.forEach((activity) => {
@@ -230,14 +246,10 @@ class ActivityService {
     return activitiesByDate;
   };
 
-  static queryActivity = async ({
-    query,
-    items_per_page,
-    page,
-    search,
-    nextPage,
-    previousPage,
-  }) => {
+  static queryActivity = async (
+    { query, items_per_page, page, search, nextPage, previousPage },
+    isNotTrash = false
+  ) => {
     const searchKeyword = search || "";
     let itemsPerPage;
     let whereClause = {
@@ -272,10 +284,37 @@ class ActivityService {
         createdAt: "desc",
       },
     });
-
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
+    if (isNotTrash) {
+      const user_list_id = activities.map(
+        (activity) => activity.ActivityProperty.user_property_id
+      );
+      console.log(user_list_id);
+      await runProducer(
+        userProducerTopic.getUserInformationForActivity,
+        user_list_id
+      );
+      const userInformationData = await runUserConsumerOnDemand();
+      console.log("received User Data:::", userInformationData);
+      if (Array.isArray(userInformationData)) {
+        activities.forEach((item, index) => {
+          item.user_information = userInformationData[index];
+        });
+      } else {
+        console.error("Error: Invalid user data received.");
+      }
+      return {
+        data: activities,
+        total,
+        nextPage: nextPageNumber,
+        previousPage: previousPageNumber,
+        currentPage,
+        itemsPerPage,
+      };
+    }
+
     return {
       data: activities,
       total,

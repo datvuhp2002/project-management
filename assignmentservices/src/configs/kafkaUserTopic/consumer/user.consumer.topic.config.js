@@ -1,5 +1,7 @@
 "use strict";
-const userTopicsContinuous = {};
+const userTopicsContinuous = {
+  getListUserPropertyFromProject: "get-list-user-property-from-project",
+};
 
 const userTopicsOnDemand = {
   receivedListUserFromProject: "received-list-user-from-project",

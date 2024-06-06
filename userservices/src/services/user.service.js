@@ -14,6 +14,10 @@ const {
 const cloudinary = require("../configs/cloudinary.config");
 const { runProducer } = require("../message_queue/producer");
 const { departmentProducerTopic } = require("../configs/kafkaDepartmentTopic");
+const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
+const {
+  runAssignmentConsumerOnDemand,
+} = require("../message_queue/consumer.assignment.demand");
 
 class UserService {
   static select = {
@@ -215,6 +219,15 @@ class UserService {
       previousPage,
     });
   };
+  static getAllStaffInProject = async (query, project_property_id) => {
+    await runProducer(
+      assignmentProducerTopic.getListUserPropertyFromProject,
+      project_property_id
+    );
+    const user_property_ids = await runAssignmentConsumerOnDemand();
+    console.log("list user property:", user_property_ids);
+    return await this.getAllStaffByUserProperty(query, { user_property_ids });
+  };
   // get All Staff in department for ADMIN
   static getAllStaffInDepartmentForAdmin = async (
     { items_per_page, page, search, nextPage, previousPage, role = null },
@@ -300,12 +313,46 @@ class UserService {
   static getAll = async ({
     items_per_page,
     page,
+    haveDepartment,
     search,
     nextPage,
     previousPage,
     role = null,
   }) => {
     let query = [];
+    if (haveDepartment && haveDepartment == "false") {
+      query.push({
+        OR: [
+          {
+            UserProperty: {
+              department_id: null,
+            },
+          },
+          {
+            UserProperty: {
+              department_id: undefined,
+            },
+          },
+        ],
+        deletedMark: false,
+      });
+    } else if (haveDepartment && haveDepartment == "true") {
+      query.push({
+        OR: [
+          {
+            UserProperty: {
+              department_id: { not: null },
+            },
+          },
+          {
+            UserProperty: {
+              department_id: { not: undefined },
+            },
+          },
+        ],
+        deletedMark: false,
+      });
+    }
     if (role) {
       query.push({
         user_id: {
@@ -325,7 +372,7 @@ class UserService {
       previousPage,
     });
   };
-  static getListOfStaffDoesNotHaveDepartment = async ({
+  static getListOfStaffDoNotHaveDepartment = async ({
     items_per_page,
     page,
     search,

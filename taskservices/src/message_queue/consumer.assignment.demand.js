@@ -1,18 +1,18 @@
+"use strict";
 const { Kafka } = require("kafkajs");
-const { taskTopicsOnDemand } = require("../configs/kafkaTaskTopic");
 const { convertObjectToArray } = require("../utils");
-
+const { assignmentTopicsOnDemand } = require("../configs/kafkaAssignmentTopic");
 const kafka = new Kafka({
-  clientId: "assignment-services",
+  clientId: "task-services",
   brokers: [process.env.KAFKA_BROKER],
 });
 const consumer = kafka.consumer({
-  groupId: "assignment-task-on-demand-group",
+  groupId: "task-assignment-on-demand-group",
 });
-const runConsumerTaskOnDemand = async () => {
+const runConsumerAssignmentOnDemand = async () => {
   await consumer.connect();
   await consumer.subscribe({
-    topics: convertObjectToArray(taskTopicsOnDemand),
+    topics: convertObjectToArray(assignmentTopicsOnDemand),
     fromBeginning: false,
   });
   return new Promise((resolve, reject) => {
@@ -29,4 +29,4 @@ const runConsumerTaskOnDemand = async () => {
   });
 };
 
-module.exports = { runConsumerTaskOnDemand };
+module.exports = { runConsumerAssignmentOnDemand };

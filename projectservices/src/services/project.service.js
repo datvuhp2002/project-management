@@ -113,7 +113,7 @@ class ProjectService {
         nextPage,
         previousPage,
       },
-      false
+      true
     );
   };
 

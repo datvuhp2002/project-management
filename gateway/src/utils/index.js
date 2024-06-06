@@ -7,12 +7,65 @@ const getInfoData = ({ fields = [], object = {} }) => {
   return _.pick(object, fields);
 };
 
+const getAllUsersForActivity = async (user_property_ids) => {
+  try {
+    const response = await axios.post(
+      `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUserProperty?items_per_page=ALL`,
+      { user_property_ids }
+    );
+    return response.data.data.users;
+  } catch (error) {
+    console.error(
+      "Error fetching user information for activities:",
+      error.message
+    );
+    throw new BadRequestError(
+      "Failed to fetch user information for activities"
+    );
+  }
+};
+
 const getAllActivitiesForTask = async (task_property_id) => {
   try {
     const response = await axios.get(
-      `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYear/${task_property_id}?items_per_page="ALL"`
+      `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYear/${task_property_id}?items_per_page=ALL`
     );
-    return response.data.data;
+    let activities = response.data.data;
+
+    try {
+      // Lấy danh sách user_property_id và lọc trùng
+      const user_property_ids = [
+        ...new Set(
+          Object.values(activities).flatMap((dateActivities) =>
+            dateActivities.map(
+              (activity) => activity.ActivityProperty.user_property_id
+            )
+          )
+        ),
+      ];
+      console.log("user_property_ids:", user_property_ids);
+
+      // Lấy thông tin người dùng dựa trên user_property_ids
+      const userInformation = await getAllUsersForActivity(user_property_ids);
+      console.log("userInformation:", userInformation);
+
+      // Gắn thông tin người dùng vào mỗi hoạt động
+      for (const dateActivities of Object.values(activities)) {
+        for (const activity of dateActivities) {
+          const correspondingUser = userInformation.find(
+            (user) =>
+              user.UserProperty.user_property_id ===
+              activity.ActivityProperty.user_property_id
+          );
+          activity.user_information = correspondingUser;
+        }
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+
+    console.log("Activities with user information:", activities);
+    return activities;
   } catch (error) {
     console.error("Error fetching activities for task:", error);
     throw new BadRequestError("Failed to fetch activities for task");
@@ -68,7 +121,6 @@ const getAllTasksPropertyForProject = async (project_property_id) => {
 };
 
 const getListTaskByTaskProperty = async (task_property_ids) => {
-  console.log(task_property_ids);
   try {
     const listTaskResponse = await axios.post(
       `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskByTaskProperty`,
@@ -101,7 +153,6 @@ const addTasksToProjects = async (projects) => {
 };
 const addTasksToProject = async (project) => {
   try {
-    console.log(project);
     const tasks = await getAllTasksPropertyForProject(
       project.ProjectProperty.project_property_id
     );
