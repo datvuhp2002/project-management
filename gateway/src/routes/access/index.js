@@ -13,15 +13,15 @@ router.post("/login", asyncHandler(accessController.login));
 // AUTHENTICATION
 router.use(authentication);
 router.get(
-  "/handleRefreshToken",
+  "/handle-refresh-token",
   asyncHandler(accessController.handleRefreshToken)
 );
 router.get(
-  "/reportForDepartment/:id",
+  "/report-for-department/:id",
   asyncHandler(accessController.reportForDepartment)
 );
 router.get(
-  "/reportForProject/:id",
+  "/report-for-project/:id",
   asyncHandler(accessController.reportForProject)
 );
 
