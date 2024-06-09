@@ -5,7 +5,9 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
-const { runConsumerOnDemand } = require("./message_queue/consumer.demand");
+const {
+  runConsumerAssignmentOnDemand,
+} = require("./message_queue/consumer.assignment.demand");
 const { v4: uuidv4 } = require("uuid");
 const TaskLogger = require("./loggers/task.log");
 const initElasticsearch = require("./dbs/init.elasticsearch");
@@ -63,7 +65,7 @@ continuousConsumer().catch(console.error);
 (async () => {
   try {
     console.log("Starting consumer...");
-    await runConsumerOnDemand();
+    await runConsumerAssignmentOnDemand();
     console.log("Consumer started successfully.");
   } catch (error) {
     console.error("Error starting consumer:", error);

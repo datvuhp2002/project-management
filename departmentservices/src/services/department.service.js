@@ -36,9 +36,11 @@ class DepartmentService {
         });
         const department_for_delete_old_manager_id =
           await prisma.department.findFirst({
-            where: { manager_id },
+            where: {
+              manager_id,
+              department_id: { not: department.department_id },
+            },
           });
-        console.log(department_for_delete_old_manager_id);
         if (department_for_delete_old_manager_id) {
           await prisma.department.update({
             where: {

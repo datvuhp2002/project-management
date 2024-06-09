@@ -6,6 +6,14 @@ const {
 const AssignmentServices = require("../services/assignment.service");
 const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
+const {
+  userTopicsContinuous,
+  userProducerTopic,
+} = require("../configs/kafkaUserTopic");
+const {
+  taskTopicsContinuous,
+  taskProducerTopic,
+} = require("../configs/kafkaTaskTopic");
 
 const kafka = new Kafka({
   clientId: "assignment-services",
@@ -17,6 +25,14 @@ const continuousConsumer = async () => {
   await consumer.connect();
   await consumer.subscribe({
     topics: convertObjectToArray(projectTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(userTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(taskTopicsContinuous),
     fromBeginning: false,
   });
   await consumer.run({
@@ -51,6 +67,36 @@ const continuousConsumer = async () => {
             );
           } catch (err) {
             console.log(err);
+          }
+          break;
+        case userTopicsContinuous.getListUserPropertyFromProject:
+          const resultUserTopic =
+            await AssignmentServices.getAllUserPropertyFromProject(
+              parsedMessage
+            );
+          console.log("result:::", resultUserTopic);
+          try {
+            await runProducer(
+              userProducerTopic.receivedListUserPropertyFromProject,
+              resultUserTopic
+            );
+          } catch (err) {
+            console.log(err.message);
+          }
+          break;
+        case taskTopicsContinuous.getListTaskPropertyFromProject:
+          const resultTaskTopic =
+            await AssignmentServices.getAllTaskPropertyFromProject(
+              parsedMessage
+            );
+          console.log("result:::", resultTaskTopic);
+          try {
+            await runProducer(
+              taskProducerTopic.receivedTaskPropertyFromProject,
+              resultTaskTopic
+            );
+          } catch (err) {
+            console.log(err.message);
           }
           break;
         default:

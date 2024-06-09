@@ -86,10 +86,15 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/get-a-list-of-all-managers-who-do-not-manage-departments": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/getListOfStaffDoesNotHaveDepartment`,
+  "/get-a-list-of-staff-do-do-not-have-departments": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/getListOfStaffDoNotHaveDepartment`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
+  },
+  "/get-all-staff-in-project": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffInProject`,
+    authRequired: true,
+    permissions: null,
   },
   "/remove-staff-from-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/removeStaffFromDepartment`,

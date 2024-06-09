@@ -15,11 +15,19 @@ class TaskController {
       data: await TaskService.getAll(req.query),
     }).send(res);
   };
+
   getAllTaskByTaskProperty = async (req, res, next) => {
     console.log(req.body);
     new CREATED({
       message: "lấy danh sách nhiệm vụ trong dự án thành công",
       data: await TaskService.getAllTaskByTaskProperty(req.query, req.body),
+    }).send(res);
+  };
+  getAllTaskInProject = async (req, res, next) => {
+    console.log(req.body);
+    new CREATED({
+      message: "lấy danh sách nhiệm vụ trong dự án thành công",
+      data: await TaskService.getAllTaskInProject(req.query, req.params.id),
     }).send(res);
   };
   trash = async (req, res, next) => {

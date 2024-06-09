@@ -270,7 +270,6 @@ services:
       - elasticsearch
     networks:
       - kafka-network
-
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.10.0
     container_name: filebeat

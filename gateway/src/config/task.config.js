@@ -61,8 +61,8 @@ const taskServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/get-all-task-by-task-property": {
-    target: `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskByTaskProperty`,
+  "/get-all-task-in-project": {
+    target: `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskInProject`,
     authRequired: true,
     permissions: null,
   },

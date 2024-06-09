@@ -13,17 +13,21 @@ router.get("/findByEmail/:email", asyncHandler(UserController.findByEmail));
 // Lấy ra hết tất cả user
 router.get("/admin/getAll", asyncHandler(UserController.getAll));
 router.get(
-  "/getListOfStaffDoesNotHaveDepartment",
-  asyncHandler(UserController.getListOfStaffDoesNotHaveDepartment)
+  "/getListOfStaffDoNotHaveDepartment",
+  asyncHandler(UserController.getListOfStaffDoNotHaveDepartment)
 );
 // get all user in department
+router.get(
+  "/admin/getAllStaffInDepartment/:id",
+  asyncHandler(UserController.getAllStaffInDepartmentForAdmin)
+);
 router.post(
   "/getAllStaffInDepartment",
   asyncHandler(UserController.getAllStaffInDepartment)
 );
 router.get(
-  "/admin/getAllStaffInDepartment/:id",
-  asyncHandler(UserController.getAllStaffInDepartmentForAdmin)
+  "/getAllStaffInProject/:id",
+  asyncHandler(UserController.getAllStaffInProject)
 );
 // Lấy ra hết tất cả user đã bị xoá
 router.get("/admin/trash", asyncHandler(UserController.trash));

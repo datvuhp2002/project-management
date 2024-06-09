@@ -32,6 +32,7 @@ class AccessService {
   };
   static reportForProject = async (project_id) => {
     const listProject = await detailProject(project_id);
+    if (!listProject) throw new BadRequestError("Không tồn tại dự án");
     const listProjectWithTask = await addTasksToProject(listProject.data.data);
     return listProjectWithTask;
   };

@@ -22,6 +22,23 @@ class AssignmentController {
     }).send(res);
   };
   /**
+   * @query {items_per_page}
+   * @query {page}
+   * @query {nextPage}
+   * @query {previousPage}
+   * @query {target} default user
+   * @query {status} is done or not (true || false),
+   * @query {isAssignment} check task is assignment or not (true || false)
+   * @query {page},
+   * @query search,
+   */
+  getAllAssignment = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy tất cả phân công",
+      data: await AssignmentService.getAllAssignment(req.query, req.params.id),
+    }).send(res);
+  };
+  /**
    * @param {status} is done or not,
    * @param {page},
    * @param search,
