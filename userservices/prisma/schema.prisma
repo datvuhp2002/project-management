@@ -36,6 +36,7 @@ enum RolesEnum {
   ADMIN
   MANAGER
   STAFF
+  PROJECT_MANAGER
 }
 
 model Role {

@@ -28,7 +28,7 @@ router.get(
   "/getAllTaskInProject/:id",
   asyncHandler(TaskController.getAllTaskInProject)
 );
-
+router.post("/getFile", asyncHandler(TaskController.getFile));
 // Xoá một task theo id
 router.delete("/admin/delete/:id", asyncHandler(TaskController.delete));
 

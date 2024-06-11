@@ -30,6 +30,7 @@ class ProjectService {
     ProjectProperty: {
       select: {
         project_property_id: true,
+        project_manager_id: true,
         project_id: true,
         department_id: true,
         client_id: true,
@@ -38,10 +39,18 @@ class ProjectService {
   };
   // create a new project
   static create = async (data, modifiedBy) => {
-    const { department_id, client_id, ...projectData } = data;
-    const projectPropertyData = { department_id, client_id };
+    const { department_id, client_id, project_manager_id, ...projectData } =
+      data;
+    const projectPropertyData = {
+      department_id,
+      client_id,
+      project_manager_id,
+    };
     if (!client_id) {
       delete projectPropertyData.client_id;
+    }
+    if (!project_manager_id) {
+      delete projectPropertyData.project_manager_id;
     }
     const newProject = await prisma.project.create({
       data: { ...projectData, modifiedBy },
@@ -150,9 +159,21 @@ class ProjectService {
   };
   // update project
   static update = async ({ id, data }, modifiedBy) => {
-    const { department_id, client_id, ...projectData } = data;
-    if (department_id || client_id) {
-      await ProjectPropertyService.update({ department_id, client_id }, id);
+    const { department_id, client_id, project_manager_id, ...projectData } =
+      data;
+    const projectPropertyData = {
+      department_id,
+      client_id,
+      project_manager_id,
+    };
+    if (!client_id) {
+      delete projectPropertyData.client_id;
+    }
+    if (!project_manager_id) {
+      delete projectPropertyData.project_manager_id;
+    }
+    if (department_id || client_id || project_manager_id) {
+      await ProjectPropertyService.update(projectPropertyData, id);
     }
     return await prisma.project.update({
       where: { project_id: id },
