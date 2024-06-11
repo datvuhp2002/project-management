@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-11T13:16:33.142Z","context":"/report/report-for-department/6633dbae50da2131dab8a5cf","ecs.version":"8.10.0","log.level":"error","message":"400:-:3ms:-:Response:{\"status\":400,\"now\":1718111793137}","metadata":{"message":"Failed to fetch projects in department"},"requestId":"eb9a71c7-72ba-4725-bb63-2da30452dbd3","timestamp":"2024-06-11 08:16:142 PM"}

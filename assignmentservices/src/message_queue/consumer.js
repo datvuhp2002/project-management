@@ -45,11 +45,11 @@ const continuousConsumer = async () => {
             async (item) => {
               const list_user_property =
                 await AssignmentServices.getAllUserPropertyFromProject(
-                  item.project_property_id
+                  item.project_id
                 );
               const list_task_property =
                 await AssignmentServices.getTotalTaskPropertyWithStatusFromProject(
-                  item.project_property_id
+                  item.project_id
                 );
               return {
                 total_user: list_user_property.length,
@@ -84,15 +84,14 @@ const continuousConsumer = async () => {
             console.log(err.message);
           }
           break;
-        case taskTopicsContinuous.getListTaskPropertyFromProject:
+        case taskTopicsContinuous.getListTaskFromProject:
+          console.log(parsedMessage);
           const resultTaskTopic =
-            await AssignmentServices.getAllTaskPropertyFromProject(
-              parsedMessage
-            );
+            await AssignmentServices.getAllTaskFromProject(parsedMessage);
           console.log("result:::", resultTaskTopic);
           try {
             await runProducer(
-              taskProducerTopic.receivedTaskPropertyFromProject,
+              taskProducerTopic.receivedTaskFromProject,
               resultTaskTopic
             );
           } catch (err) {

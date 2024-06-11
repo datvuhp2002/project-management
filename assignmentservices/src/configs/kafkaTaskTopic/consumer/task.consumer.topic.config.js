@@ -3,7 +3,7 @@ const taskTopicsOnDemand = {
   receivedTaskInformation: "received-task-information",
 };
 const taskTopicsContinuous = {
-  getListTaskPropertyFromProject: "get-list-task-property-from-project",
+  getListTaskFromProject: "get-list-task-from-project",
 };
 module.exports = {
   taskTopicsOnDemand,

@@ -9,8 +9,8 @@ const router = express.Router();
 router.get("/admin/getAll", asyncHandler(TaskController.getAll));
 // get list task from project
 router.post(
-  "/getAllTaskByTaskProperty",
-  asyncHandler(TaskController.getAllTaskByTaskProperty)
+  "/getAllTaskByTaskIds",
+  asyncHandler(TaskController.getAllTaskByTaskIds)
 );
 // Lấy ra hết tất cả task đã bị xoá
 router.get("/admin/trash", asyncHandler(TaskController.trash));

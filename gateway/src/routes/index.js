@@ -18,7 +18,6 @@ const registerRouterServices = (basePath, routes, app) => {
       middlewareChain.push((req, res, next) => {
         if (req.user) {
           req.headers.user = req.user.userId;
-          req.headers.user_property = req.user.userProperty;
         }
         next();
       });

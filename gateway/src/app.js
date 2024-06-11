@@ -32,9 +32,9 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 // init elasticsearch
-initElasticsearch.init({
-  ELASTICSEARCH_IS_ENABLED: true,
-});
+// initElasticsearch.init({
+//   ELASTICSEARCH_IS_ENABLED: true,
+// });
 // init routes
 app.use(router);
 registerRouterServices("/departments", departmentServicesRoutes, app);

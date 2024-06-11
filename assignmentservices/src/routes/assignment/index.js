@@ -14,15 +14,14 @@ router.get(
 // can delete
 // get all staff from project
 router.get(
-  "/getAllUserPropertyFromProject/:id",
-  asyncHandler(AssignmentController.getAllUserPropertyFromProject)
+  "/getAllUserFromProject/:id",
+  asyncHandler(AssignmentController.getAllUserFromProject)
 );
 // can delete
 router.get(
-  "/getAllTaskPropertyFromProject/:id",
-  asyncHandler(AssignmentController.getAllTaskPropertyFromProject)
+  "/getAllTaskFromProject/:id",
+  asyncHandler(AssignmentController.getAllTaskFromProject)
 );
-
 router.delete(
   "/removeStaffFromProject/:id",
   asyncHandler(AssignmentController.removeStaffFromProject)

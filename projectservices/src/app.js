@@ -29,9 +29,9 @@ app.use((req, res, next) => {
   next();
 });
 // init elasticsearch
-initElasticsearch.init({
-  ELASTICSEARCH_IS_ENABLED: true,
-});
+// initElasticsearch.init({
+//   ELASTICSEARCH_IS_ENABLED: true,
+// });
 // init db
 require(`./dbs/init.dbs`);
 // init routes
