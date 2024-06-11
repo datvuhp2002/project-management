@@ -15,9 +15,9 @@ datasource db {
 
 model Assignment {
   assignment_id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  user_property_id    String?   @db.ObjectId
-  project_property_id String?   @db.ObjectId
-  task_property_id    String?   @db.ObjectId
+  user_id    String?   @db.ObjectId
+  project_id String?   @db.ObjectId
+  task_id    String?   @db.ObjectId
   createdBy           String?   @db.ObjectId
   modifiedBy          String?   @db.ObjectId
   createdAt           DateTime  @default(now())

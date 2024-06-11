@@ -48,8 +48,8 @@ const userServicesRoutes = {
   },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    authRequired: null,
+    permissions: null,
   },
   "/admin/delete": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/delete`,

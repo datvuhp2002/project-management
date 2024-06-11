@@ -15,7 +15,7 @@ datasource db {
 
 model Project {
   project_id      String           @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
+  name            String           
   projectCode     String           @unique
   description     String?
   startAt         DateTime         @default(now())
