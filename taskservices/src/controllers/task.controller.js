@@ -79,6 +79,12 @@ class TaskController {
       data: await TaskService.getFileImage(req.body),
     }).send(res);
   };
+  getFile = async (req, res, next) => {
+    new SuccessResponse({
+      message: "lấy file về thành công",
+      data: await TaskService.getFile(req.body),
+    }).send(res);
+  };
   deleteFile = async (req, res, next) => {
     new SuccessResponse({
       message: "xoá file thành công",

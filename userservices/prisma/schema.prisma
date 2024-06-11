@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   user_id      String        @id @default(auto()) @map("_id") @db.ObjectId
-  username     String
+  username     String       @unique
   password     String
   email        String        @unique
   status       Boolean       @default(true)
@@ -36,6 +36,7 @@ enum RolesEnum {
   ADMIN
   MANAGER
   STAFF
+  PROJECT_MANAGER
 }
 
 model Role {

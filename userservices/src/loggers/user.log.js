@@ -13,11 +13,7 @@ class UserLogger {
       }
     );
     this.logger = createLogger({
-      format: format.combine(
-        format.timestamp({ format: "YYYY-MM-DD hh:mm:SSS A" }),
-        formatPrint,
-        ecsFormat()
-      ),
+      format: ecsFormat(),
       transports: [
         new transports.Console(),
         new transports.DailyRotateFile({
@@ -27,11 +23,7 @@ class UserLogger {
           zippedArchive: true,
           maxSize: "1m",
           maxFiles: "14d",
-          format: format.combine(
-            format.timestamp({ format: "YYYY-MM-DD hh:mm:SSS A" }),
-            formatPrint,
-            ecsFormat()
-          ),
+          format: ecsFormat(),
           level: "info",
         }),
         new transports.DailyRotateFile({
@@ -41,11 +33,7 @@ class UserLogger {
           zippedArchive: true,
           maxSize: "1m",
           maxFiles: "14d",
-          format: format.combine(
-            format.timestamp({ format: "YYYY-MM-DD hh:mm:SSS A" }),
-            formatPrint,
-            ecsFormat()
-          ),
+          format: ecsFormat(),
           level: "error",
         }),
       ],

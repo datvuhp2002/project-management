@@ -125,23 +125,6 @@ class UserService {
       include: { UserProperty: { include: { role: true } } },
     });
   };
-  // static verifyUser = async (email, password) => {
-  //   const userData = await this.findByEmail(email);
-  //   console.log(userData);
-  //   const match = await bcrypt.compare(password, userData.password);
-  //   if (!match) {
-  //     return false;
-  //   } else {
-  //     const { user_id: userId } = userData;
-  //     const { user_property_id: userProperty } = userData.UserProperty;
-  //     return {
-  //       userId,
-  //       email,
-  //       userProperty,
-  //       role: userData.UserProperty.role.name,
-  //     };
-  //   }
-  // };
   // add user into department
   static addUserIntoDepartment = async ({ list_user_ids }, department_id) => {
     return await prisma.userProperty.updateMany({
@@ -467,6 +450,41 @@ class UserService {
       select: this.select,
     });
     return detailUser;
+  };
+  // update user information
+  static update = async ({ id, data }) => {
+    if (data.avatar) {
+      try {
+        return await prisma.user.update({
+          where: { user_id: id },
+          data,
+          select: this.select,
+        });
+      } catch (errr) {
+        cloudinary.uploader.destroy(data.avatar);
+        throw new BadRequestError(
+          "Cập nhật không thành công, vui lòng thử lại."
+        );
+      }
+    }
+
+    const { department_id, role, ...updateUserData } = data;
+    if (department_id !== undefined) {
+      console.log("before update user with id:::", id);
+      await UserPropertyService.update(id, { department_id });
+    }
+    if (role) {
+      const role_data = await RoleService.findByName(role);
+      if (!role_data) throw new BadRequestError("Role not found");
+      await UserPropertyService.update(id, { role_id: role_data.role_id });
+    }
+    const updateUser = await prisma.user.update({
+      where: { user_id: id },
+      data: updateUserData,
+      select: this.select,
+    });
+    if (updateUser) return true;
+    throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
   };
   // delete user account
   static delete = async (user_id) => {

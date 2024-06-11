@@ -115,7 +115,7 @@ class AssignmentService {
       nextPage,
       previousPage,
       status,
-      isAssignment,
+      isAssigned,
     },
     task_property_id
   ) => {
@@ -126,7 +126,7 @@ class AssignmentService {
     } else if (status && status === "false") {
       query.push({ status: false });
     }
-    if (isAssignment && isAssignment === "true") {
+    if (isAssigned && isAssigned === "true") {
       query.push(
         {
           user_property_id: { not: null },
@@ -135,7 +135,7 @@ class AssignmentService {
           user_property_id: { not: undefined },
         }
       );
-    } else if (isAssignment && isAssignment === "false") {
+    } else if (isAssigned && isAssigned === "false") {
       query.push(
         {
           user_property_id: null,
@@ -165,13 +165,13 @@ class AssignmentService {
       nextPage,
       previousPage,
       status,
-      isAssignment,
+      isAssigned,
     },
     project_property_id
   ) => {
     let query = [];
     query.push({ deletedMark: false, project_property_id });
-    if (isAssignment && isAssignment === "true") {
+    if (isAssigned && isAssigned === "true") {
       query.push(
         {
           user_property_id: { not: null },
@@ -180,7 +180,7 @@ class AssignmentService {
           user_property_id: { not: undefined },
         }
       );
-    } else if (isAssignment && isAssignment === "false") {
+    } else if (isAssigned && isAssigned === "false") {
       query.push(
         {
           user_property_id: null,

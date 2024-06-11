@@ -232,6 +232,14 @@ class TaskService {
     }
     return await cloudinary.image(filename);
   };
+  static getFile = async ({ filename }) => {
+    try {
+      const result = await cloudinary.url(filename, { resource_type: "raw" });
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  };
   static deleteFile = async (task_id, { filename }) => {
     const existingTask = await prisma.task.findUnique({
       where: { task_id },
