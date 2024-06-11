@@ -11,7 +11,6 @@ class ClientService {
     phone: true,
     createdBy: true,
     modifiedBy: true,
-    ProjectProperty: true,
   };
   static detail = async (client_id) => {
     return await prisma.client.findUnique({ where: { client_id } });
@@ -51,7 +50,7 @@ class ClientService {
       deletedMark: false,
     });
     query.push({
-      ProjectProperty: {
+      Project: {
         some: {
           project_id,
         },

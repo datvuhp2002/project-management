@@ -12,7 +12,6 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
 model User {
   user_id      String        @id @default(auto()) @map("_id") @db.ObjectId
   username     String       @unique
@@ -29,38 +28,24 @@ model User {
   updatedAt    DateTime?     @updatedAt
   deletedAt    DateTime?
   deletedMark  Boolean       @default(false)
-  UserProperty UserProperty?
+  role             Role      @relation(fields: [role_id], references: [role_id])
+  role_id          String    @db.ObjectId
+  department_id    String?   @db.ObjectId
 }
-
 enum RolesEnum {
   ADMIN
   MANAGER
   STAFF
   PROJECT_MANAGER
 }
-
 model Role {
   role_id      String         @id @default(auto()) @map("_id") @db.ObjectId
   name         RolesEnum      @unique @default(STAFF)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime?      @updatedAt
   deletedAt    DateTime?
-  UserProperty UserProperty[]
+  User User[]
 }
-
-model UserProperty {
-  user_property_id String    @id @default(auto()) @map("_id") @db.ObjectId
-  author           User      @relation(fields: [user_id], references: [user_id]) // Chỉ định User là one-to-one
-  user_id          String    @unique @db.ObjectId
-  role             Role      @relation(fields: [role_id], references: [role_id])
-  role_id          String    @db.ObjectId
-  department_id    String?   @db.ObjectId
-  createdAt        DateTime? @default(now())
-  updatedAt        DateTime? @updatedAt
-  deletedAt        DateTime?
-  deletedMark      Boolean   @default(false)
-}
-
 model otp {
   otp_id   String    @id @default(auto()) @map("_id") @db.ObjectId
   token    String    @unique

@@ -40,11 +40,11 @@ class UserController {
    * @param {previousPage}
    * @param {role}
    */
-  getAllStaffByUserProperty = async (req, res, next) => {
+  getAllStaffByUser = async (req, res, next) => {
     console.log(req.body);
     new CREATED({
       message: "Lấy tất cả nhân viên trong phòng ban thành công",
-      data: await UserService.getAllStaffByUserProperty(req.query, req.body),
+      data: await UserService.getAllStaffByUser(req.query, req.body),
     }).send(res);
   };
   getAll = async (req, res, next) => {

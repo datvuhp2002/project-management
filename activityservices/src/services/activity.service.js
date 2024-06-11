@@ -1,7 +1,6 @@
 "use strict";
 
 const prisma = require("../prisma");
-const ActivityPropertyService = require("./activity.property.service");
 const {
   BadRequestError,
   AuthFailureError,
@@ -19,51 +18,26 @@ class ActivityService {
     createdBy: true,
     modifiedBy: true,
     createdAt: true,
-    ActivityProperty: {
-      select: {
-        activity_property_id: true,
-        user_property_id: true,
-        activity_id: true,
-        task_property_id: true,
-      },
-    },
+    task_id: true,
   };
   // create a new activity
-  static create = async (data, createdBy, user_property_id) => {
-    const { task_property_id, ...activityData } = data;
-    const newActivity = await prisma.activity.create({
-      data: { ...activityData, createdBy },
+  static create = async (data, createdBy) => {
+    const activity = await prisma.activity.create({
+      data: { ...data, createdBy },
     });
-    if (newActivity) {
-      const newActivityProperty = await ActivityPropertyService.create({
-        activity_id: newActivity.activity_id,
-        user_property_id,
-        task_property_id,
-      });
-      if (newActivityProperty) {
-        return true;
-      }
-      await prisma.activity.delete({
-        where: { activity_id: newActivity.activity_id },
-      });
-      throw new BadRequestError("Tạo mới không thành công, vui lòng thử lại");
+    if (!activity) {
+      throw new BadRequestError("Create activity failed");
     }
-    return {
-      code: 200,
-      data: null,
-    };
+    return activity;
   };
   // get all activities
-  static getAllActivitiesByUserProperty = async (
+  static getAllActivitiesByUser = async (
     { items_per_page, page, search, nextPage, previousPage },
-    user_property_id
+    createdBy
   ) => {
-    console.log(user_property_id);
     let query = [];
     query.push({
-      ActivityProperty: {
-        user_property_id,
-      },
+      createdBy,
     });
     query.push({
       deletedMark: false,
@@ -106,13 +80,11 @@ class ActivityService {
   // get all activities from task
   static getAllActivitiesFromTask = async (
     { items_per_page, page, search, nextPage, previousPage },
-    task_property_id
+    task_id
   ) => {
     let query = [];
     query.push({
-      ActivityProperty: {
-        task_property_id,
-      },
+      task_id,
       deletedMark: false,
     });
     return await this.queryActivity(
@@ -177,11 +149,10 @@ class ActivityService {
         deletedAt: new Date(),
       },
     });
-    if (deleteActivity) {
-      await ActivityPropertyService.delete(activity_id);
-      return true;
+    if (!deleteActivity) {
+      throw new BadRequestError(`Can not delete activity`);
     }
-    return null;
+    return true;
   };
   // restore project
   static restore = async (activity_id) => {
@@ -191,30 +162,22 @@ class ActivityService {
         deletedMark: false,
       },
     });
-    if (restoreActivity) {
-      const restoreActivityProperty = await ActivityPropertyService.restore(
-        activity_id
-      );
-      if (restoreActivityProperty) return true;
-      await this.delete(activity_id);
-      return null;
+    if (!restoreActivity) {
+      throw new BadRequestError(`Can not restore activity`);
     }
-    return null;
+    return true;
   };
   static getAllActivitiesByYear = async (
     { year = new Date().getFullYear() },
-    task_property_id
+    task_id
   ) => {
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
-
     const whereClause = {
       AND: [
         {
-          ActivityProperty: {
-            task_property_id: {
-              equals: task_property_id,
-            },
+          task_id: {
+            equals: task_id,
           },
         },
         {
@@ -225,7 +188,6 @@ class ActivityService {
         },
       ],
     };
-
     const activities = await prisma.activity.findMany({
       where: whereClause,
       orderBy: {
@@ -233,10 +195,9 @@ class ActivityService {
       },
       select: this.select,
     });
-    // Tạo một đối tượng để tổ chức dữ liệu theo ngày
     const activitiesByDate = {};
     activities.forEach((activity) => {
-      const createdAtDate = activity.createdAt.toISOString().split("T")[0]; // Lấy ngày tạo
+      const createdAtDate = activity.createdAt.toISOString().split("T")[0];
       if (!activitiesByDate[createdAtDate]) {
         activitiesByDate[createdAtDate] = [];
       }
@@ -245,7 +206,6 @@ class ActivityService {
 
     return activitiesByDate;
   };
-
   static queryActivity = async (
     { query, items_per_page, page, search, nextPage, previousPage },
     isNotTrash = false
@@ -274,7 +234,6 @@ class ActivityService {
     }
     const currentPage = Number(page) || 1;
     const skip = currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0;
-
     const activities = await prisma.activity.findMany({
       take: itemsPerPage,
       skip,
@@ -288,9 +247,7 @@ class ActivityService {
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
     if (isNotTrash) {
-      const user_list_id = activities.map(
-        (activity) => activity.ActivityProperty.user_property_id
-      );
+      const user_list_id = activities.map((activity) => activity.createdBy);
       console.log(user_list_id);
       await runProducer(
         userProducerTopic.getUserInformationForActivity,
@@ -314,7 +271,6 @@ class ActivityService {
         itemsPerPage,
       };
     }
-
     return {
       data: activities,
       total,

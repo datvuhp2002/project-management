@@ -1,7 +1,6 @@
 "use strict";
 
 const prisma = require("../prisma");
-const TaskPropertyService = require("./task.property.service");
 const cloudinary = require("../configs/cloudinary.config");
 const {
   BadRequestError,
@@ -21,12 +20,6 @@ class TaskService {
     createdBy: true,
     modifiedBy: true,
     createdAt: true,
-    TaskProperty: {
-      select: {
-        task_property_id: true,
-        task_id: true,
-      },
-    },
   };
   // create a new task
   static create = async (data, createdBy) => {
@@ -34,34 +27,19 @@ class TaskService {
       data: { ...data, createdBy },
     });
     if (newTask) {
-      console.log(newTask.task_id);
-      const newTaskProperty = await prisma.taskProperty.create({
-        data: {
-          task_id: newTask.task_id,
-        },
-      });
-      if (newTaskProperty) {
-        return {
-          task: newTask,
-          task_property: newTaskProperty,
-        };
-      }
-    } else {
-      await prisma.task.delete({ where: { task_id: newTask.task_id } });
-      return false;
+      return newTask;
     }
+    throw new BadRequestError("Can't create task");
   };
   // get All tasks by task property
-  static getAllTaskByTaskProperty = async (
+  static getAllTaskByTaskIds = async (
     { items_per_page, page, search, nextPage, previousPage },
-    { task_property_ids }
+    { task_ids }
   ) => {
     let query = [];
     query.push({
-      TaskProperty: {
-        task_property_id: {
-          in: task_property_ids,
-        },
+      task_id: {
+        in: task_ids,
       },
     });
     query.push({
@@ -76,33 +54,22 @@ class TaskService {
       previousPage,
     });
   };
-  static getListDetailTaskByTaskProperty = async ({ task_property_id }) => {
-    console.log("TASK:::", task_property_id);
-    if (task_property_id === null || task_property_id === undefined)
-      return null;
-    let query = [];
-    query.push({
-      TaskProperty: {
-        task_property_id,
-      },
+  static getListDetailTask = async ({ task_id }) => {
+    if (task_id === null || task_id === undefined) return null;
+    const task = await prisma.task.findUnique({
+      where: { task_id, deletedMark: false },
+      select: this.select,
     });
-    query.push({
-      deletedMark: false,
-    });
-    const result = await this.queryTask({
-      query: query,
-      items_per_page: "ALL",
-    });
-    return result.data;
+    return task;
   };
-  static getAllTaskInProject = async (query, project_property_id) => {
+  static getAllTaskInProject = async (query, project_id) => {
     await runProducer(
-      assignmentProducerTopic.getListTaskPropertyFromProject,
-      project_property_id
+      assignmentProducerTopic.getListTaskFromProject,
+      project_id
     );
-    const task_property_ids = await runConsumerAssignmentOnDemand();
-    console.log("list task property:", task_property_ids);
-    return await this.getAllTaskByTaskProperty(query, { task_property_ids });
+    const task_ids = await runConsumerAssignmentOnDemand();
+    console.log("list task:", task_ids);
+    return await this.getAllTaskByTask(query, { task_ids });
   };
   // get all tasks
   static getAll = async ({
@@ -148,10 +115,12 @@ class TaskService {
   };
   // detail task
   static detail = async (task_id) => {
-    return await prisma.task.findUnique({
+    const task = await prisma.task.findUnique({
       where: { task_id },
       select: this.select,
     });
+    if (!task) throw new BadRequestError("Task not found");
+    return task;
   };
   // update task
   static update = async ({ task_id, data }, modifiedBy) => {
@@ -173,10 +142,10 @@ class TaskService {
       },
     });
     if (deleteTask) {
-      await TaskPropertyService.delete(task_id);
       return true;
     }
-    return null;
+    this.restore(task_id);
+    return false;
   };
   // restore project
   static restore = async (task_id) => {
@@ -186,13 +155,11 @@ class TaskService {
         deletedMark: false,
       },
     });
-    if (restoreTask) {
-      const restoreTaskProperty = await TaskPropertyService.restore(task_id);
-      if (restoreTaskProperty) return true;
+    if (!restoreTask) {
       await this.delete(task_id);
-      return null;
+      throw new BadRequestError("Can't restore task");
     }
-    return null;
+    return true;
   };
   // upload file to cloud and store it in db
   static uploadFile = async (task_id, { path, filename }) => {

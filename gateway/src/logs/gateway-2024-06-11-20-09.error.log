@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-11T13:09:25.987Z","context":"/report/report-for-project/666825480112edd8275af440","ecs.version":"8.10.0","log.level":"error","message":"400:-:5ms:-:Response:{\"status\":400,\"now\":1718111365980}","metadata":{"message":"Failed to add tasks to projects"},"requestId":"7598524f-0e59-43b1-8f30-0423c449c8f0","timestamp":"2024-06-11 08:09:987 PM"}

@@ -22,6 +22,13 @@ const runConsumerTaskOnDemand = async () => {
           const parsedMessage = JSON.parse(message.value.toString());
           console.log(parsedMessage);
           resolve(parsedMessage);
+          consumer.commitOffsets([
+            {
+              topic,
+              partition,
+              offset: (Number(message.offset) + 1).toString(),
+            },
+          ]);
           consumer.disconnect();
         },
       })

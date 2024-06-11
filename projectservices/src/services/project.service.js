@@ -2,8 +2,6 @@
 
 const { getInfoData } = require("../utils");
 const prisma = require("../prisma");
-const RoleService = require("./client.service");
-const ProjectPropertyService = require("./project.property.service");
 const cloudinary = require("../configs/cloudinary.config");
 const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
 const { runProducer } = require("../message_queue/producer");
@@ -27,52 +25,23 @@ class ProjectService {
     createdBy: true,
     modifiedBy: true,
     createdAt: true,
-    ProjectProperty: {
-      select: {
-        project_property_id: true,
-        project_manager_id: true,
-        project_id: true,
-        department_id: true,
-        client_id: true,
-      },
-    },
+    project_id: true,
+    project_manager_id: true,
+    department_id: true,
+    client_ownership: true,
   };
   // create a new project
   static create = async (data, modifiedBy) => {
-    const { department_id, client_id, project_manager_id, ...projectData } =
-      data;
-    const projectPropertyData = {
-      department_id,
-      client_id,
-      project_manager_id,
-    };
-    if (!client_id) {
-      delete projectPropertyData.client_id;
-    }
-    if (!project_manager_id) {
-      delete projectPropertyData.project_manager_id;
-    }
+    data.modifiedBy = modifiedBy;
     const newProject = await prisma.project.create({
-      data: { ...projectData, modifiedBy },
+      data,
     });
-    if (newProject) {
-      const newProjectProperty = await ProjectPropertyService.create({
-        project_id: newProject.project_id,
-        ...projectPropertyData,
-      });
-      if (newProjectProperty) {
-        return true;
-      }
-      await prisma.project.delete({
-        where: { project_id: newProject.project_id },
-      });
+    if (!newProject) {
       throw new BadRequestError(
         "Tạo một dự án mới không thành công, vui lòng thử lại"
       );
     }
-    return {
-      code: 201,
-    };
+    return newProject;
   };
   // get all projects
   static getAll = async ({
@@ -107,9 +76,7 @@ class ProjectService {
     let query = [];
     // Thêm điều kiện phòng ban và trạng thái xoá
     query.push({
-      ProjectProperty: {
-        department_id: id,
-      },
+      department_id: id,
       deletedMark: false,
     });
     // Gọi phương thức queryProject với các tham số đã truyền vào
@@ -159,28 +126,17 @@ class ProjectService {
   };
   // update project
   static update = async ({ id, data }, modifiedBy) => {
-    const { department_id, client_id, project_manager_id, ...projectData } =
-      data;
-    const projectPropertyData = {
-      department_id,
-      client_id,
-      project_manager_id,
-    };
-    if (!client_id) {
-      delete projectPropertyData.client_id;
-    }
-    if (!project_manager_id) {
-      delete projectPropertyData.project_manager_id;
-    }
-    if (department_id || client_id || project_manager_id) {
-      await ProjectPropertyService.update(projectPropertyData, id);
-    }
-    return await prisma.project.update({
+    const updateProject = await prisma.project.update({
       where: { project_id: id },
-      data: { ...projectData, modifiedBy },
+      data: { ...data, modifiedBy },
       select: this.select,
     });
+    if (updateProject) {
+      return updateProject;
+    }
+    throw new BadRequestError("Update project failed");
   };
+
   // delete project
   static delete = async (project_id) => {
     const deleteProject = await prisma.project.update({
@@ -333,20 +289,20 @@ class ProjectService {
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
 
-    if (isNotTrash) {
-      const project_list_id = projects.map((project) => ({
-        project_property_id: project.ProjectProperty.project_property_id,
-      }));
-      await runProducer(
-        assignmentProducerTopic.getProjectInformationFromAssignment,
-        project_list_id
-      );
-      const projectDataReceived = await runConsumerOnDemand();
-      console.log("receive message:::", projectDataReceived);
-      projects.map((item, index) => {
-        item.information = projectDataReceived[index];
-      });
-    }
+    // if (isNotTrash) {
+    //   const project_list_id = projects.map((project) => ({
+    //     project_id: project.project_id,
+    //   }));
+    //   await runProducer(
+    //     assignmentProducerTopic.getProjectInformationFromAssignment,
+    //     project_list_id
+    //   );
+    //   const projectDataReceived = await runConsumerOnDemand();
+    //   console.log("receive message:::", projectDataReceived);
+    //   projects.map((item, index) => {
+    //     item.information = projectDataReceived[index];
+    //   });
+    // }
 
     return {
       data: projects,

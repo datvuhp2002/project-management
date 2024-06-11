@@ -26,7 +26,7 @@ const clientRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/get-all-clientfrom-project": {
+  "/get-all-client-from-project": {
     target: `${process.env.CLIENT_REQUEST_URL}/getAllClientFromProject`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],

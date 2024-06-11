@@ -21,8 +21,8 @@ const activityServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/admin/get-all-activities-by-user-property": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/getAllActivitiesByUserProperty`,
+  "/admin/get-all-activities-by-user": {
+    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/getAllActivitiesByUser`,
     authRequired: true,
     permissions: ["ADMIN"],
   },
@@ -31,8 +31,8 @@ const activityServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/get-all-activities-by-your-property": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYourProperty`,
+  "/get-all-your-activities": {
+    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllYourActivities`,
     authRequired: true,
     permissions: null,
   },

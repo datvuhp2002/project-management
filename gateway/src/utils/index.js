@@ -7,11 +7,11 @@ const getInfoData = ({ fields = [], object = {} }) => {
   return _.pick(object, fields);
 };
 
-const getAllUsersForActivity = async (user_property_ids) => {
+const getAllUsersForActivity = async (user_ids) => {
   try {
     const response = await axios.post(
       `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUserProperty?items_per_page=ALL`,
-      { user_property_ids }
+      { user_ids }
     );
     return response.data.data.users;
   } catch (error) {
@@ -25,25 +25,23 @@ const getAllUsersForActivity = async (user_property_ids) => {
   }
 };
 
-const getAllActivitiesForTask = async (task_property_id) => {
+const getAllActivitiesForTask = async (task_id) => {
   try {
     const response = await axios.get(
-      `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYear/${task_property_id}?items_per_page=ALL`
+      `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYear/${task_id}?items_per_page=ALL`
     );
     let activities = response.data.data;
 
     try {
-      // Lấy danh sách user_property_id và lọc trùng
-      const user_property_ids = [
+      // Lấy danh sách user_id và lọc trùng
+      const user_ids = [
         ...new Set(
           Object.values(activities).flatMap((dateActivities) =>
-            dateActivities.map(
-              (activity) => activity.ActivityProperty.user_property_id
-            )
+            dateActivities.map((activity) => activity.ActivityProperty.user_id)
           )
         ),
       ];
-      console.log("user_property_ids:", user_property_ids);
+      console.log("user_ids:", user_property_ids);
 
       // Lấy thông tin người dùng dựa trên user_property_ids
       const userInformation = await getAllUsersForActivity(user_property_ids);
@@ -98,6 +96,7 @@ const getAllProjectInDepartment = async (department_id) => {
     if (!response.data) {
       throw new BadRequestError("Dự án không tồn tại");
     }
+    console.log(response.data.data);
     return response.data.data.data;
   } catch (error) {
     console.error("Error fetching projects in department:", error);
@@ -105,14 +104,13 @@ const getAllProjectInDepartment = async (department_id) => {
   }
 };
 
-const getAllTasksPropertyForProject = async (project_property_id) => {
+const getAllTasksForProject = async (project_id) => {
   try {
     const taskPropertyResponse = await axios.get(
-      `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllTaskPropertyFromProject/${project_property_id}?items_per_page="ALL"`
+      `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllTaskFromProject/${project_id}?items_per_page="ALL"`
     );
-    const taskProperties = taskPropertyResponse.data.data;
-    const listTask = await getListTaskByTaskProperty(taskProperties);
-
+    const taskIds = taskPropertyResponse.data.data;
+    const listTask = await getListTaskByTaskIds(taskIds);
     return listTask;
   } catch (error) {
     console.error("Error fetching task properties for project:", error);
@@ -120,11 +118,11 @@ const getAllTasksPropertyForProject = async (project_property_id) => {
   }
 };
 
-const getListTaskByTaskProperty = async (task_property_ids) => {
+const getListTaskByTaskIds = async (task_ids) => {
   try {
     const listTaskResponse = await axios.post(
-      `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskByTaskProperty`,
-      { task_property_ids }
+      `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskByTaskIds`,
+      { task_ids }
     );
     const listTasks = listTaskResponse.data.data.data;
     return listTasks;
@@ -138,9 +136,7 @@ const addTasksToProjects = async (projects) => {
   try {
     const projectsWithTasks = await Promise.all(
       projects.map(async (project) => {
-        const tasks = await getAllTasksPropertyForProject(
-          project.ProjectProperty.project_property_id
-        );
+        const tasks = await getAllTasksForProject(project.project_id);
         const taskWithActivities = await addActivitiesToTasks(tasks);
         return { ...project, tasks: taskWithActivities };
       })
@@ -153,9 +149,7 @@ const addTasksToProjects = async (projects) => {
 };
 const addTasksToProject = async (project) => {
   try {
-    const tasks = await getAllTasksPropertyForProject(
-      project.ProjectProperty.project_property_id
-    );
+    const tasks = await getAllTasksForProject(project.project_id);
     const taskWithActivities = await addActivitiesToTasks(tasks);
     return { ...project, tasks: taskWithActivities };
   } catch (error) {
@@ -183,7 +177,7 @@ const getUserByEmail = async (email) => {
       throw new BadRequestError("Người dùng không tồn tại");
     }
     const foundUser = response.data.data;
-    const role = response.data.data.UserProperty.role;
+    const role = foundUser.role;
     return { user: foundUser, role };
   } catch (error) {
     console.error("Error fetching user by email:", error);
@@ -195,7 +189,7 @@ module.exports = {
   getInfoData,
   getUserByEmail,
   getAllProjectInDepartment,
-  getAllTasksPropertyForProject,
+  getAllTasksForProject,
   addTasksToProjects,
   detailProject,
   addTasksToProject,
