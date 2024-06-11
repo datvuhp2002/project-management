@@ -57,6 +57,7 @@ model ProjectProperty {
   department_id       String?   @db.ObjectId
   client_id           String?   @db.ObjectId
   createdBy           String?   @db.ObjectId
+  project_manager_id String? @db.ObjectId
   modifiedBy          String?   @db.ObjectId
   createdAt           DateTime  @default(now())
   updatedAt           DateTime? @updatedAt

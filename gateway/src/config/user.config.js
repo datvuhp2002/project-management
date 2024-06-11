@@ -86,7 +86,7 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/get-a-list-of-staff-do-do-not-have-departments": {
+  "/get-a-list-of-staff-do-not-have-departments": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getListOfStaffDoNotHaveDepartment`,
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],

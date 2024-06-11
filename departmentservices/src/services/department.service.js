@@ -115,16 +115,30 @@ class DepartmentService {
   };
   // department information
   static detail = async (id) => {
-    return await prisma.department.findUnique({
+    const department = await prisma.department.findUnique({
       where: { department_id: id },
       select: this.select,
     });
+    await runProducer(
+      userProducerTopic.getAllUserInDepartmentAndDetailManager,
+      [
+        {
+          department_id: department.department_id,
+          manager_id: department.manager_id,
+        },
+      ]
+    );
+    const userData = await runConsumerOnDemand();
+    console.log("User DATA:::", userData);
+    department.information = userData;
+    return department;
   };
   // update department for manager
   static updateForManager = async ({ id, data, userId }) => {
     const department = await prisma.department.findUnique({
       where: { department_id: id },
     });
+    if (!department) throw new BadRequestError("Department not found");
     if (department.manager_id !== userId)
       throw new BadRequestError("Bạn không có quyền cập nhật cho phòng ban");
     if (data.manager_id)

@@ -270,10 +270,12 @@ services:
       - elasticsearch
     networks:
       - kafka-network
+
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.10.0
     container_name: filebeat
     user: root
+    init: true
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -282,6 +284,18 @@ services:
       - elasticsearch
     networks:
       - kafka-network
+
+  # projectmanagementwebui:
+  #   build:
+  #     dockerfile: Dockerfile
+  #   platform: linux/amd64
+  #   image: nambndpx000/projectmanagementwebui
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - VITE_REQUEST_API_URL=http://10.100.1.153:3050/
+  #   networks:
+  #     - kafka-network
 volumes:
   esdata:
     driver: local
