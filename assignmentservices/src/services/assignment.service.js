@@ -224,11 +224,11 @@ class AssignmentService {
       null
     );
     if (listOfAssignment) {
-      const userPropertyIds = listOfAssignment.assignments
+      const userIds = listOfAssignment.assignments
         .map((assignment) => assignment.user_id)
         .filter((id) => id !== null);
-      const uniqueUserPropertyIds = [...new Set(userPropertyIds)];
-      return uniqueUserPropertyIds;
+      const uniqueUserIds = [...new Set(userIds)];
+      return uniqueUserIds;
     }
     return null;
   };
@@ -239,11 +239,11 @@ class AssignmentService {
       null
     );
     if (listOfAssignment.assignments) {
-      const taskPropertyIds = listOfAssignment.assignments
+      const taskIds = listOfAssignment.assignments
         .map((assignment) => assignment.task_id)
         .filter((id) => id !== null);
-      const uniqueTaskPropertyIds = [...new Set(taskPropertyIds)];
-      return uniqueTaskPropertyIds;
+      const uniqueTaskIds = [...new Set(taskIds)];
+      return uniqueTaskIds;
     }
     return null;
   };
@@ -402,7 +402,7 @@ class AssignmentService {
     };
   };
   // consumer handle request
-  static getTotalTaskPropertyWithStatusFromProject = async (project_id) => {
+  static getTotalTaskWithStatusFromProject = async (project_id) => {
     const listOfAssignmentIsNotDone = await this.listOfAssignmentFromProject(
       project_id,
       false
@@ -415,16 +415,15 @@ class AssignmentService {
       listOfAssignmentIsNotDone.assignments &&
       listOfAssignmentIsDone.assignments
     ) {
-      const taskPropertyIdsIsDone = listOfAssignmentIsDone.assignments.map(
+      const taskIdsIsDone = listOfAssignmentIsDone.assignments.map(
         (assignment) => assignment.task_id
       );
-      const taskPropertyIdsIsNotDone =
-        listOfAssignmentIsNotDone.assignments.map(
-          (assignment) => assignment.task_id
-        );
+      const taskIdsIsNotDone = listOfAssignmentIsNotDone.assignments.map(
+        (assignment) => assignment.task_id
+      );
       return {
-        total_task_is_done: taskPropertyIdsIsDone.length,
-        total_task_is_not_done: taskPropertyIdsIsNotDone.length,
+        total_task_is_done: taskIdsIsDone.length,
+        total_task_is_not_done: taskIdsIsNotDone.length,
       };
     }
     return null;
