@@ -3,7 +3,7 @@
 const prisma = require("../prisma");
 const RoleService = require("./role.service");
 const UserPropertyService = require("./user.property.service");
-const { sendEmailToken } = require("./email.service");
+const EmailService = require("./email.service");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -18,6 +18,8 @@ const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const {
   runAssignmentConsumerOnDemand,
 } = require("../message_queue/consumer.assignment.demand");
+const EMAIL_SERVICE_URL =
+  process.env.EMAIL_SERVICE_URL || "http://localhost:3001";
 
 class UserService {
   static select = {
@@ -95,6 +97,7 @@ class UserService {
     if (result) return true;
     throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại");
   };
+
   static changePassword = async ({ password, email }) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const changePassword = await prisma.user.update({

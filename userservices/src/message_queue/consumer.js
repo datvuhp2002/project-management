@@ -5,6 +5,10 @@ const {
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
 const {
+  emailTopicsContinuous,
+  emailProducerTopic,
+} = require("../configs/kafkaEmailTopic");
+const {
   activityTopicsContinuous,
   activityProducerTopic,
 } = require("../configs/kafkaActivityTopic");
@@ -38,6 +42,14 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(emailTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -82,6 +94,26 @@ const continuousConsumer = async () => {
           }
           if (id !== null) {
             await UserService.update({ id, data });
+          }
+          break;
+        case emailTopicsContinuous.sendEmailToken:
+          const sendEmailTokenData = JSON.parse(message.value.toString());
+          console.log("Message receive:::", sendEmailTokenData);
+          const emailRequestResultPromises = sendEmailTokenData.map(
+            async (item) => {
+              return await UserService.forgetPassword(item);
+            }
+          );
+          const emailRequestResults = await Promise.all(
+            emailRequestResultPromises
+          );
+          try {
+            await runProducer(
+              emailProducerTopic.sendEmailToken,
+              emailRequestResults
+            );
+          } catch (err) {
+            console.log(err);
           }
           break;
         case assignmentTopicsContinuous.getUserInformation:
