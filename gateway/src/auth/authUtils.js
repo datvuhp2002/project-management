@@ -82,16 +82,26 @@ const { AuthFailureError, NotFoundError } = require("../core/error.response");
 // service
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
-    // access token
-    const accessToken = await JWT.sign(payload, publicKey, {
-      // algorithm: "RS256",
-      expiresIn: "2 days",
+    // // access token
+    // const accessToken = await JWT.sign(payload, publicKey, {
+    //   // algorithm: "RS256",
+    //   expiresIn: "2 days",
+    // });
+    // const refreshToken = await JWT.sign(payload, privateKey, {
+    //   // algorithm: "RS256",
+    //   expiresIn: "30 days",
+    // });
+    // //
+    res.cookie("accessToken", tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // chỉ sử dụng https trong môi trường production
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 ngày
     });
-    const refreshToken = await JWT.sign(payload, privateKey, {
-      // algorithm: "RS256",
-      expiresIn: "30 days",
+    res.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 ngày
     });
-    //
     return { accessToken, refreshToken };
   } catch (error) {}
 };
