@@ -8,19 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  user_id   String    @id @default(auto()) @map("_id") @db.ObjectId
-  email     String    @unique
-  password  String
-  status    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-}
-
 model otp {
   otp_id   String    @id @default(auto()) @map("_id") @db.ObjectId
   token    String    @unique
   email    String    @unique
   expireAt DateTime?
   status   Boolean   @default(true)
+}
+
+model template {
+  template_id String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String  @unique
+  html        String
+  status      Boolean @default(true)
 }
