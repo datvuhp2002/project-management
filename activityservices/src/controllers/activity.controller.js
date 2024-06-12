@@ -18,36 +18,19 @@ class ActivityController {
       ),
     }).send(res);
   };
-  getAll = async (req, res, next) => {
+  /**
+   *
+   * @param {id} task_id
+   * @param {target} task || user
+   * @description get all activities from task and all activities of user in task
+   */
+  getAllActivities = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách hoạt động thành công",
-      data: await ActivityService.getAll(req.query),
-    }).send(res);
-  };
-  getAllActivitiesByUser = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Lấy ra danh sách hoạt động thành công",
-      data: await ActivityService.getAllActivitiesByUser(
+      data: await ActivityService.getAllActivities(
         req.query,
-        req.params.id
-      ),
-    }).send(res);
-  };
-  getAllYourActivities = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Lấy ra danh sách hoạt động thành công",
-      data: await ActivityService.getAllActivitiesByUser(
-        req.query,
+        req.params.id,
         req.headers.user
-      ),
-    }).send(res);
-  };
-  getAllActivitiesFromTask = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Lấy ra danh sách hoạt động thành công",
-      data: await ActivityService.getAllActivitiesFromTask(
-        req.query,
-        req.params.id
       ),
     }).send(res);
   };

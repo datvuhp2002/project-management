@@ -16,30 +16,15 @@ const activityServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/admin/get-all": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/getAll`,
+  "/get-all-activities": {
+    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivities`,
     authRequired: true,
-    permissions: ["ADMIN"],
-  },
-  "/admin/get-all-activities-by-user": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/getAllActivitiesByUser`,
-    authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: null,
   },
   "/admin/delete": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/delete`,
     authRequired: true,
     permissions: ["ADMIN"],
-  },
-  "/get-all-your-activities": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllYourActivities`,
-    authRequired: true,
-    permissions: null,
-  },
-  "/get-all-activities-from-task": {
-    target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesFromTask`,
-    authRequired: true,
-    permissions: null,
   },
   "/create": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/create`,

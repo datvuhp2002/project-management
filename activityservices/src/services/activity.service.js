@@ -31,58 +31,19 @@ class ActivityService {
     return activity;
   };
   // get all activities
-  static getAllActivitiesByUser = async (
-    { items_per_page, page, search, nextPage, previousPage },
+  static getAllActivities = async (
+    { items_per_page, page, search, nextPage, previousPage, target },
+    task_id,
     createdBy
   ) => {
     let query = [];
-    query.push({
-      createdBy,
-    });
-    query.push({
-      deletedMark: false,
-    });
-    return await this.queryActivity(
-      {
-        query: query,
-        items_per_page,
-        page,
-        search,
-        nextPage,
-        previousPage,
-      },
-      true
-    );
-  };
-  static getAll = async ({
-    items_per_page,
-    page,
-    search,
-    nextPage,
-    previousPage,
-  }) => {
-    let query = [];
-    query.push({
-      deletedMark: false,
-    });
-    return await this.queryActivity(
-      {
-        query: query,
-        items_per_page,
-        page,
-        search,
-        nextPage,
-        previousPage,
-      },
-      true
-    );
-  };
-  // get all activities from task
-  static getAllActivitiesFromTask = async (
-    { items_per_page, page, search, nextPage, previousPage },
-    task_id
-  ) => {
-    let query = [];
+    if (target && target === "user") {
+      console.log(target);
+      console.log(createdBy);
+      query.push({
+        createdBy,
+      });
+    }
     query.push({
       task_id,
       deletedMark: false,
