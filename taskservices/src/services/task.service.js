@@ -12,6 +12,9 @@ const {
   runConsumerAssignmentOnDemand,
 } = require("../message_queue/consumer.assignment.demand");
 const { runProducer } = require("../message_queue/producer");
+const {
+  ActivityProducerTopic,
+} = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
 class TaskService {
   static select = {
     task_id: true,
@@ -27,6 +30,11 @@ class TaskService {
       data: { ...data, createdBy },
     });
     if (newTask) {
+      await runProducer(ActivityProducerTopic.taskCreated, {
+        task_id: newTask.task_id,
+        description: newTask.description,
+        createdBy,
+      });
       return newTask;
     }
     throw new BadRequestError("Can't create task");
@@ -128,7 +136,14 @@ class TaskService {
       where: { task_id },
       data: { ...data, modifiedBy },
     });
-    if (updateTask) return true;
+    if (updateTask) {
+      await runProducer(ActivityProducerTopic.taskUpdated, {
+        task_id: updateTask.task_id,
+        description: updateTask.description,
+        modifiedBy,
+      });
+      return true;
+    }
     return false;
   };
   // delete task
