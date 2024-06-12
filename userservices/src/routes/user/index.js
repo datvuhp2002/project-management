@@ -33,10 +33,6 @@ router.get(
 router.get("/admin/trash", asyncHandler(UserController.trash));
 // Tạo ra một người dùng mới
 router.post("/create", asyncHandler(UserController.create));
-router.post(
-  "/getAllStaffByUser",
-  asyncHandler(UserController.getAllStaffByUser)
-);
 // Upload Avatar
 router.post(
   "/uploadAvatarFromUrl",
