@@ -18,11 +18,11 @@ router.get(
 );
 router.get(
   "/admin/getAllActivitiesByUserProperty/:id",
-  asyncHandler(ActivityController.getAllActivitiesByUserProperty)
+  asyncHandler(ActivityController.getAllActivitiesByUser)
 );
 router.get(
-  "/getAllActivitiesByYourProperty",
-  asyncHandler(ActivityController.getAllActivitiesByYourProperty)
+  "/getAllYourActivities",
+  asyncHandler(ActivityController.getAllYourActivities)
 );
 
 // Xoá một activity theo id

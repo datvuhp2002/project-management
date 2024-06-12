@@ -29,12 +29,13 @@ const continuousConsumer = async () => {
             console.log("After:::", parsedMessage);
             const assignmentRequestResultPromises = parsedMessage.map(
               async (item) => {
-                return await TaskService.getListDetailTaskByTaskProperty(item);
+                return await TaskService.getListDetailTask(item);
               }
             );
             const assignmentRequestResults = await Promise.all(
               assignmentRequestResultPromises
             );
+            console.log(assignmentRequestResults);
             try {
               runProducer(
                 assignmentProducerTopic.receivedTaskInformation,

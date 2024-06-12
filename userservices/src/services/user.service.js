@@ -4,6 +4,7 @@ const prisma = require("../prisma");
 const RoleService = require("./role.service");
 const UserPropertyService = require("./user.property.service");
 const EmailService = require("./email.service");
+// const { sendEmailToken } = require("./email.service");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -33,25 +34,22 @@ class UserService {
     createdAt: true,
     createdBy: true,
     deletedMark: true,
-    UserProperty: {
+    department_id: true,
+    role: {
       select: {
-        user_property_id: true,
-        department_id: true,
-        role: {
-          select: {
-            name: true,
-          },
-        },
+        role_id: true,
+        name: true,
       },
     },
   };
   // create new user
   static create = async (
-    { username, email, password, role, department_id, ...rest },
+    { username, email, password, role, ...rest },
     createdBy
   ) => {
     if (!role) throw new BadRequestError("Role is not defined");
     const role_data = await RoleService.findByName(role);
+    if (!role) throw new BadRequestError("Role is not defined");
     if (!email) {
       throw new BadRequestError("Error: Email is not defined");
     }
@@ -64,26 +62,14 @@ class UserService {
       data: {
         username,
         email,
+        role_id: role_data.role_id,
         password: passwordHash,
         createdBy,
         ...rest,
       },
       select: this.select,
     });
-
-    if (newUser) {
-      const userProperty = await UserPropertyService.create({
-        role_id: role_data.role_id,
-        user_id: newUser.user_id,
-        department_id,
-      });
-      if (userProperty) {
-        return { user: newUser, user_property: userProperty };
-      } else {
-        await prisma.user.delete({ where: { user_id: newUser.user_id } });
-        throw new BadRequestError("Đã sảy ra lỗi, vui lòng thử lại");
-      }
-    }
+    if (!newUser) throw new BadRequestError("Error: Cannot create new user");
     return newUser;
   };
 
@@ -111,26 +97,29 @@ class UserService {
   static findUserByRole = async (role) => {
     const role_data = await RoleService.findByName(role);
     if (!role_data) throw new BadRequestError("Role không tồn tại");
-    const users = await UserPropertyService.findUserByRole(role_data.role_id);
+    const users = await prisma.user.findMany({
+      where: { role_id: role_data.role_id },
+    });
     return users.map((user) => user.user_id);
-  };
-  // find user property by role
-  static findUserPropertyByRole = async (role) => {
-    const role_data = await RoleService.findByName(role);
-    if (!role_data) throw new BadRequestError("Role không tồn tại");
-    const users = await UserProperty.findUserByRole(role_data.role_id);
-    return users.map((user) => user.user_property_id);
   };
   // find user by email
   static findByEmail = async (email) => {
     return await prisma.user.findFirst({
       where: { email },
-      include: { UserProperty: { include: { role: true } } },
+      include: {
+        role: {
+          select: {
+            role_id: true, // Assuming 'id' is a valid field
+            name: true,
+          },
+        },
+      },
     });
   };
+
   // add user into department
   static addUserIntoDepartment = async ({ list_user_ids }, department_id) => {
-    return await prisma.userProperty.updateMany({
+    return await prisma.user.updateMany({
       where: {
         OR: list_user_ids.map((user_id) => ({ user_id: user_id })),
       },
@@ -144,7 +133,7 @@ class UserService {
     { list_user_ids },
     department_id
   ) => {
-    return await prisma.userProperty.updateMany({
+    return await prisma.user.updateMany({
       where: {
         department_id,
         OR: list_user_ids.map((user_id) => ({ user_id: user_id })),
@@ -173,24 +162,24 @@ class UserService {
     userId
   ) => {
     let query = [];
-    let ListUserProperty;
+    let listUser;
     if (manager_id !== userId)
       throw new AuthFailureError(
         "Đây không phải phòng ban bạn của bạn, vui lòng rời đi."
       );
     if (role) {
       const role_data = await RoleService.findByName(role);
-      ListUserProperty = await prisma.userProperty.findMany({
+      listUser = await prisma.user.findMany({
         where: { department_id, role_id: role_data.role_id },
       });
     } else {
-      ListUserProperty = await prisma.userProperty.findMany({
+      listUser = await prisma.user.findMany({
         where: { department_id },
       });
     }
     query.push({
       user_id: {
-        in: ListUserProperty.map((user) => user.user_id),
+        in: listUser.map((user) => user.user_id),
       },
     });
     query.push({
@@ -205,14 +194,14 @@ class UserService {
       previousPage,
     });
   };
-  static getAllStaffInProject = async (query, project_property_id) => {
+  static getAllStaffInProject = async (query, project_id) => {
     await runProducer(
       assignmentProducerTopic.getListUserPropertyFromProject,
-      project_property_id
+      project_id
     );
-    const user_property_ids = await runAssignmentConsumerOnDemand();
-    console.log("list user property:", user_property_ids);
-    return await this.getAllStaffByUserProperty(query, { user_property_ids });
+    const user_ids = await runAssignmentConsumerOnDemand();
+    console.log("list user property:", user_ids);
+    return await this.getAllStaffByUser(query, { user_ids });
   };
   // get All Staff in department for ADMIN
   static getAllStaffInDepartmentForAdmin = async (
@@ -220,20 +209,20 @@ class UserService {
     department_id
   ) => {
     let query = [];
-    let ListUserProperty;
+    let ListUser;
     if (role) {
       const role_data = await RoleService.findByName(role);
-      ListUserProperty = await prisma.userProperty.findMany({
+      ListUser = await prisma.user.findMany({
         where: { department_id, role_id: role_data.role_id },
       });
     } else {
-      ListUserProperty = await prisma.userProperty.findMany({
+      ListUser = await prisma.user.findMany({
         where: { department_id },
       });
     }
     query.push({
       user_id: {
-        in: ListUserProperty.map((user) => user.user_id),
+        in: ListUser.map((user) => user.user_id),
       },
     });
     query.push({
@@ -249,15 +238,15 @@ class UserService {
     });
   };
   // get all staff by user properties
-  static getAllStaffByUserProperty = async (
+  static getAllStaffByUser = async (
     { items_per_page, page, search, nextPage, previousPage, role = null },
-    { user_property_ids }
+    { user_ids }
   ) => {
     let query = [];
     if (role) {
-      const listUserPropertyByRole = await this.findUserPropertyByRole(role);
-      const commonElements = listUserPropertyByRole.filter((element) =>
-        user_property_ids.includes(element)
+      const listUserByRole = await this.findUserByRole(role);
+      const commonElements = listUserByRole.filter((element) =>
+        user_ids.includes(element)
       );
       query.push({
         user_id: {
@@ -266,10 +255,8 @@ class UserService {
       });
     } else {
       query.push({
-        UserProperty: {
-          user_property_id: {
-            in: user_property_ids,
-          },
+        user_id: {
+          in: user_ids,
         },
       });
     }
@@ -285,48 +272,6 @@ class UserService {
       previousPage,
     });
   };
-  static getStaffInformationByUserProperty = async (user_property_id) => {
-    if (user_property_id == null || user_property_id == undefined) return null;
-    const userInformation = await prisma.user.findFirst({
-      where: { UserProperty: { user_property_id } },
-    });
-    if (userInformation) {
-      return userInformation;
-    }
-    return null;
-  };
-  // update user information
-  static update = async ({ id, data }) => {
-    if (data.avatar) {
-      try {
-        return await prisma.user.update({
-          where: { user_id: id },
-          data,
-          select: this.select,
-        });
-      } catch (errr) {
-        cloudinary.uploader.destroy(data.avatar);
-        throw new BadRequestError(
-          "Cập nhật không thành công, vui lòng thử lại."
-        );
-      }
-    }
-    const { department_id, role_id, ...updateUserData } = data;
-    if (department_id !== undefined) {
-      console.log("before update user with id:::", id);
-      await UserPropertyService.update(id, { department_id });
-    }
-    if (role_id !== undefined) {
-      await UserPropertyService.update(id, { role_id });
-    }
-    const updateUser = await prisma.user.update({
-      where: { user_id: id },
-      data: updateUserData,
-      select: this.select,
-    });
-    if (updateUser) return true;
-    throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
-  };
   // get all staffs
   static getAll = async ({
     items_per_page,
@@ -335,7 +280,7 @@ class UserService {
     search,
     nextPage,
     previousPage,
-    role = null,
+    role,
   }) => {
     let query = [];
 
@@ -343,14 +288,10 @@ class UserService {
       query.push({
         OR: [
           {
-            UserProperty: {
-              department_id: null,
-            },
+            department_id: null,
           },
           {
-            UserProperty: {
-              department_id: undefined,
-            },
+            department_id: undefined,
           },
         ],
         deletedMark: false,
@@ -359,9 +300,10 @@ class UserService {
       query.push({
         OR: [
           {
-            UserProperty: {
-              department_id: null,
-            },
+            department_id: { not: null },
+          },
+          {
+            department_id: { not: undefined },
           },
         ],
         deletedMark: false,
@@ -369,6 +311,7 @@ class UserService {
     }
 
     if (role) {
+      console.log(role);
       query.push({
         user_id: {
           in: await this.findUserByRole(role),
@@ -376,6 +319,33 @@ class UserService {
       });
     }
     query.push({
+      deletedMark: false,
+    });
+    return await this.queryUser({
+      query: query,
+      items_per_page,
+      page,
+      search,
+      nextPage,
+      previousPage,
+    });
+  };
+  static getListOfStaffDoNotHaveDepartment = async ({
+    items_per_page,
+    page,
+    search,
+    nextPage,
+    previousPage,
+    role = "STAFF",
+  }) => {
+    let query = [];
+    query.push({
+      user_id: {
+        in: await this.findUserByRole(role),
+      },
+    });
+    query.push({
+      department_id: null || undefined,
       deletedMark: false,
     });
     return await this.queryUser({
@@ -470,16 +440,11 @@ class UserService {
         );
       }
     }
-
-    const { department_id, role, ...updateUserData } = data;
-    if (department_id !== undefined) {
-      console.log("before update user with id:::", id);
-      await UserPropertyService.update(id, { department_id });
-    }
+    const { role, ...updateUserData } = data;
     if (role) {
       const role_data = await RoleService.findByName(role);
       if (!role_data) throw new BadRequestError("Role not found");
-      await UserPropertyService.update(id, { role_id: role_data.role_id });
+      updateUserData.role_id = role_data.role_id;
     }
     const updateUser = await prisma.user.update({
       where: { user_id: id },
@@ -491,7 +456,6 @@ class UserService {
   };
   // delete user account
   static delete = async (user_id) => {
-    const userProperty = await UserPropertyService.findUserByUser_Id(user_id);
     const deleteUser = await prisma.user.update({
       where: { user_id },
       select: this.select,
@@ -501,15 +465,12 @@ class UserService {
       },
     });
     if (deleteUser) {
-      const deleteUserProperty = await UserPropertyService.delete(user_id);
-      if (deleteUserProperty) {
-        const roleUser = await RoleService.findById(deleteUserProperty.role_id);
-        if (roleUser.name === "ADMIN" || roleUser.name === "MANAGER") {
-          await runProducer(
-            departmentProducerTopic.deleteUser,
-            userProperty.department_id
-          );
-        }
+      const roleUser = await RoleService.findById(deleteUser);
+      if (roleUser.name === "ADMIN" || roleUser.name === "MANAGER") {
+        await runProducer(
+          departmentProducerTopic.deleteUser,
+          deleteUser.department_id
+        );
         return true;
       }
       await this.restore(user_id);
@@ -527,9 +488,7 @@ class UserService {
       },
     });
     if (restoreUser) {
-      const restoreUserProperty = await UserPropertyService.restore(user_id);
-      if (restoreUserProperty) return true;
-      await this.delete(user_id);
+      return restoreUser;
     }
     await this.delete(user_id);
     return null;

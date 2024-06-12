@@ -30,7 +30,10 @@ model Project {
   status          Boolean?         @default(true)
   deletedAt       DateTime?
   deletedMark     Boolean          @default(false)
-  ProjectProperty ProjectProperty?
+  client_ownership    Client?   @relation(fields: [client_id], references: [client_id])
+  department_id       String?   @db.ObjectId
+  client_id           String?   @db.ObjectId
+  project_manager_id String? @db.ObjectId
 }
 
 model Client {
@@ -46,21 +49,6 @@ model Client {
   updatedAt       DateTime?         @updatedAt
   deletedAt       DateTime?
   deletedMark     Boolean           @default(false)
-  ProjectProperty ProjectProperty[]
+  Project Project[]
 }
 
-model ProjectProperty {
-  project_property_id String    @id @default(auto()) @map("_id") @db.ObjectId
-  project_ownership   Project   @relation(fields: [project_id], references: [project_id])
-  project_id          String    @unique @db.ObjectId
-  client_ownership    Client?   @relation(fields: [client_id], references: [client_id])
-  department_id       String?   @db.ObjectId
-  client_id           String?   @db.ObjectId
-  createdBy           String?   @db.ObjectId
-  project_manager_id String? @db.ObjectId
-  modifiedBy          String?   @db.ObjectId
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime? @updatedAt
-  deletedAt           DateTime?
-  deletedMark         Boolean   @default(false)
-}

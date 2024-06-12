@@ -6,11 +6,7 @@ class ActivityController {
   create = async (req, res, next) => {
     new CREATED({
       message: "Tạo hoạt động mới thành công",
-      data: await ActivityService.create(
-        req.body,
-        req.headers.user,
-        req.headers.user_property
-      ),
+      data: await ActivityService.create(req.body, req.headers.user),
     }).send(res);
   };
   getAllActivitiesByYear = async (req, res, next) => {
@@ -28,21 +24,21 @@ class ActivityController {
       data: await ActivityService.getAll(req.query),
     }).send(res);
   };
-  getAllActivitiesByUserProperty = async (req, res, next) => {
+  getAllActivitiesByUser = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách hoạt động thành công",
-      data: await ActivityService.getAllActivitiesByUserProperty(
+      data: await ActivityService.getAllActivitiesByUser(
         req.query,
         req.params.id
       ),
     }).send(res);
   };
-  getAllActivitiesByYourProperty = async (req, res, next) => {
+  getAllYourActivities = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách hoạt động thành công",
-      data: await ActivityService.getAllActivitiesByUserProperty(
+      data: await ActivityService.getAllActivitiesByUser(
         req.query,
-        req.headers.user_property
+        req.headers.user
       ),
     }).send(res);
   };

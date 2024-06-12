@@ -30,8 +30,8 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/get-all-staff-by-user-property": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUserProperty`,
+  "/get-all-staff-by-user": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUser`,
     authRequired: true,
     permissions: null,
   },

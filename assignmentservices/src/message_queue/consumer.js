@@ -43,17 +43,16 @@ const continuousConsumer = async () => {
         case projectTopicsContinuous.getProjectInformationFromAssignment:
           const projectRequestResultPromises = await parsedMessage.map(
             async (item) => {
-              const list_user_property =
-                await AssignmentServices.getAllUserPropertyFromProject(
-                  item.project_property_id
-                );
-              const list_task_property =
-                await AssignmentServices.getTotalTaskPropertyWithStatusFromProject(
-                  item.project_property_id
+              const list_user = await AssignmentServices.getAllUserFromProject(
+                item.project_id
+              );
+              const list_task =
+                await AssignmentServices.getTotalTaskWithStatusFromProject(
+                  item.project_id
                 );
               return {
-                total_user: list_user_property.length,
-                total_task: list_task_property,
+                total_user: list_user.length,
+                total_task: list_task,
               };
             }
           );
@@ -71,9 +70,7 @@ const continuousConsumer = async () => {
           break;
         case userTopicsContinuous.getListUserPropertyFromProject:
           const resultUserTopic =
-            await AssignmentServices.getAllUserPropertyFromProject(
-              parsedMessage
-            );
+            await AssignmentServices.getAllUserFromProject(parsedMessage);
           console.log("result:::", resultUserTopic);
           try {
             await runProducer(
@@ -84,15 +81,14 @@ const continuousConsumer = async () => {
             console.log(err.message);
           }
           break;
-        case taskTopicsContinuous.getListTaskPropertyFromProject:
+        case taskTopicsContinuous.getListTaskFromProject:
+          console.log(parsedMessage);
           const resultTaskTopic =
-            await AssignmentServices.getAllTaskPropertyFromProject(
-              parsedMessage
-            );
+            await AssignmentServices.getAllTaskFromProject(parsedMessage);
           console.log("result:::", resultTaskTopic);
           try {
             await runProducer(
-              taskProducerTopic.receivedTaskPropertyFromProject,
+              taskProducerTopic.receivedTaskFromProject,
               resultTaskTopic
             );
           } catch (err) {

@@ -39,14 +39,16 @@ class AccessService {
 
   static login = async ({ email, password }) => {
     const userData = await getUserByEmail(email);
+    if (!userData) {
+      throw new AuthFailureError("Error: User Is not exist");
+    }
     const match = await bcrypt.compare(password, userData.user.password);
     if (!match) {
       throw new AuthFailureError("Error: Mật khẩu không đúng, hãy thử lại");
     } else {
       const { user_id: userId } = userData.user;
-      const { user_property_id: userProperty } = userData.user.UserProperty;
       const tokens = await createTokenPair(
-        { userId, email, userProperty, role: userData.role.name },
+        { userId, email, role: userData.role.name },
         process.env.PUBLIC_KEY,
         process.env.PRIVATE_KEY
       );

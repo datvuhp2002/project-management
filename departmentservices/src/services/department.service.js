@@ -119,6 +119,9 @@ class DepartmentService {
       where: { department_id: id },
       select: this.select,
     });
+    if (!department) {
+      throw new BadRequestError("Department not found");
+    }
     await runProducer(
       userProducerTopic.getAllUserInDepartmentAndDetailManager,
       [
@@ -131,6 +134,7 @@ class DepartmentService {
     const userData = await runConsumerOnDemand();
     console.log("User DATA:::", userData);
     department.information = userData;
+
     return department;
   };
   // update department for manager

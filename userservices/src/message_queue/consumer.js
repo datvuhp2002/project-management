@@ -117,15 +117,15 @@ const continuousConsumer = async () => {
           }
           break;
         case assignmentTopicsContinuous.getUserInformation:
-          console.log(parsedMessage);
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {
-              return await UserService.getStaffInformationByUserProperty(item);
+              return await UserService.detail(item);
             }
           );
           const assignmentRequestResults = await Promise.all(
             assignmentRequestResultPromises
           );
+          console.log(assignmentRequestResults);
           try {
             runProducer(
               assignmentProducerTopic.receivedUserInformation,
@@ -154,7 +154,7 @@ const continuousConsumer = async () => {
         case activityTopicsContinuous.getUserInformationForActivity:
           const activityRequestResultPromises = parsedMessage.map(
             async (item) => {
-              return await UserService.getStaffInformationByUserProperty(item);
+              return await UserService.detail(item);
             }
           );
           const activityRequestResults = await Promise.all(

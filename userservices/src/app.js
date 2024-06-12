@@ -22,9 +22,9 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 // init elasticsearch
-initElasticsearch.init({
-  ELASTICSEARCH_IS_ENABLED: true,
-});
+// initElasticsearch.init({
+//   ELASTICSEARCH_IS_ENABLED: true,
+// });
 // init db
 require(`./dbs/init.dbs`);
 // init routes

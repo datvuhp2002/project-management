@@ -123,7 +123,6 @@ const authentication = asyncHandler(async (req, res, next) => {
         process.env.PRIVATE_KEY
       );
       req.user = decodeUser;
-      req.userProperty = decodeUser.userProperty;
       req.refreshToken = refreshToken;
       req.role = decodeUser.role;
       return next();
@@ -136,10 +135,8 @@ const authentication = asyncHandler(async (req, res, next) => {
   try {
     const decodeUser = await JWT.verify(accessToken, process.env.PUBLIC_KEY);
     req.user = decodeUser;
-    req.userProperty = decodeUser.userProperty;
     req.role = decodeUser.role;
     req.headers.user = req.user.userId;
-    req.headers.user_property = req.user.userProperty;
     return next();
   } catch (error) {
     throw error;

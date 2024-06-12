@@ -11,8 +11,8 @@ class RoleService {
   static findByName = async (name) => {
     return await prisma.role.findFirst({ where: { name } });
   };
-  static findById = async ({ id }) => {
-    return await prisma.role.findFirst({ where: { role_id: id } });
+  static findById = async ({ role_id }) => {
+    return await prisma.role.findFirst({ where: { role_id } });
   };
 }
 module.exports = RoleService;

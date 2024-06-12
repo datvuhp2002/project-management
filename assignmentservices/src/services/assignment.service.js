@@ -7,7 +7,6 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const { ObjectId } = require("mongodb");
-const { getUserByUserPropertyIds } = require("../utils");
 const { runProducer } = require("../message_queue/producer");
 const {
   runConsumerTaskOnDemand,
@@ -22,9 +21,9 @@ const {
 class AssignmentService {
   static select = {
     assignment_id: true,
-    user_property_id: true,
-    project_property_id: true,
-    task_property_id: true,
+    user_id: true,
+    project_id: true,
+    task_id: true,
     startAt: true,
     endAt: true,
     status: true,
@@ -71,25 +70,25 @@ class AssignmentService {
       true
     );
   };
-  static getAllAssignment = async (query, property_id) => {
+  static getAllAssignment = async (query, id) => {
     switch (query.target) {
       case "project":
-        return await this.getAllAssignmentForProject(query, property_id);
+        return await this.getAllAssignmentForProject(query, id);
         break;
       case "task":
-        return await this.getAllAssignmentForTask(query, property_id);
+        return await this.getAllAssignmentForTask(query, id);
         break;
       default:
-        return await this.getAllAssignmentForUser(query, property_id);
+        return await this.getAllAssignmentForUser(query, id);
         break;
     }
   };
   static getAllAssignmentForUser = async (
     { items_per_page, page, search, nextPage, previousPage, status },
-    user_property_id
+    user_id
   ) => {
     let query = [];
-    query.push({ deletedMark: false, user_property_id });
+    query.push({ deletedMark: false, user_id });
     if (status && status === "true") {
       query.push({ status: true });
     } else if (status && status === "false") {
@@ -117,10 +116,10 @@ class AssignmentService {
       status,
       isAssigned,
     },
-    task_property_id
+    task_id
   ) => {
     let query = [];
-    query.push({ deletedMark: false, task_property_id });
+    query.push({ deletedMark: false, task_id });
     if (status && status === "true") {
       query.push({ status: true });
     } else if (status && status === "false") {
@@ -129,19 +128,19 @@ class AssignmentService {
     if (isAssigned && isAssigned === "true") {
       query.push(
         {
-          user_property_id: { not: null },
+          user_id: { not: null },
         },
         {
-          user_property_id: { not: undefined },
+          user_id: { not: undefined },
         }
       );
     } else if (isAssigned && isAssigned === "false") {
       query.push(
         {
-          user_property_id: null,
+          user_id: null,
         },
         {
-          user_property_id: undefined,
+          user_id: undefined,
         }
       );
     }
@@ -167,26 +166,26 @@ class AssignmentService {
       status,
       isAssigned,
     },
-    project_property_id
+    project_id
   ) => {
     let query = [];
-    query.push({ deletedMark: false, project_property_id });
+    query.push({ deletedMark: false, project_id });
     if (isAssigned && isAssigned === "true") {
       query.push(
         {
-          user_property_id: { not: null },
+          user_id: { not: null },
         },
         {
-          user_property_id: { not: undefined },
+          user_id: { not: undefined },
         }
       );
     } else if (isAssigned && isAssigned === "false") {
       query.push(
         {
-          user_property_id: null,
+          user_id: null,
         },
         {
-          user_property_id: undefined,
+          user_id: undefined,
         }
       );
     }
@@ -208,55 +207,52 @@ class AssignmentService {
     );
   };
   // remove staff from project
-  static removeStaffFromProject = async (
-    project_property_id,
-    user_property_ids
-  ) => {
+  static removeStaffFromProject = async (project_id, user_ids) => {
     const removeStaff = await prisma.assignment.deleteMany({
       where: {
-        project_property_id,
-        user_property_id: { in: user_property_ids },
+        project_id,
+        user_id: { in: user_ids },
       },
     });
     if (removeStaff.count > 0) return true;
     return false;
   };
   // get all assignment instances
-  static getAllUserPropertyFromProject = async (project_property_id) => {
+  static getAllUserFromProject = async (project_id) => {
     const listOfAssignment = await this.listOfAssignmentFromProject(
-      project_property_id,
+      project_id,
       null
     );
     if (listOfAssignment) {
-      const userPropertyIds = listOfAssignment.assignments
-        .map((assignment) => assignment.user_property_id)
+      const userIds = listOfAssignment.assignments
+        .map((assignment) => assignment.user_id)
         .filter((id) => id !== null);
-      const uniqueUserPropertyIds = [...new Set(userPropertyIds)];
-      return uniqueUserPropertyIds;
+      const uniqueUserIds = [...new Set(userIds)];
+      return uniqueUserIds;
     }
     return null;
   };
-  // list of task property from project
-  static getAllTaskPropertyFromProject = async (project_property_id) => {
+  // list of task from project
+  static getAllTaskFromProject = async (project_id) => {
     const listOfAssignment = await this.listOfAssignmentFromProject(
-      project_property_id,
+      project_id,
       null
     );
     if (listOfAssignment.assignments) {
-      const taskPropertyIds = listOfAssignment.assignments
-        .map((assignment) => assignment.task_property_id)
+      const taskIds = listOfAssignment.assignments
+        .map((assignment) => assignment.task_id)
         .filter((id) => id !== null);
-      const uniqueTaskPropertyIds = [...new Set(taskPropertyIds)];
-      return uniqueTaskPropertyIds;
+      const uniqueTaskIds = [...new Set(taskIds)];
+      return uniqueTaskIds;
     }
     return null;
   };
-  // list of task property from project
-  static listOfAssignmentFromProject = async (project_property_id, status) => {
+  // list of task from project
+  static listOfAssignmentFromProject = async (project_id, status) => {
     let query = [
       {
         deletedMark: false,
-        project_property_id,
+        project_id,
       },
     ];
     if (status) {
@@ -354,12 +350,10 @@ class AssignmentService {
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
     if (isNotTrash) {
       const assignment_list_id = assignments.map((assignment) => ({
-        task_property_id: assignment.task_property_id,
+        task_id: assignment.task_id,
       }));
 
-      const user_list_id = assignments.map(
-        (assignment) => assignment.user_property_id
-      );
+      const user_list_id = assignments.map((assignment) => assignment.user_id);
 
       // Tạo các Promise cho các producers và consumers
       await runProducer(
@@ -408,35 +402,28 @@ class AssignmentService {
     };
   };
   // consumer handle request
-  static getTotalTaskPropertyWithStatusFromProject = async (
-    project_property_id
-  ) => {
+  static getTotalTaskWithStatusFromProject = async (project_id) => {
     const listOfAssignmentIsNotDone = await this.listOfAssignmentFromProject(
-      project_property_id,
+      project_id,
       false
     );
     const listOfAssignmentIsDone = await this.listOfAssignmentFromProject(
-      project_property_id,
+      project_id,
       true
     );
     if (
       listOfAssignmentIsNotDone.assignments &&
       listOfAssignmentIsDone.assignments
     ) {
-      const taskPropertyIdsIsDone = listOfAssignmentIsDone.assignments.map(
-        (assignment) => assignment.task_property_id
+      const taskIdsIsDone = listOfAssignmentIsDone.assignments.map(
+        (assignment) => assignment.task_id
       );
-      const taskPropertyIdsIsNotDone =
-        listOfAssignmentIsNotDone.assignments.map(
-          (assignment) => assignment.task_property_id
-        );
-      // const uniqueTaskPropertyIdsIsDone = [...new Set(taskPropertyIdsIsDone)];
-      // const uniqueTaskPropertyIdsIsNotDone = [
-      //   ...new Set(taskPropertyIdsIsNotDone),
-      // ];
+      const taskIdsIsNotDone = listOfAssignmentIsNotDone.assignments.map(
+        (assignment) => assignment.task_id
+      );
       return {
-        total_task_is_done: taskPropertyIdsIsDone.length,
-        total_task_is_not_done: taskPropertyIdsIsNotDone.length,
+        total_task_is_done: taskIdsIsDone.length,
+        total_task_is_not_done: taskIdsIsNotDone.length,
       };
     }
     return null;

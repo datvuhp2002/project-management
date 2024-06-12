@@ -83,21 +83,17 @@ class AssignmentController {
       ),
     }).send(res);
   };
-  getAllUserPropertyFromProject = async (req, res, next) => {
+  getAllUserFromProject = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy tất cả thuộc tính nhân viên trong dự án thành công",
-      data: await AssignmentService.getAllUserPropertyFromProject(
-        req.params.id
-      ),
+      data: await AssignmentService.getAllUserFromProject(req.params.id),
     }).send(res);
   };
 
-  getAllTaskPropertyFromProject = async (req, res, next) => {
+  getAllTaskFromProject = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy tất cả thuộc tính nhiệm vụ trong dự án thành công",
-      data: await AssignmentService.getAllTaskPropertyFromProject(
-        req.params.id
-      ),
+      data: await AssignmentService.getAllTaskFromProject(req.params.id),
     }).send(res);
   };
   removeStaffFromProject = async (req, res, next) => {
