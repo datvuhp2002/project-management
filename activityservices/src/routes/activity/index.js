@@ -11,27 +11,16 @@ router.get("/admin/trash", asyncHandler(ActivityController.trash));
 router.put("/admin/restore/:id", asyncHandler(ActivityController.restore));
 
 // Lấy ra hết tất cả activity
-router.get("/admin/getAll", asyncHandler(ActivityController.getAll));
 router.get(
   "/getAllActivitiesByYear/:id",
   asyncHandler(ActivityController.getAllActivitiesByYear)
 );
 router.get(
-  "/admin/getAllActivitiesByUserProperty/:id",
-  asyncHandler(ActivityController.getAllActivitiesByUser)
+  "/getAllActivities/:id",
+  asyncHandler(ActivityController.getAllActivities)
 );
-router.get(
-  "/getAllYourActivities",
-  asyncHandler(ActivityController.getAllYourActivities)
-);
-
 // Xoá một activity theo id
 router.delete("/admin/delete/:id", asyncHandler(ActivityController.delete));
-// Lấy ra hết tất cả activity
-router.get(
-  "/getAllActivitiesFromTask/:id",
-  asyncHandler(ActivityController.getAllActivitiesFromTask)
-);
 // Tạo ra một activity mới
 router.post("/create", asyncHandler(ActivityController.create));
 // Cập nhật một activity theo id

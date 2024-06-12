@@ -1,2 +1,0 @@
-{"@timestamp":"2024-06-05T19:12:19.584Z","context":"/users/admin/get-all","ecs.version":"8.10.0","log.level":"info","message":"input params:-:GET:-:","metadata":{},"requestId":"faf5e73e-c1c2-425e-8ceb-3990dfff66d7","timestamp":"2024-06-06 02:12:584 AM"}
-{"@timestamp":"2024-06-05T19:12:25.484Z","context":"/users/admin/getAll","ecs.version":"8.10.0","log.level":"info","message":"input params:-:GET:-:","metadata":{},"requestId":"1ab3597a-a1cb-4c6e-8513-274788bee420","timestamp":"2024-06-06 02:12:484 AM"}

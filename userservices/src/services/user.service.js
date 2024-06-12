@@ -196,7 +196,7 @@ class UserService {
     );
     const user_ids = await runAssignmentConsumerOnDemand();
     console.log("list user property:", user_ids);
-    return await this.getAllStaffByUser(query, { user_ids });
+    return await this.getAllStaffByUserIds(query, { user_ids });
   };
   // get All Staff in department for ADMIN
   static getAllStaffInDepartmentForAdmin = async (
@@ -233,7 +233,7 @@ class UserService {
     });
   };
   // get all staff by user properties
-  static getAllStaffByUser = async (
+  static getAllStaffByUserIds = async (
     { items_per_page, page, search, nextPage, previousPage, role = null },
     { user_ids }
   ) => {

@@ -10,6 +10,31 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
+  "/admin/delete": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/delete`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
+  "/admin/get-all-staff-in-department": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAllStaffInDepartment`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
+  "/admin/trash": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/trash`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
+  "/admin/update": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/update`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
+  "/admin/restore": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/restore`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
   "/forget-password": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/forget-password`,
     authRequired: false,
@@ -30,42 +55,17 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/get-all-staff-by-user": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUser`,
-    authRequired: true,
-    permissions: null,
-  },
-  "/admin/get-all-staff-in-department": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAllStaffInDepartment`,
-    authRequired: true,
-    permissions: ["ADMIN"],
-  },
-
-  "/admin/trash": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/trash`,
-    authRequired: true,
-    permissions: ["ADMIN"],
-  },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
     authRequired: null,
     permissions: null,
-  },
-  "/admin/delete": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/delete`,
-    authRequired: true,
-    permissions: ["ADMIN"],
   },
   "/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
     permissions: null,
   },
-  "/admin/update": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/update`,
-    authRequired: true,
-    permissions: ["ADMIN"],
-  },
+
   "/detail": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/detail`,
     authRequired: true,
@@ -76,11 +76,7 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
-  "/admin/restore": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/restore`,
-    authRequired: true,
-    permissions: ["ADMIN"],
-  },
+
   "/add-user-into-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/addUserIntoDepartment`,
     authRequired: true,
