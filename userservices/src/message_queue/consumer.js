@@ -19,6 +19,11 @@ const {
   assignmentTopicsContinuous,
   assignmentProducerTopic,
 } = require("../configs/kafkaAssignmentTopic");
+const {
+  uploadTopicsContinuous,
+  uploadTopicsOnDemand,
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic");
 
 const kafka = new Kafka({
   clientId: "user-services",
@@ -50,6 +55,10 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(emailTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -116,6 +125,27 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
+        case uploadTopicsOnDemand.uploadImageFromLocal:
+          const uploadImageFromLocalData = JSON.parse(message.value.toString());
+          console.log("Message receive:::", uploadImageFromLocalData);
+          const uploadRequestResultPromises = uploadImageFromLocalData.map(
+            async (item) => {
+              return await UserService.update(item);
+            }
+          );
+          const uploadRequestResults = await Promise.all(
+            uploadRequestResultPromises
+          );
+          try {
+            await runProducer(
+              uploadProducerTopic.uploadImageFromLocal,
+              uploadRequestResults
+            );
+          } catch (err) {
+            console.log(err);
+          }
+          break;
+
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

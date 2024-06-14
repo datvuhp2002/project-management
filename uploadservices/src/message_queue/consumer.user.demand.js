@@ -1,18 +1,17 @@
 const { Kafka } = require("kafkajs");
 const { convertObjectToArray } = require("../utils");
-const { assignmentTopicsOnDemand } = require("../configs/kafkaAssignmentTopic");
-
+const { userTopicsOnDemand } = require("../configs/kafkaUserTopic");
 const kafka = new Kafka({
-  clientId: "user-services",
+  clientId: "upload-services",
   brokers: [process.env.KAFKA_BROKER],
 });
 const consumer = kafka.consumer({
-  groupId: "user-assignment-on-demand-group",
+  groupId: "upload-on-demand-group",
 });
-const runAssignmentConsumerOnDemand = async () => {
+const runUploadConsumerOnDemand = async () => {
   await consumer.connect();
   await consumer.subscribe({
-    topics: convertObjectToArray(assignmentTopicsOnDemand),
+    topics: convertObjectToArray(userTopicsOnDemand),
     fromBeginning: false,
   });
   return new Promise((resolve, reject) => {
@@ -28,4 +27,4 @@ const runAssignmentConsumerOnDemand = async () => {
       .catch(reject);
   });
 };
-module.exports = { runAssignmentConsumerOnDemand };
+module.exports = { runUploadConsumerOnDemand };
