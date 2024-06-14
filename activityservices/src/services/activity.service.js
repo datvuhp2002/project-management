@@ -14,11 +14,10 @@ const {
 class ActivityService {
   static select = {
     activity_id: true,
+    task_id: true,
     description: true,
     createdBy: true,
-    modifiedBy: true,
     createdAt: true,
-    task_id: true,
   };
   // create a new activity
   static create = async (data, createdBy) => {
@@ -37,9 +36,8 @@ class ActivityService {
     createdBy
   ) => {
     let query = [];
-    if (target && target === "user") {
-      console.log(target);
-      console.log(createdBy);
+    console.log(task_id);
+    if (target && target == "user") {
       query.push({
         createdBy,
       });
@@ -57,7 +55,7 @@ class ActivityService {
         nextPage,
         previousPage,
       },
-      true
+      false
     );
   };
   // get all activities has been deleted
