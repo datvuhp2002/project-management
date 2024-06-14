@@ -19,6 +19,11 @@
             "date": 1718269561227,
             "name": "src\\logs\\gateway-2024-06-13-16-06.error.log",
             "hash": "33ff99a8d9b584b7e3948e1781c350cbce26fe60f992fe3c5060c1b273f90175"
+        },
+        {
+            "date": 1718332436604,
+            "name": "src\\logs\\gateway-2024-06-14-09-33.error.log",
+            "hash": "7b199236bd071d6fd7b527cf6bb52f8d5256669496af7717dddc859dff7b88ea"
         }
     ],
     "hashType": "sha256"
