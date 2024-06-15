@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   allowedFormat: ["jpg", "png", "jpeg"],
   params: {
-    folder: (req, file) => `avatar/${req.headers.user}`,
+    folder: (req, file) => `post/${req.headers.user}`,
     format: async (req, file) => {
       return "jpg";
     },

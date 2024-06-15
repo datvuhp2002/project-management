@@ -5,12 +5,6 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
-const {
-  runConsumerTaskOnDemand,
-} = require("./message_queue/consumer.task.demand");
-const {
-  runConsumerUserOnDemand,
-} = require("./message_queue/consumer.user.demand");
 const app = express();
 const initElasticsearch = require("./dbs/init.elasticsearch");
 const { v4: uuidv4 } = require("uuid");
@@ -63,24 +57,5 @@ app.use((err, req, res, next) => {
   });
 });
 continuousConsumer().catch(console.error);
-(async () => {
-  try {
-    console.log("Starting consumer...");
-    await runConsumerTaskOnDemand();
-    console.log("Consumer started successfully.");
-  } catch (error) {
-    console.error("Error starting consumer:", error);
-    process.exit(1); // Thoát ứng dụng với mã lỗi nếu không thể khởi động consumer
-  }
-})();
-(async () => {
-  try {
-    console.log("Starting consumer...");
-    await runConsumerUserOnDemand();
-    console.log("Consumer started successfully.");
-  } catch (error) {
-    console.error("Error starting consumer:", error);
-    process.exit(1); // Thoát ứng dụng với mã lỗi nếu không thể khởi động consumer
-  }
-})();
+
 module.exports = app;

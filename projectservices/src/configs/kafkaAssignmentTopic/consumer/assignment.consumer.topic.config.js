@@ -1,7 +1,5 @@
 "use strict";
-const assignmentTopicsContinuous = {
-  abc: "abc",
-};
+const assignmentTopicsContinuous = {};
 const assignmentTopicsOnDemand = {
   receiveProjectInformationFromAssignment:
     "received-project-information-from-assignment",

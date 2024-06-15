@@ -14,6 +14,7 @@
   "dependencies": {
     "@elastic/ecs-winston-format": "^1.5.3",
     "@elastic/elasticsearch": "^7.10.0",
+    "@grpc/grpc-js": "^1.10.9",
     "@prisma/client": "^5.14.0",
     "@prisma/extension-read-replicas": "^0.3.0",
     "cors": "^2.8.5",

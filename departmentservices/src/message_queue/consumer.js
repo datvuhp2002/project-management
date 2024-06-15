@@ -22,7 +22,6 @@ const continuousConsumer = async () => {
       switch (topic) {
         case userTopicsContinuous.deleteUser:
           if (parsedMessage !== null) {
-            console.log("After:::", parsedMessage);
             return await DepartmentService.deleteManagerId(parsedMessage);
           }
           break;

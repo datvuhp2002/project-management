@@ -8,13 +8,11 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
-const {
-  runConsumerAssignmentOnDemand,
-} = require("../message_queue/consumer.assignment.demand");
 const { runProducer } = require("../message_queue/producer");
 const {
   ActivityProducerTopic,
 } = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
+const { GetAllTaskFromProject } = require("./grpcClient.services");
 class TaskService {
   static select = {
     task_id: true,
@@ -71,13 +69,9 @@ class TaskService {
     return task;
   };
   static getAllTaskInProject = async (query, project_id) => {
-    await runProducer(
-      assignmentProducerTopic.getListTaskFromProject,
-      project_id
-    );
-    const task_ids = await runConsumerAssignmentOnDemand();
+    const task_ids = await GetAllTaskFromProject(project_id);
     console.log("list task:", task_ids);
-    return await this.getAllTaskByTask(query, { task_ids });
+    return await this.getAllTaskByTaskIds(query, { task_ids });
   };
   // get all tasks
   static getAll = async ({

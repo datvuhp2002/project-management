@@ -13,11 +13,7 @@ const {
 const cloudinary = require("../configs/cloudinary.config");
 const { runProducer } = require("../message_queue/producer");
 const { departmentProducerTopic } = require("../configs/kafkaDepartmentTopic");
-const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
-const {
-  runAssignmentConsumerOnDemand,
-} = require("../message_queue/consumer.assignment.demand");
-
+const { GetAllUserFromProject } = require("./grpcClient.services");
 class UserService {
   static select = {
     user_id: true,
@@ -141,7 +137,7 @@ class UserService {
   static removeStaffFromDepartmentHasBeenDeleted = async ({
     department_id,
   }) => {
-    return await prisma.userProperty.updateMany({
+    return await prisma.user.updateMany({
       where: {
         department_id,
       },
@@ -190,12 +186,7 @@ class UserService {
     });
   };
   static getAllStaffInProject = async (query, project_id) => {
-    await runProducer(
-      assignmentProducerTopic.getListUserPropertyFromProject,
-      project_id
-    );
-    const user_ids = await runAssignmentConsumerOnDemand();
-    console.log("list user property:", user_ids);
+    const user_ids = await GetAllUserFromProject(project_id);
     return await this.getAllStaffByUserIds(query, { user_ids });
   };
   // get All Staff in department for ADMIN
@@ -354,17 +345,22 @@ class UserService {
     department_id,
     manager_id,
   }) => {
+    let managerInformation;
     const totalStaffInDePartment = await this.getAllStaffInDepartment(
       { items_per_page: "ALL" },
       { department_id }
     );
-    let managerInformation = await this.detailManager(manager_id);
-    if (managerInformation) {
-      if (managerInformation.avatar) {
-        managerInformation.avatar = await this.getAvatar(
-          managerInformation.avatar
-        );
+    if (manager_id) {
+      managerInformation = await this.detailManager(manager_id);
+      if (managerInformation) {
+        if (managerInformation.avatar) {
+          managerInformation.avatar = await this.getAvatar(
+            managerInformation.avatar
+          );
+        }
       }
+    } else {
+      managerInformation = null;
     }
     return {
       total_staff: totalStaffInDePartment.total,
@@ -407,6 +403,7 @@ class UserService {
       where: { user_id: id },
       select: this.select,
     });
+    if (!detailUser) throw new NotFoundError("User not found");
     return detailUser;
   };
   static detailManager = async (id) => {
@@ -453,6 +450,7 @@ class UserService {
       where: { user_id },
       select: this.select,
       data: {
+        department_id: null,
         deletedMark: true,
         deletedAt: new Date(),
       },

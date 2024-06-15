@@ -1,14 +1,12 @@
 "use strict";
 
-const { getInfoData } = require("../utils");
 const prisma = require("../prisma");
 const cloudinary = require("../configs/cloudinary.config");
-const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
-const { runProducer } = require("../message_queue/producer");
 const {
   BadRequestError,
   AuthFailureError,
   ForbiddenError,
+  NotFoundError,
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 class ProjectService {
@@ -119,10 +117,12 @@ class ProjectService {
   };
   // detail project
   static detail = async (project_id) => {
-    return await prisma.project.findUnique({
+    const project = await prisma.project.findUnique({
       where: { project_id },
       select: this.select,
     });
+    if (!project) throw new NotFoundError("No project found");
+    return project;
   };
   // update project
   static update = async ({ id, data }, modifiedBy) => {
@@ -288,21 +288,6 @@ class ProjectService {
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
-
-    // if (isNotTrash) {
-    //   const project_list_id = projects.map((project) => ({
-    //     project_id: project.project_id,
-    //   }));
-    //   await runProducer(
-    //     assignmentProducerTopic.getProjectInformationFromAssignment,
-    //     project_list_id
-    //   );
-    //   const projectDataReceived = await runConsumerOnDemand();
-    //   console.log("receive message:::", projectDataReceived);
-    //   projects.map((item, index) => {
-    //     item.information = projectDataReceived[index];
-    //   });
-    // }
 
     return {
       data: projects,

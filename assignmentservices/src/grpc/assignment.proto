@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package assignment;
+
+service AssignmentService {
+  rpc GetAssignment(AssignmentRequest) returns (AssignmentResponse);
+  rpc getAllTaskFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
+  rpc getAllUserFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
+}
+
+message AssignmentRequest {
+  string assignment_id = 1;
+}
+
+message AssignmentResponse {
+  string assignment_id = 1;
+  string user_id = 2;
+  string project_id = 3;
+  string task_id = 4;
+  string createdBy = 5;
+  string createdAt = 6;
+}
+message getAllTaskOrUserFromProjectResponse{
+  repeated string ids = 1;
+
+}
+message getAllTaskOrUserFromProjectRequest{
+  string project_id = 1;
+}
