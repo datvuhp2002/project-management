@@ -6,11 +6,7 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const { runProducer } = require("../message_queue/producer");
-const { userProducerTopic } = require("../configs/kafkaUserTopic");
-const {
-  runUserConsumerOnDemand,
-} = require("../message_queue/consumer.user.demand");
+const { getUser } = require("./grpcClient.services");
 class ActivityService {
   static select = {
     activity_id: true,
@@ -55,7 +51,7 @@ class ActivityService {
         nextPage,
         previousPage,
       },
-      false
+      true
     );
   };
   // get all activities has been deleted
@@ -206,29 +202,16 @@ class ActivityService {
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
     if (isNotTrash) {
-      const user_list_id = activities.map((activity) => activity.createdBy);
-      console.log(user_list_id);
-      await runProducer(
-        userProducerTopic.getUserInformationForActivity,
-        user_list_id
-      );
-      const userInformationData = await runUserConsumerOnDemand();
-      console.log("received User Data:::", userInformationData);
-      if (Array.isArray(userInformationData)) {
-        activities.forEach((item, index) => {
-          item.user_information = userInformationData[index];
-        });
-      } else {
-        console.error("Error: Invalid user data received.");
-      }
-      return {
-        data: activities,
-        total,
-        nextPage: nextPageNumber,
-        previousPage: previousPageNumber,
-        currentPage,
-        itemsPerPage,
-      };
+      const activityPromises = activities.map(async (activity, index) => {
+        const userResponse = await getUser(activity.createdBy);
+        if (userResponse) {
+          activity.user = userResponse;
+        } else {
+          activity.user = null;
+        }
+      });
+
+      await Promise.all(activityPromises);
     }
     return {
       data: activities,

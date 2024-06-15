@@ -1,2 +1,0 @@
-{"@timestamp":"2024-06-12T04:17:23.247Z","context":"/services/api/task/create/","ecs.version":"8.10.0","log.level":"info","message":"input params:-:POST:-:","metadata":{"description":"Gộp api thừa lại"},"requestId":"66681cc99776be35488eeb74","timestamp":"2024-06-12 11:17:247 AM"}
-{"@timestamp":"2024-06-12T04:17:55.690Z","context":"/services/api/task/update/6669215306538ea9752183e4","ecs.version":"8.10.0","log.level":"info","message":"input params:-:PUT:-:","metadata":{},"requestId":"66681cc99776be35488eeb74","timestamp":"2024-06-12 11:17:690 AM"}
