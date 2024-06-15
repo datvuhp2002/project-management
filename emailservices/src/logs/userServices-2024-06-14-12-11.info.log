@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-14T05:11:26.324Z","context":"/services/api/email/forget-password/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Cannot read properties of undefined (reading 'email')"},"requestId":"87e1808b-74ab-4298-881a-b3f2ceed2d9b","timestamp":"2024-06-14 12:11:324 PM"}

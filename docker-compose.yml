@@ -213,6 +213,36 @@ services:
     networks:
       - kafka-network
 
+  emailservices:
+    build:
+      context: ./emailservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    image: datvudinhtrong/emailservices
+    container_name: emailservices
+    environment:
+      - PORT=3069
+      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
+    ports:
+      - "3069:3069"
+    depends_on:
+      - kafka
+      - elasticsearch
+    networks:
+      - kafka-network
+    
+
   taskservices:
     build:
       context: ./taskservices

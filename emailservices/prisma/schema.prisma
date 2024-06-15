@@ -1,0 +1,24 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model otp {
+  otp_id   String    @id @default(auto()) @map("_id") @db.ObjectId
+  token    String    @unique
+  email    String    @unique
+  expireAt DateTime?
+  status   Boolean   @default(true)
+}
+
+model template {
+  template_id String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String  @unique
+  html        String
+  status      Boolean @default(true)
+}

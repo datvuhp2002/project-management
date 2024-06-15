@@ -1,0 +1,2 @@
+{"@timestamp":"2024-06-14T04:12:15.414Z","context":"/services/api/user/forget-password/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Kafka is not defined"},"requestId":"d85a5e6a-a9b7-4626-85df-64571913cb64"}
+{"@timestamp":"2024-06-14T04:12:16.805Z","context":"/services/api/user/forget-password/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Kafka is not defined"},"requestId":"7db6ccd5-383e-4192-9d3d-5416761c63ff"}

@@ -1,8 +1,7 @@
 "use strict";
-
+// const { Kafka } = require("kafkajs");
 const prisma = require("../prisma");
 const RoleService = require("./role.service");
-const { sendEmailToken } = require("./email.service");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -17,6 +16,9 @@ const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const {
   runAssignmentConsumerOnDemand,
 } = require("../message_queue/consumer.assignment.demand");
+const {
+  emailProducerTopic,
+} = require("../configs/kafkaEmailTopic/producer/email.producer.topic.config");
 
 class UserService {
   static select = {
@@ -69,15 +71,29 @@ class UserService {
     return newUser;
   };
 
+  // static forgetPassword = async ({ email = null, captcha = null }) => {
+  //   const holderUser = await prisma.user.findFirst({ where: { email } });
+  //   if (!holderUser) {
+  //     throw new NotFoundError("User not found");
+  //   }
+  //   // send mail
+  //   const result = await sendEmailToken({ email });
+  //   if (result) return true;
+  //   throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại");
+  // };
   static forgetPassword = async ({ email = null, captcha = null }) => {
     const holderUser = await prisma.user.findFirst({ where: { email } });
+    // return holderUser;
     if (!holderUser) {
       throw new NotFoundError("User not found");
     }
-    // send mail
-    const result = await sendEmailToken({ email });
-    if (result) return true;
-    throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại");
+    try {
+      await runProducer(emailProducerTopic.sendEmailToken, email);
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại:");
+    }
   };
   static changePassword = async ({ password, email }) => {
     const passwordHash = await bcrypt.hash(password, 10);

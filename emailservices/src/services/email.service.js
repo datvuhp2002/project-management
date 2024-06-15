@@ -1,10 +1,13 @@
 "use strict";
-const prisma = require("../prisma");
+const prisma = require("../prisma/index.js");
 const { newOtp } = require("./otp.service.js");
 const { getTemplate } = require("./template.service.js");
 const transport = require("../dbs/init.nodemailer.js");
 const { BadRequestError, NotFoundError } = require("../core/error.response.js");
 const { replacePlaceholder } = require("../utils/index.js");
+const {
+  runEmailConsumerOnDemand,
+} = require("../message_queue/consumer.user.demand.js");
 
 const sendEmailLinkVerify = async ({
   html,
@@ -81,4 +84,28 @@ const verifyToken = async ({ token, email }) => {
   throw new BadRequestError("Hệ thống gặp trục trặc, vui lòng thử lại");
 };
 
-module.exports = { sendEmailToken, verifyToken };
+const forgetPassword = async ({ email }) => {
+  // Generate OTP token
+  const token = await newOtp({ email });
+
+  // Get email template
+  const template = await getTemplate({ name: "HTML_MAIL_TOKEN" });
+  if (!template) {
+    throw new NotFoundError("Template not found");
+  }
+  // Replace placeholders in the email template with token and email
+  const content = replacePlaceholder(template.html, {
+    link_verify: token,
+    email,
+  });
+  // Send verification email
+  await sendEmailLinkVerify({
+    html: content,
+    toEmail: email,
+    subject: "Vui lòng xác nhận địa chỉ email đăng ký",
+  });
+
+  return true;
+};
+
+module.exports = { sendEmailToken, verifyToken, forgetPassword };

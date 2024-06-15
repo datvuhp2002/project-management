@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-14T03:16:51.942Z","context":"/services/api/user/create/","ecs.version":"8.10.0","log.level":"error","message":"400:-:0ms:-:Response:{\"status\":400,\"now\":1718335011938}","metadata":{"message":"Error: Email is not defined"},"requestId":"f1025bdc-957d-4cae-ae90-acb6f4bfa128"}
