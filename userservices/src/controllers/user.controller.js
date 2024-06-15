@@ -2,7 +2,7 @@
 
 const UserService = require("../services/user.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response");
-const { uploadImageFromUrl } = require("../services/upload.services");
+// const { uploadImageFromUrl } = require("../services/upload.services");
 const { BadRequestError } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
 const { getInfoData } = require("../utils/index");
@@ -145,13 +145,13 @@ class UserController {
       ),
     }).send(res);
   };
-  uploadImageFromUrl = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Tải avatar thành công",
-      data: await uploadImageFromUrl(req.body, req.headers.user),
-    }).send(res);
-  };
-  uploadFileAvatarFromLocal = async (req, res, next) => {
+  // uploadImageFromUrl = async (req, res, next) => {
+  //   new SuccessResponse({
+  //     message: "Tải avatar thành công",
+  //     data: await uploadImageFromUrl(req.body, req.headers.user),
+  //   }).send(res);
+  // };
+  uploadAvatarFromLocal = async (req, res, next) => {
     const { file } = req;
     if (!file) {
       throw new BadRequestError("File is missing");

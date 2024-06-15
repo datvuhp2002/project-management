@@ -9,6 +9,10 @@ const {
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic");
 const {
+  uploadTopicsOnDemand,
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic");
+const {
   activityTopicsContinuous,
   activityProducerTopic,
 } = require("../configs/kafkaActivityTopic");
@@ -108,6 +112,52 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
+        case uploadTopicsOnDemand.uploadAvatarFromLocal:
+          const uploadAvatarFromLocalData = JSON.parse(
+            message.value.toString()
+          );
+          console.log("Message receive:::", uploadAvatarFromLocalData);
+          const uploadRequestResultPromises = uploadAvatarFromLocalData.map(
+            async (item) => {
+              return await UserService.update(item);
+            }
+          );
+          const uploadRequestResults = await Promise.all(
+            uploadRequestResultPromises
+          );
+          try {
+            await runProducer(
+              uploadProducerTopic.uploadAvatarFromLocal,
+              uploadRequestResults
+            );
+          } catch (err) {
+            console.log(err);
+          }
+          break;
+
+        // case uploadTopicsOnDemand.uploadAvatarFromLocal:
+        //   try {
+        //     // Ensure the data contains correct information
+        //     const { user_id, avatar } = parsedMessage;
+        //     if (!user_id || !avatar) {
+        //       throw new Error("Missing required data - user_id or avatar");
+        //     }
+
+        //     // Update user avatar using UserService
+        //     const updateResult = await UserService.update({
+        //       id: user_id,
+        //       data: { avatar },
+        //     });
+
+        //     // Send updated data to upload producer
+        //     await runProducer(
+        //       uploadProducerTopic.uploadAvatarFromLocal,
+        //       updateResult
+        //     );
+        //   } catch (error) {
+        //     console.error("Error handling message:", error);
+        //   }
+        //   break;
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

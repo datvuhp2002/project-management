@@ -19,8 +19,8 @@ const uploadImageFromUrl = async ({ urlImage }, userId) => {
   }
 };
 
-// // 2.upload image from local
-const uploadImageFromLocal = async (path, userId) => {
+// 2.upload image from local
+const uploadAvatarFromLocal = async (path, userId) => {
   const folderName = `avatar/${userId}`;
   console.log("FolderName:::", folderName);
   try {
@@ -42,8 +42,35 @@ const uploadImageFromLocal = async (path, userId) => {
     throw new BadRequestError("Upload avatar không thành công");
   }
 };
+
+// const uploadAvatarFromLocal = async ({ path, userId }) => {
+//   const folderName = `avatar/${userId}`;
+//   console.log("FolderName:::", folderName);
+//   try {
+//     const result = await cloudinary.uploader.upload(path, {
+//       public_id: userId,
+//       folder: folderName,
+//     });
+
+//     const thumb_url = await cloudinary.url(result.public_id, {
+//       height: 100,
+//       width: 100,
+//       crop: "fill",
+//       format: "jpg",
+//     });
+
+//     return {
+//       image_url: result.secure_url,
+//       public_id: result.public_id,
+//       thumb_url: thumb_url,
+//     };
+//   } catch (err) {
+//     console.error("Error uploading avatar to cloudinary:", err);
+//     throw new BadRequestError("Upload avatar không thành công");
+//   }
+// };
 // // 3.upload image from local
-const uploadImageFromLocalFiles = async (files, userId) => {
+const uploadAvatarFromLocalFiles = async (files, userId) => {
   const folderName = `avatar/${userId}`;
   try {
     console.log("Files::", files);
@@ -91,8 +118,8 @@ const uploadFile = async (project_id, { path, filename }) => {
 };
 
 module.exports = {
-  uploadImageFromLocal,
+  uploadAvatarFromLocal,
   uploadImageFromUrl,
-  uploadImageFromLocalFiles,
+  uploadAvatarFromLocalFiles,
   uploadFile,
 };

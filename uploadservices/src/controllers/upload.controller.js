@@ -1,20 +1,16 @@
 "use strict";
-
-const UserService = require("../services/user.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response");
 const { uploadImageFromUrl } = require("../services/upload.services");
 const { BadRequestError } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
-const { getInfoData } = require("../utils/index");
-
-class UserController {
+class UploadController {
   uploadImageFromUrl = async (req, res, next) => {
     new SuccessResponse({
       message: "Tải avatar thành công",
       data: await uploadImageFromUrl(req.body, req.headers.user),
     }).send(res);
   };
-  uploadFileAvatarFromLocal = async (req, res, next) => {
+  uploadAvatarFromLocal = async (req, res, next) => {
     const { file } = req;
     if (!file) {
       throw new BadRequestError("File is missing");
@@ -27,21 +23,39 @@ class UserController {
       }),
     }).send(res);
   };
-  getAvatar = async (req, res, next) => {
+  uploadAvatarFromLocalFiles = async (req, res, next) => {
+    const { files } = req;
+    if (!files || files.length === 0) {
+      throw new BadRequestError("Files are missing");
+    }
+    const uploadedUrls = await uploadAvatarFromLocalFiles(
+      files,
+      req.headers.user
+    );
+    if (!uploadedUrls) {
+      throw new BadRequestError("Upload avatar không thành công");
+    }
     new SuccessResponse({
-      message: "Lấy ảnh đại diện về thành công",
-      data: await UserService.getAvatar(req.body.avatar),
+      message: "Tải ảnh đại diện lên thành công",
+      data: uploadedUrls,
     }).send(res);
   };
-  deleteAvatarInCloud = async (req, res, next) => {
+
+  uploadFile = async (req, res, next) => {
+    const { file } = req;
+    if (!file) {
+      throw new BadRequestError("File is missing");
+    }
+    const { project_id } = req.body;
+    const result = await uploadFile(project_id, file);
+    if (!result) {
+      throw new BadRequestError("Upload file không thành công");
+    }
     new SuccessResponse({
-      message: "Xóa ảnh đại diện thành công",
-      data: await UserService.deleteAvatarInCloud(
-        req.body.avatar,
-        req.headers.user
-      ),
+      message: "Tải file lên thành công",
+      data: { success: true },
     }).send(res);
   };
 }
 
-module.exports = new UserController();
+module.exports = new UploadController();

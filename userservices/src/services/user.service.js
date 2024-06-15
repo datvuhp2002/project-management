@@ -19,6 +19,9 @@ const {
 const {
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic/producer/email.producer.topic.config");
+const {
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
 
 class UserService {
   static select = {
@@ -434,33 +437,74 @@ class UserService {
     return detailUser;
   };
   // update user information
+  // static update = async ({ id, data }) => {
+  //   if (data.avatar) {
+  //     try {
+  //       return await prisma.user.update({
+  //         where: { user_id: id },
+  //         data,
+  //         select: this.select,
+  //       });
+  //     } catch (errr) {
+  //       cloudinary.uploader.destroy(data.avatar);
+  //       throw new BadRequestError(
+  //         "Cập nhật không thành công, vui lòng thử lại."
+  //       );
+  //     }
+  //   }
+
+  //   const { role, ...updateUserData } = data;
+  //   if (role) {
+  //     const role_data = await RoleService.findByName(role);
+  //     if (!role_data) throw new BadRequestError("Role not found");
+  //     updateUserData.role_id = role_data.role_id;
+  //   }
+  //   const updateUser = await prisma.user.update({
+  //     where: { user_id: id },
+  //     data: updateUserData,
+  //     select: this.select,
+  //   });
+  //   if (updateUser) return true;
+  //   throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
+  // };
+
   static update = async ({ id, data }) => {
     if (data.avatar) {
       try {
-        return await prisma.user.update({
+        const updatedUser = await prisma.user.update({
           where: { user_id: id },
           data,
           select: this.select,
         });
-      } catch (errr) {
+        // Gửi dữ liệu đến Kafka topic sau khi cập nhật thành công
+        await runProducer(uploadProducerTopic.uploadAvatarFromLocal, {
+          user_id: id,
+          avatar: data.avatar,
+        });
+        return updatedUser;
+      } catch (err) {
+        // Hủy bỏ ảnh đã tải lên nếu cập nhật không thành công
         cloudinary.uploader.destroy(data.avatar);
         throw new BadRequestError(
           "Cập nhật không thành công, vui lòng thử lại."
         );
       }
     }
+
     const { role, ...updateUserData } = data;
     if (role) {
       const role_data = await RoleService.findByName(role);
       if (!role_data) throw new BadRequestError("Role not found");
       updateUserData.role_id = role_data.role_id;
     }
-    const updateUser = await prisma.user.update({
+
+    const updatedUser = await prisma.user.update({
       where: { user_id: id },
       data: updateUserData,
       select: this.select,
     });
-    if (updateUser) return true;
+
+    if (updatedUser) return updatedUser;
     throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
   };
   // delete user account
@@ -502,6 +546,31 @@ class UserService {
     await this.delete(user_id);
     return null;
   };
+  // static async uploadImageFromLocal(data) {
+  //   const result = await uploadServices.uploadImageFromLocal(data);
+  //   await runProducer(uploadProducerTopic.uploadImageFromLocal, result);
+  //   return result;
+  // }
+
+  // static async uploadImageFromLocal(userId, avatarFileName) {
+  //   try {
+  //     const message = {
+  //       userId: userId,
+  //       avatarFileName: avatarFileName,
+  //     };
+  //     await runProducer(uploadProducerTopic.uploadAvatar, message);
+  //     return null;
+  //   } catch (error) {
+  //     console.error("Error uploading user avatar to Kafka:", error);
+  //     throw error;
+  //   }
+  // }
+
+  // static async uploadImageFromLocalFile(file) {
+  //   const result = await uploadServices.uploadImageFromLocalFile(file);
+  //   await runProducer(uploadProducerTopic.uploadImageFromLocalFile, result);
+  //   return result;
+  // }
   // get avatar by public id
   static getAvatar = async (avatar) => {
     // Return colors in the response
