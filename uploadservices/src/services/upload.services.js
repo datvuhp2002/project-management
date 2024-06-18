@@ -20,11 +20,59 @@ const uploadImageFromUrl = async ({ urlImage }, userId) => {
 };
 
 // 2.upload image from local
-const uploadAvatarFromLocal = async (path, userId) => {
+// const uploadAvatarFromLocal = async (path, userId) => {
+//   const folderName = `avatar/${userId}`;
+//   console.log("FolderName:::", folderName);
+//   try {
+//     const result = await cloudinary.uploader.upload(await path, {
+//       public_id: userId,
+//       folder: folderName,
+//     });
+//     return {
+//       image_url: result.secure_url,
+//       public_id: result.public_id,
+//       thumb_url: await cloudinary.url(result.public_id, {
+//         height: 100,
+//         width: 100,
+//         format: "jpg",
+//       }),
+//     };
+//   } catch (err) {
+//     console.error("Error uploading avatar to cloudinary:", err);
+//     throw new BadRequestError("Upload avatar không thành công");
+//   }
+// };
+// const uploadAvatarFromLocal = async ({ userId, path }) => {
+//   const folderName = `avatar/${userId}`;
+//   console.log("FolderName:::", folderName);
+//   try {
+//     const result = await cloudinary.uploader.upload(path, {
+//       public_id: userId,
+//       folder: folderName,
+//     });
+//     return {
+//       image_url: result.secure_url,
+//       public_id: result.public_id,
+//       thumb_url: await cloudinary.url(result.public_id, {
+//         height: 100,
+//         width: 100,
+//         format: "jpg",
+//       }),
+//     };
+//   } catch (err) {
+//     console.error("Error uploading avatar to cloudinary:", err);
+//     throw new BadRequestError("Upload avatar không thành công");
+//   }
+// };
+
+const uploadAvatarFromLocal = async ({ userId, path }) => {
   const folderName = `avatar/${userId}`;
   console.log("FolderName:::", folderName);
   try {
-    const result = await cloudinary.uploader.upload(await path, {
+    if (!path) {
+      throw new BadRequestError("Missing required parameter - path");
+    }
+    const result = await cloudinary.uploader.upload(path, {
       public_id: userId,
       folder: folderName,
     });
@@ -38,50 +86,61 @@ const uploadAvatarFromLocal = async (path, userId) => {
       }),
     };
   } catch (err) {
-    console.log(err);
+    console.error("Error uploading avatar to cloudinary:", err);
     throw new BadRequestError("Upload avatar không thành công");
   }
 };
 
-// const uploadAvatarFromLocal = async ({ path, userId }) => {
+module.exports = {
+  uploadAvatarFromLocal,
+};
+
+// // // 3.upload image from local
+// const uploadAvatarFromLocalFiles = async (files, userId) => {
 //   const folderName = `avatar/${userId}`;
-//   console.log("FolderName:::", folderName);
 //   try {
-//     const result = await cloudinary.uploader.upload(path, {
-//       public_id: userId,
-//       folder: folderName,
-//     });
-
-//     const thumb_url = await cloudinary.url(result.public_id, {
-//       height: 100,
-//       width: 100,
-//       crop: "fill",
-//       format: "jpg",
-//     });
-
-//     return {
-//       image_url: result.secure_url,
-//       public_id: result.public_id,
-//       thumb_url: thumb_url,
-//     };
+//     console.log("Files::", files);
+//     const uploadedUrls = [];
+//     if (!files.length) return;
+//     for (const file of files) {
+//       const result = await cloudinary.uploader.upload(file.path, {
+//         public_id: `${userId}-${file.size}`,
+//         folder: folderName,
+//       });
+//       uploadedUrls.push({
+//         image_url: result.secure_url,
+//         public_id: result.public_id,
+//         thumb_url: await cloudinary.url(result.public_id, {
+//           height: 100,
+//           width: 100,
+//           format: "jpg",
+//         }),
+//       });
+//     }
+//     return uploadedUrls;
 //   } catch (err) {
-//     console.error("Error uploading avatar to cloudinary:", err);
-//     throw new BadRequestError("Upload avatar không thành công");
+//     console.log(err);
 //   }
 // };
-// // 3.upload image from local
 const uploadAvatarFromLocalFiles = async (files, userId) => {
   const folderName = `avatar/${userId}`;
   try {
     console.log("Files::", files);
     const uploadedUrls = [];
-    if (!files.length) return;
+
+    // Kiểm tra nếu không có file nào trong mảng thì không làm gì cả
+    if (!files || files.length === 0) {
+      return uploadedUrls; // Trả về mảng rỗng nếu không có file nào
+    }
+
     for (const file of files) {
       const result = await cloudinary.uploader.upload(file.path, {
-        public_id: `${userId}-${file.size}`,
-        folder: folderName,
+        public_id: `${userId}-${file.size}`, // Tạo public_id dựa trên userId và kích thước file
+        folder: folderName, // Đường dẫn thư mục trên Cloudinary
       });
-      uploadedUrls.push({
+
+      // Tạo đối tượng mới chứa thông tin về URL của hình ảnh và thumbnail
+      const uploadedImage = {
         image_url: result.secure_url,
         public_id: result.public_id,
         thumb_url: await cloudinary.url(result.public_id, {
@@ -89,13 +148,19 @@ const uploadAvatarFromLocalFiles = async (files, userId) => {
           width: 100,
           format: "jpg",
         }),
-      });
+      };
+
+      // Đẩy đối tượng vào mảng uploadedUrls
+      uploadedUrls.push(uploadedImage);
     }
-    return uploadedUrls;
+
+    return uploadedUrls; // Trả về mảng các đối tượng đã tải lên thành công
   } catch (err) {
-    console.log(err);
+    console.error("Error uploading avatar to cloudinary:", err);
+    throw new BadRequestError("Upload avatar không thành công");
   }
 };
+
 // // 4.upload file
 const uploadFile = async (project_id, { path, filename }) => {
   const existingProject = await prisma.project.findUnique({

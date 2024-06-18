@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-15T16:41:32.828Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"400:-:1ms:-:Response:{\"status\":400,\"now\":1718469692825}","metadata":{"message":"Cập nhật không thành công, vui lòng thử lại."},"requestId":"f8d2976a-5ca7-47f2-af09-244664094c35"}

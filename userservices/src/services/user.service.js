@@ -14,9 +14,6 @@ const { runProducer } = require("../message_queue/producer");
 const { departmentProducerTopic } = require("../configs/kafkaDepartmentTopic");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const {
-  runAssignmentConsumerOnDemand,
-} = require("../message_queue/consumer.assignment.demand");
-const {
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic/producer/email.producer.topic.config");
 const {
@@ -438,7 +435,7 @@ class UserService {
     });
     return detailUser;
   };
-  // update user information
+  //update user information
   // static update = async ({ id, data }) => {
   //   if (data.avatar) {
   //     try {
@@ -492,7 +489,6 @@ class UserService {
         );
       }
     }
-
     const { role, ...updateUserData } = data;
     if (role) {
       const role_data = await RoleService.findByName(role);
@@ -509,6 +505,7 @@ class UserService {
     if (updatedUser) return updatedUser;
     throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
   };
+
   // delete user account
   static delete = async (user_id) => {
     const deleteUser = await prisma.user.update({
@@ -549,19 +546,19 @@ class UserService {
     await this.delete(user_id);
     return null;
   };
-  // static async uploadImageFromLocal(data) {
-  //   const result = await uploadServices.uploadImageFromLocal(data);
-  //   await runProducer(uploadProducerTopic.uploadImageFromLocal, result);
-  //   return result;
-  // }
+  static async uploadImageFromLocal(data) {
+    const result = await uploadServices.uploadImageFromLocal(data);
+    await runProducer(uploadProducerTopic.uploadImageFromLocal, result);
+    return result;
+  }
 
-  // static async uploadImageFromLocal(userId, avatarFileName) {
+  // static async uploadAvatarFromLocal(userId, avatarFileName) {
   //   try {
   //     const message = {
   //       userId: userId,
   //       avatarFileName: avatarFileName,
   //     };
-  //     await runProducer(uploadProducerTopic.uploadAvatar, message);
+  //     await runProducer(uploadProducerTopic.uploadAvatarFromLocal, message);
   //     return null;
   //   } catch (error) {
   //     console.error("Error uploading user avatar to Kafka:", error);
@@ -574,6 +571,7 @@ class UserService {
   //   await runProducer(uploadProducerTopic.uploadImageFromLocalFile, result);
   //   return result;
   // }
+
   // get avatar by public id
   static getAvatar = async (avatar) => {
     // Return colors in the response
