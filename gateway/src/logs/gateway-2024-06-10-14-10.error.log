@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-10T07:10:39.489Z","context":"/users/admin/get-all","ecs.version":"8.10.0","log.level":"error","message":"401:-:8ms:-:Response:{\"status\":401,\"now\":1718003439469}","metadata":{"message":"Vui lòng đăng nhập!!!"},"requestId":"81da4d8f-a876-47f5-b151-235a9bf5a7b6","timestamp":"2024-06-10 02:10:489 PM"}

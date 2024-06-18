@@ -23,6 +23,7 @@
     "express": "^4.19.2",
     "http-proxy-middleware": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
+    "kafkajs": "^2.2.4",
     "lodash": "^4.17.21",
     "mongoose": "^8.2.4",
     "uuid": "^9.0.1",

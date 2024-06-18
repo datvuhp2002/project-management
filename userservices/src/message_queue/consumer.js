@@ -5,6 +5,10 @@ const {
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
 const {
+  emailTopicsOnDemand,
+  emailProducerTopic,
+} = require("../configs/kafkaEmailTopic");
+const {
   activityTopicsContinuous,
   activityProducerTopic,
 } = require("../configs/kafkaActivityTopic");
@@ -15,6 +19,11 @@ const {
   assignmentTopicsContinuous,
   assignmentProducerTopic,
 } = require("../configs/kafkaAssignmentTopic");
+const {
+  uploadTopicsContinuous,
+  uploadTopicsOnDemand,
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic");
 
 const kafka = new Kafka({
   clientId: "user-services",
@@ -38,6 +47,18 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(emailTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -84,6 +105,47 @@ const continuousConsumer = async () => {
             await UserService.update({ id, data });
           }
           break;
+        case emailTopicsOnDemand.sendEmailToken:
+          const sendEmailTokenData = JSON.parse(message.value.toString());
+          console.log("Message receive:::", sendEmailTokenData);
+          const emailRequestResultPromises = sendEmailTokenData.map(
+            async (item) => {
+              return await UserService.forgetPassword(item);
+            }
+          );
+          const emailRequestResults = await Promise.all(
+            emailRequestResultPromises
+          );
+          try {
+            await runProducer(
+              emailProducerTopic.sendEmailToken,
+              emailRequestResults
+            );
+          } catch (err) {
+            console.log(err);
+          }
+          break;
+        case uploadTopicsOnDemand.uploadImageFromLocal:
+          const uploadImageFromLocalData = JSON.parse(message.value.toString());
+          console.log("Message receive:::", uploadImageFromLocalData);
+          const uploadRequestResultPromises = uploadImageFromLocalData.map(
+            async (item) => {
+              return await UserService.update(item);
+            }
+          );
+          const uploadRequestResults = await Promise.all(
+            uploadRequestResultPromises
+          );
+          try {
+            await runProducer(
+              uploadProducerTopic.uploadImageFromLocal,
+              uploadRequestResults
+            );
+          } catch (err) {
+            console.log(err);
+          }
+          break;
+
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

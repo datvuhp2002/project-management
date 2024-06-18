@@ -16,5 +16,11 @@ class EmailController {
       data: await verifyToken(req.body),
     }).send(res);
   };
+  sendEmailToken = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Send Email Token",
+      data: await this.sendEmailToken(req.body),
+    }).send(res);
+  };
 }
 module.exports = new EmailController();

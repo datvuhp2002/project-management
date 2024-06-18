@@ -1,7 +1,5 @@
 "use strict";
-
 const { getAllStaffByUserProperty } = require("../services/user.service");
-
 const gatewayTopics = {
   forgetPassword: "forget-password",
   changePassword: "change-password",

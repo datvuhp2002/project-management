@@ -69,8 +69,30 @@ const uploadImageFromLocalFiles = async (files, userId) => {
     console.log(err);
   }
 };
+// // 4.upload file
+const uploadFile = async (project_id, { path, filename }) => {
+  const existingProject = await prisma.project.findUnique({
+    where: { project_id },
+  });
+  if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
+  try {
+    const uploadFile = await prisma.project.update({
+      where: { project_id },
+      data: {
+        document: [...existingProject.document, filename],
+      },
+    });
+    if (uploadFile) return true;
+    cloudinary.uploader.destroy(filename);
+    return false;
+  } catch (e) {
+    throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
+  }
+};
+
 module.exports = {
   uploadImageFromLocal,
   uploadImageFromUrl,
   uploadImageFromLocalFiles,
+  uploadFile,
 };

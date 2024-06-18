@@ -12,7 +12,7 @@ const initElasticsearch = require("./dbs/init.elasticsearch");
 
 const app = express();
 
-// init middleware
+// init middlewarenpm
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());

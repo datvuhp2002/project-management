@@ -1,10 +1,13 @@
 "use strict";
-const prisma = require("../prisma");
+const prisma = require("../prisma/index.js");
 const { newOtp } = require("./otp.service.js");
 const { getTemplate } = require("./template.service.js");
 const transport = require("../dbs/init.nodemailer.js");
 const { BadRequestError, NotFoundError } = require("../core/error.response.js");
 const { replacePlaceholder } = require("../utils/index.js");
+const {
+  runEmailConsumerOnDemand,
+} = require("../message_queue/consumer.user.demand.js");
 
 const sendEmailLinkVerify = async ({
   html,
@@ -80,5 +83,15 @@ const verifyToken = async ({ token, email }) => {
   if (deleteToken) return { email: getToken.email };
   throw new BadRequestError("Hệ thống gặp trục trặc, vui lòng thử lại");
 };
+
+runEmailConsumerOnDemand()
+  .then(() => {
+    console.log(
+      "Kafka consumer for emailServices is running and listening for messages."
+    );
+  })
+  .catch((error) => {
+    console.error("Error starting Kafka consumer for emailServices:", error);
+  });
 
 module.exports = { sendEmailToken, verifyToken };

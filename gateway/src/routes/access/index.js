@@ -13,7 +13,7 @@ router.post("/login", asyncHandler(accessController.login));
 // AUTHENTICATION
 router.use(authentication);
 router.get(
-  "/handleRefreshToken",
+  "/handle-refresh-token",
   asyncHandler(accessController.handleRefreshToken)
 );
 

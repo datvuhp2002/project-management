@@ -1,8 +1,9 @@
 "use strict";
-
+const { Kafka } = require("kafkajs");
 const prisma = require("../prisma");
 const RoleService = require("./role.service");
-const { sendEmailToken } = require("./email.service");
+const UserPropertyService = require("./user.property.service");
+const { sendEmailToken } = require("../message_queue/producer.email");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -65,16 +66,50 @@ class UserService {
     return newUser;
   };
 
-  static forgetPassword = async ({ email = null, captcha = null }) => {
+  // static async forgetPassword({ email = null, captcha = null }) {
+  //   const holderUser = await prisma.user.findFirst({ where: { email } });
+  //   if (!holderUser) {
+  //     throw new NotFoundError("User not found");
+  //   }
+  //   // Gửi thông điệp tới emailServices
+  //   await sendEmailToken({ email });
+  //   return true;
+  // }
+  static async forgetPassword({ email = null, captcha = null }) {
     const holderUser = await prisma.user.findFirst({ where: { email } });
     if (!holderUser) {
       throw new NotFoundError("User not found");
     }
-    // send mail
-    const result = await sendEmailToken({ email });
-    if (result) return true;
-    throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại");
-  };
+
+    // Khởi tạo Kafka Producer
+    const kafka = new Kafka({
+      clientId: "user-services",
+      brokers: [process.env.KAFKA_BROKER],
+    });
+    const producer = kafka.producer();
+
+    // Gửi thông điệp tới Kafka topic
+    try {
+      await producer.connect();
+      await producer.send({
+        topic: "send-email-token", // Đặt tên Kafka topic mà `emailServices` sẽ lắng nghe
+        messages: [
+          {
+            value: JSON.stringify({ email }), // Chuyển đổi dữ liệu thành chuỗi JSON
+          },
+        ],
+      });
+      console.log("Message sent to emailServices:", { email });
+    } catch (error) {
+      console.error("Error sending message to emailServices:", error);
+      throw error;
+    } finally {
+      await producer.disconnect();
+    }
+
+    return true;
+  }
+
   static changePassword = async ({ password, email }) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const changePassword = await prisma.user.update({
@@ -269,6 +304,7 @@ class UserService {
     role,
   }) => {
     let query = [];
+
     if (haveDepartment && haveDepartment == "false") {
       query.push({
         OR: [
@@ -294,6 +330,7 @@ class UserService {
         deletedMark: false,
       });
     }
+
     if (role) {
       console.log(role);
       query.push({
