@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package assignment;
+
+service AssignmentService {
+  rpc getAllTaskFromProject(getAllTaskFromProjectRequest) returns (getAllTaskFromProjectResponse);
+}
+
+message getAllTaskFromProjectResponse{
+  repeated string ids = 1;
+
+}
+message getAllTaskFromProjectRequest{
+  string project_id = 1;
+}
