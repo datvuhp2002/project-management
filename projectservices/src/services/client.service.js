@@ -91,15 +91,70 @@ class ClientService {
       select: this.select,
     });
   };
+  // static update = async (client_id, data, modifiedBy) => {
+  //   if (data.avatar) {
+  //     try {
+  //       return await prisma.client.update({
+  //         where: { client_id },
+  //         data: { ...data, modifiedBy },
+  //         select: this.select,
+  //       });
+  //     } catch (errr) {
+  //       cloudinary.uploader.destroy(data.avatar);
+  //       throw new BadRequestError(
+  //         "Cập nhật không thành công, vui lòng thử lại."
+  //       );
+  //     }
+  //   }
+  //   return await prisma.client.update({
+  //     where: { client_id },
+  //     data: { ...data, modifiedBy },
+  //     select: this.select,
+  //   });
+  // };
+  // static update = async (client_id, data, modifiedBy) => {
+  //   if (data.avatar) {
+  //     try {
+  //       // Gửi thông báo tải lên hình ảnh tới Kafka
+  //       await sendUploadRequest("uploadImageFromLocal", {
+  //         client_id,
+  //         avatar: data.avatar,
+  //       });
+
+  //       return await prisma.client.update({
+  //         where: { client_id },
+  //         data: { ...data, modifiedBy },
+  //         select: this.select,
+  //       });
+  //     } catch (err) {
+  //       cloudinary.uploader.destroy(data.avatar);
+  //       throw new BadRequestError(
+  //         "Cập nhật không thành công, vui lòng thử lại."
+  //       );
+  //     }
+  //   }
+  //   return await prisma.client.update({
+  //     where: { client_id },
+  //     data: { ...data, modifiedBy },
+  //     select: this.select,
+  //   });
+  // };
+
   static update = async (client_id, data, modifiedBy) => {
     if (data.avatar) {
       try {
+        // Gửi thông báo tải lên hình ảnh tới Kafka
+        await runProducer(uploadProducerTopic.uploadImageFromLocal, {
+          client_id,
+          avatar: data.avatar,
+        });
+
         return await prisma.client.update({
           where: { client_id },
           data: { ...data, modifiedBy },
           select: this.select,
         });
-      } catch (errr) {
+      } catch (err) {
         cloudinary.uploader.destroy(data.avatar);
         throw new BadRequestError(
           "Cập nhật không thành công, vui lòng thử lại."
@@ -111,6 +166,23 @@ class ClientService {
       data: { ...data, modifiedBy },
       select: this.select,
     });
+  };
+  static uploadImageFromLocal = async (client_id, avatar) => {
+    try {
+      // Thực hiện upload ảnh lên cloudinary hoặc xử lý tùy ý
+      const result = await cloudinary.uploader.upload(avatar);
+
+      // Cập nhật thông tin avatar của client trong cơ sở dữ liệu
+      await prisma.client.update({
+        where: { client_id },
+        data: { avatar: result.secure_url },
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Failed to upload image from local:", error);
+      return false;
+    }
   };
   static delete = async (client_id) => {
     const deleteClient = await prisma.client.update({

@@ -12,51 +12,55 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  user_id      String        @id @default(auto()) @map("_id") @db.ObjectId
-  username     String       @unique
-  password     String
-  email        String        @unique
-  status       Boolean       @default(true)
-  phone        String?
-  avatar       String?
-  name         String?
-  birthday     DateTime?
-  createdBy    String?       @db.ObjectId
-  modifiedBy   String?       @db.ObjectId
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime?     @updatedAt
-  deletedAt    DateTime?
-  deletedMark  Boolean       @default(false)
-  role             Role      @relation(fields: [role_id], references: [role_id])
-  role_id          String    @db.ObjectId
-  department_id    String?   @db.ObjectId
+  user_id       String        @id @default(auto()) @map("_id") @db.ObjectId
+  username      String        @unique
+  password      String
+  email         String        @unique
+  status        Boolean       @default(true)
+  phone         String?
+  avatar        String?
+  name          String?
+  birthday      DateTime?
+  createdBy     String?       @db.ObjectId
+  modifiedBy    String?       @db.ObjectId
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime?     @updatedAt
+  deletedAt     DateTime?
+  deletedMark   Boolean       @default(false)
+  role          Role          @relation(fields: [role_id], references: [role_id])
+  role_id       String        @db.ObjectId
+  department_id String?       @db.ObjectId
+  UserProperty  UserProperty?
 }
+
 enum RolesEnum {
   ADMIN
   MANAGER
   STAFF
   PROJECT_MANAGER
 }
+
 model Role {
   role_id      String         @id @default(auto()) @map("_id") @db.ObjectId
   name         RolesEnum      @unique @default(STAFF)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime?      @updatedAt
   deletedAt    DateTime?
-  User User[]
-}
-model otp {
-  otp_id   String    @id @default(auto()) @map("_id") @db.ObjectId
-  token    String    @unique
-  email    String    @unique
-  expireAt DateTime?
-  status   Boolean   @default(true)
+  UserProperty UserProperty[]
+  User         User[]
 }
 
-model template {
-  template_id String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String  @unique
-  html        String
-  status      Boolean @default(true)
+model UserProperty {
+  user_property_id String    @id @default(auto()) @map("_id") @db.ObjectId
+  author           User      @relation(fields: [user_id], references: [user_id]) // Chỉ định User là one-to-one
+  user_id          String    @unique @db.ObjectId
+  role             Role      @relation(fields: [role_id], references: [role_id])
+  role_id          String    @db.ObjectId
+  department_id    String?   @db.ObjectId
+  createdAt        DateTime? @default(now())
+  updatedAt        DateTime? @updatedAt
+  deletedAt        DateTime?
+  deletedMark      Boolean   @default(false)
 }

@@ -177,25 +177,60 @@ class ProjectService {
     return null;
   };
   // upload file to cloud and store it in db
-  static uploadFile = async (project_id, { path, filename }) => {
-    const existingProject = await prisma.project.findUnique({
-      where: { project_id },
-    });
-    if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
+  // static uploadFile = async (project_id, { path, filename }) => {
+  //   const existingProject = await prisma.project.findUnique({
+  //     where: { project_id },
+  //   });
+  //   if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
+  //   try {
+  //     const uploadFile = await prisma.project.update({
+  //       where: { project_id },
+  //       data: {
+  //         document: [...existingProject.document, filename],
+  //       },
+  //     });
+  //     if (uploadFile) return true;
+  //     cloudinary.uploader.destroy(filename);
+  //     return false;
+  //   } catch (e) {
+  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
+  //   }
+  // };
+  static async uploadFile(project_id, fileData) {
     try {
-      const uploadFile = await prisma.project.update({
-        where: { project_id },
-        data: {
-          document: [...existingProject.document, filename],
-        },
-      });
-      if (uploadFile) return true;
-      cloudinary.uploader.destroy(filename);
-      return false;
-    } catch (e) {
-      throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
+      // Prepare the message payload
+      const messagePayload = { project_id, ...fileData };
+
+      // Send the message to the upload topic
+      await runProducer(uploadProducerTopic.uploadFile, messagePayload);
+
+      console.log("Upload request sent:", messagePayload);
+    } catch (error) {
+      console.error("Failed to send upload request:", error);
+      throw new Error("Failed to send upload request");
     }
-  };
+  }
+
+  static async update({ project_id, data, modifiedBy }) {
+    if (data.document) {
+      try {
+        return await prisma.project.update({
+          where: { project_id },
+          data: { ...data, modifiedBy },
+        });
+      } catch (error) {
+        console.error("Failed to update project:", error);
+        throw new BadRequestError(
+          "Cập nhật không thành công, vui lòng thử lại."
+        );
+      }
+    }
+    return await prisma.project.update({
+      where: { project_id },
+      data: { ...data, modifiedBy },
+      select: this.select,
+    });
+  }
   // get Image File from cloudinary
   static getFileImage = async ({ filename }) => {
     const options = {
