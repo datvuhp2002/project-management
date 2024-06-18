@@ -13,7 +13,7 @@ const packageDefinition = protoLoader.loadSync(USER_PROTO_PATH, {
 const userProto = grpc.loadPackageDefinition(packageDefinition).user;
 
 const userClient = new userProto.UserService(
-  "0.0.0.0:50053",
+  process.env.USER_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
 
