@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-12T04:18:00.773Z","context":"/services/api/activity/getAllActivities/6669215306538ea9752183e4","ecs.version":"8.10.0","log.level":"info","message":"input params:-:GET:-:","metadata":{},"requestId":"66681cc99776be35488eeb74","timestamp":"2024-06-12 11:18:773 AM"}

@@ -7,8 +7,11 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const { runProducer } = require("../message_queue/producer");
-const { runConsumerOnDemand } = require("../message_queue/consumer.demand");
 const { userProducerTopic } = require("../configs/kafkaUserTopic");
+const {
+  getUser,
+  GetDetailManagerAndTotalStaffInDepartment,
+} = require("./grpcClient.services");
 class DepartmentService {
   static select = {
     department_id: true,
@@ -122,19 +125,12 @@ class DepartmentService {
     if (!department) {
       throw new BadRequestError("Department not found");
     }
-    await runProducer(
-      userProducerTopic.getAllUserInDepartmentAndDetailManager,
-      [
-        {
-          department_id: department.department_id,
-          manager_id: department.manager_id,
-        },
-      ]
-    );
-    const userData = await runConsumerOnDemand();
-    console.log("User DATA:::", userData);
-    department.information = userData;
-
+    if (department.manager_id) {
+      try {
+        const userResponse = await getUser(department.manager_id);
+        department.manager_info = userResponse;
+      } catch (err) {}
+    }
     return department;
   };
   // update department for manager
@@ -297,22 +293,17 @@ class DepartmentService {
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
-
     if (isNotTrash) {
-      const department_list_id = departments.map((department) => ({
-        department_id: department.department_id,
-        manager_id: department.manager_id,
-      }));
-
-      await runProducer(
-        userProducerTopic.getAllUserInDepartmentAndDetailManager,
-        department_list_id
-      );
-      const userData = await runConsumerOnDemand();
-      console.log("User DATA:::", userData);
-      departments.map((item, index) => {
-        item.information = userData[index];
+      const departmentPromises = departments.map(async (department, index) => {
+        const result = await GetDetailManagerAndTotalStaffInDepartment(
+          department.department_id,
+          department.manager_id
+        );
+        console.log(result);
+        department.information = result;
       });
+
+      await Promise.all(departmentPromises);
     }
     return {
       departments: departments,

@@ -1,3 +1,4 @@
+const startGrpcServer = require("./grpc_server");
 const app = require("./src/app");
 const prisma = require("./src/prisma");
 const port = process.env.PORT;
@@ -6,6 +7,7 @@ const hostname = "0.0.0.0";
 async function main() {}
 const server = app.listen(port, hostname, () => {
   console.log(`Hello at`, port);
+  startGrpcServer();
   main()
     .then(async () => {
       await prisma.$disconnect();

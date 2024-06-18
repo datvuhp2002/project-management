@@ -6,18 +6,7 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const { ObjectId } = require("mongodb");
-const { runProducer } = require("../message_queue/producer");
-const {
-  runConsumerTaskOnDemand,
-} = require("../message_queue/consumer.task.demand");
-const {
-  runConsumerUserOnDemand,
-} = require("../message_queue/consumer.user.demand");
-const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
-const {
-  userProducerTopic,
-} = require("../configs/kafkaUserTopic/producer/user.producer.topic.config");
+const { getUser, getTask, getProject } = require("./grpcClient.services");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -239,9 +228,9 @@ class AssignmentService {
       null
     );
     if (listOfAssignment.assignments) {
-      const taskIds = listOfAssignment.assignments
-        .map((assignment) => assignment.task_id)
-        .filter((id) => id !== null);
+      const taskIds = listOfAssignment.assignments.map(
+        (assignment) => assignment.task_id
+      );
       const uniqueTaskIds = [...new Set(taskIds)];
       return uniqueTaskIds;
     }
@@ -281,18 +270,41 @@ class AssignmentService {
   };
   // assignment information
   static detail = async (id) => {
-    return await prisma.assignment.findUnique({
+    const assignment = await prisma.assignment.findUnique({
       where: { assignment_id: id },
       select: this.select,
     });
+    const userResponse = await getUser(assignment.user_id);
+    const taskResponse = await getTask(assignment.task_id);
+    const projectResponse = await getProject(assignment.project_id);
+    if (userResponse) {
+      assignment.user = userResponse;
+    } else {
+      assignment.user = null;
+    }
+    if (taskResponse) {
+      assignment.task = taskResponse;
+    } else {
+      assignment.task = null;
+    }
+    if (projectResponse) {
+      assignment.project = projectResponse;
+    } else {
+      assignment.project = null;
+    }
+    return assignment;
   };
   // update assignment
   static update = async ({ id, data }) => {
-    return await prisma.assignment.update({
+    const updateAssignment = await prisma.assignment.update({
       where: { assignment_id: id },
       data,
       select: this.select,
     });
+    if (!updateAssignment) {
+      throw new BadRequestError("Can't update assignment");
+    }
+    return updateAssignment;
   };
   // soft delete assignment
   static delete = async (assignment_id) => {
@@ -344,52 +356,35 @@ class AssignmentService {
         createdAt: "desc",
       },
     });
-    console.log(assignments);
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
     if (isNotTrash) {
-      const assignment_list_id = assignments.map((assignment) => ({
-        task_id: assignment.task_id,
-      }));
-
-      const user_list_id = assignments.map((assignment) => assignment.user_id);
-
-      // Tạo các Promise cho các producers và consumers
-      await runProducer(
-        taskProducerTopic.getTaskInformation,
-        assignment_list_id
-      );
-      await runProducer(userProducerTopic.getUserInformation, user_list_id);
-      const taskInformationData = await runConsumerTaskOnDemand();
-      const userInformationData = await runConsumerUserOnDemand();
-
-      console.log("received Task Data:::", taskInformationData);
-      console.log("received User Data:::", userInformationData);
-
-      if (Array.isArray(taskInformationData)) {
-        assignments.forEach((item, index) => {
-          item.task_information = taskInformationData[index];
-        });
-      } else {
-        console.error("Error: Invalid task data received.");
-      }
-
-      if (Array.isArray(userInformationData)) {
-        assignments.forEach((item, index) => {
-          item.user_information = userInformationData[index];
-        });
-      } else {
-        console.error("Error: Invalid user data received.");
-      }
-      return {
-        assignments: assignments,
-        total,
-        nextPage: nextPageNumber,
-        previousPage: previousPageNumber,
-        currentPage,
-        itemsPerPage,
-      };
+      const assignmentPromises = assignments.map(async (assignment) => {
+        try {
+          const userResponse = await getUser(assignment.user_id);
+          const taskResponse = await getTask(assignment.task_id);
+          const projectResponse = await getProject(assignment.project_id);
+          if (userResponse) {
+            assignment.user = userResponse;
+          } else {
+            assignment.user = null;
+          }
+          if (taskResponse) {
+            assignment.task = taskResponse;
+          } else {
+            assignment.task = null;
+          }
+          if (projectResponse) {
+            assignment.project = projectResponse;
+          } else {
+            assignment.project = null;
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      });
+      await Promise.all(assignmentPromises);
     }
 
     return {

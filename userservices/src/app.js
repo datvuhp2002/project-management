@@ -5,9 +5,7 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
-const {
-  runAssignmentConsumerOnDemand,
-} = require("./message_queue/consumer.assignment.demand");
+
 const { v4: uuidv4 } = require("uuid");
 const UserLogger = require("./loggers/user.log");
 const initElasticsearch = require("./dbs/init.elasticsearch");
@@ -63,14 +61,4 @@ app.use((err, req, res, next) => {
   });
 });
 continuousConsumer().catch(console.error);
-(async () => {
-  try {
-    console.log("Starting consumer...");
-    await runAssignmentConsumerOnDemand();
-    console.log("Consumer started successfully.");
-  } catch (error) {
-    console.error("Error starting consumer:", error);
-    process.exit(1); // Thoát ứng dụng với mã lỗi nếu không thể khởi động consumer
-  }
-})();
 module.exports = app;

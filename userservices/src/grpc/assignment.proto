@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package assignment;
+
+service AssignmentService {
+  rpc getAllUserFromProject(getAllUserFromProjectRequest) returns (getAllUserFromProjectResponse);
+}
+
+message getAllUserFromProjectRequest{
+  string project_id = 1;
+}
+
+message getAllUserFromProjectResponse{
+  repeated string ids = 1;
+
+}
+
