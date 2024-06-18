@@ -80,6 +80,9 @@ services:
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - PUBLIC_KEY=abcdefgh123
+      - PRIVATE_KEY=12345678abc
+
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -114,6 +117,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -137,10 +141,12 @@ services:
     image: datvudinhtrong/departmentservices
     container_name: departmentservices
     environment:
+      - PORT=3057
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/departmentService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - USER_GRPC_PORT=userservices:50053
 
     labels:
       co.elastic.logs/module: filebeat
@@ -171,6 +177,9 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50056
+      - USER_GRPC_PORT=userservices:50053
+      - TASK_GRPC_PORT=taskservices:50054
+      - PROJECT_GRPC_PORT=projectservices:50055
 
     labels:
       co.elastic.logs/module: filebeat
@@ -231,6 +240,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50054
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
 
     labels:
       co.elastic.logs/module: filebeat
@@ -260,6 +270,7 @@ services:
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/activityService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - USER_GRPC_PORT=userservices:50053
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -287,17 +298,17 @@ services:
     networks:
       - kafka-network
 
-  # projectmanagementwebui:
-  #   build:
-  #     dockerfile: Dockerfile
-  #   platform: linux/amd64
-  #   image: nambndpx000/projectmanagementwebui
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - VITE_REQUEST_API_URL=http://10.100.1.153:3050/
-  #   networks:
-  #     - kafka-network
+  projectmanagementwebui:
+    build:
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    image: nambndpx000/projectmanagementwebui
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_REQUEST_API_URL=http://10.100.1.153:3050/
+    networks:
+      - kafka-network
 volumes:
   esdata:
     driver: local
