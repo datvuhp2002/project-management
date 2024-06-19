@@ -9,6 +9,9 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
+const {
+  getTotalTaskWithStatusFromProjectAndTotalStaff,
+} = require("./grpcClient.services");
 class ProjectService {
   static select = {
     project_id: true,
@@ -176,26 +179,6 @@ class ProjectService {
     }
     return null;
   };
-  // upload file to cloud and store it in db
-  // static uploadFile = async (project_id, { path, filename }) => {
-  //   const existingProject = await prisma.project.findUnique({
-  //     where: { project_id },
-  //   });
-  //   if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
-  //   try {
-  //     const uploadFile = await prisma.project.update({
-  //       where: { project_id },
-  //       data: {
-  //         document: [...existingProject.document, filename],
-  //       },
-  //     });
-  //     if (uploadFile) return true;
-  //     cloudinary.uploader.destroy(filename);
-  //     return false;
-  //   } catch (e) {
-  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-  //   }
-  // };
   static async uploadFile(project_id, fileData) {
     try {
       // Prepare the message payload
@@ -320,10 +303,22 @@ class ProjectService {
         createdAt: "desc",
       },
     });
+    if (isNotTrash) {
+      const projectPromise = projects.map(async (project, index) => {
+        const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
+          project.project_id
+        );
+        project.total_staff = result.total_staff;
+        project.total_task = {
+          total_task_is_done: result.total_task_is_done,
+          total_task_is_not_done: result.total_task_is_not_done,
+        };
+      });
+      await Promise.all(projectPromise);
+    }
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
-
     return {
       data: projects,
       total,

@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 RUN npx prisma generate
-RUN npx prisma db push
+# RUN npx prisma db push
 # Expose the port the app runs on
 EXPOSE 3061
 

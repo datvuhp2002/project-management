@@ -2,7 +2,7 @@
 
 const UserService = require("../services/user.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response");
-const { uploadImageFromUrl } = require("../services/upload.services");
+// const { uploadImageFromUrl } = require("../services/upload.services");
 const { BadRequestError } = require("../core/error.response");
 const cloudinary = require("../configs/cloudinary.config");
 const { getInfoData } = require("../utils/index");

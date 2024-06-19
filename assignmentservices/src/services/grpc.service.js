@@ -50,5 +50,31 @@ async function getAllUserFromProject(call, callback) {
     });
   }
 }
+async function getTotalTaskWithStatusFromProjectAndTotalStaff(call, callback) {
+  const { project_id } = call.request;
+  try {
+    const result =
+      await AssignmentService.getTotalTaskWithStatusFromProjectAndTotalStaff(
+        project_id
+      );
+    if (result) {
+      callback(null, result);
+    } else {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        details: "Assignment not found",
+      });
+    }
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      details: "Internal server error",
+    });
+  }
+}
 
-module.exports = { getAllTaskFromProject, getAllUserFromProject };
+module.exports = {
+  getAllTaskFromProject,
+  getAllUserFromProject,
+  getTotalTaskWithStatusFromProjectAndTotalStaff,
+};

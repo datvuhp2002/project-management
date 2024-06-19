@@ -2,8 +2,7 @@
 const { Kafka } = require("kafkajs");
 const prisma = require("../prisma");
 const RoleService = require("./role.service");
-const UserPropertyService = require("./user.property.service");
-const { sendEmailToken } = require("../message_queue/producer.email");
+// const { sendEmailToken } = require("../message_queue/producer.email");
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
