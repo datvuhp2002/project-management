@@ -5,7 +5,7 @@ const {
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
 const {
-  emailTopicsOnDemand,
+  emailTopicsContinuous,
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic");
 const {
@@ -105,7 +105,7 @@ const continuousConsumer = async () => {
             await UserService.update({ id, data });
           }
           break;
-        case emailTopicsOnDemand.sendEmailToken:
+        case emailTopicsContinuous.sendEmailToken:
           const sendEmailTokenData = JSON.parse(message.value.toString());
           console.log("Message receive:::", sendEmailTokenData);
           const emailRequestResultPromises = sendEmailTokenData.map(

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package assignment;
+
+service AssignmentService {
+  rpc getTotalTaskWithStatusFromProjectAndTotalStaff(getTotalTaskWithStatusFromProjectAndTotalStaffRequest) returns (getTotalTaskWithStatusFromProjectAndTotalStaffResponse);
+}
+message getTotalTaskWithStatusFromProjectAndTotalStaffRequest{
+  string project_id = 1;
+}
+message getTotalTaskWithStatusFromProjectAndTotalStaffResponse{
+  int64 total_staff = 1;
+  int64 total_task_is_done = 2;
+  int64 total_task_is_not_done = 3;
+}
+
