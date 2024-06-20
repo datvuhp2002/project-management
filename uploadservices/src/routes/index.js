@@ -1,5 +1,9 @@
 "use strict";
 const express = require("express");
 const router = express.Router();
-router.use("/services/api/upload", require("./upload"));
+
+// check permissions
+router.use("/services/api/user/role", require("./role"));
+router.use("/services/api/user", require("./user"));
+router.use("/services/api/user/email", require("./email"));
 module.exports = router;

@@ -33,15 +33,15 @@ const projectProto = grpc.loadPackageDefinition(
 ).project;
 
 const userClient = new userProto.UserService(
-  "0.0.0.0:50053",
+  process.env.USER_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
 const taskClient = new taskProto.TaskService(
-  "0.0.0.0:50054",
+  process.env.TASK_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
 const projectClient = new projectProto.ProjectService(
-  "0.0.0.0:50055",
+  process.env.PROJECT_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
 

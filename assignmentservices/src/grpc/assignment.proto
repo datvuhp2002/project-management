@@ -6,6 +6,7 @@ service AssignmentService {
   rpc GetAssignment(AssignmentRequest) returns (AssignmentResponse);
   rpc getAllTaskFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
   rpc getAllUserFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
+  rpc getTotalTaskWithStatusFromProjectAndTotalStaff(getTotalTaskWithStatusFromProjectAndTotalStaffRequest) returns (getTotalTaskWithStatusFromProjectAndTotalStaffResponse);
 }
 
 message AssignmentRequest {
@@ -26,4 +27,13 @@ message getAllTaskOrUserFromProjectResponse{
 }
 message getAllTaskOrUserFromProjectRequest{
   string project_id = 1;
+}
+
+message getTotalTaskWithStatusFromProjectAndTotalStaffRequest{
+  string project_id = 1;
+}
+message getTotalTaskWithStatusFromProjectAndTotalStaffResponse{
+  int64 total_staff = 1;
+  int64 total_task_is_done = 2;
+  int64 total_task_is_not_done = 3;
 }

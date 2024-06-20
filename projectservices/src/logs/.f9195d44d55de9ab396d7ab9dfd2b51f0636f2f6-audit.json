@@ -1,0 +1,60 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.f9195d44d55de9ab396d7ab9dfd2b51f0636f2f6-audit.json",
+    "files": [
+        {
+            "date": 1718684179988,
+            "name": "src/logs/projectServices-2024-06-18-11-16.error.log",
+            "hash": "b5f00c44349d219738dbef0324e7fc7f41a1c8b4d9207150eccfae23a3db2183"
+        },
+        {
+            "date": 1718685714468,
+            "name": "src/logs/projectServices-2024-06-18-11-41.error.log",
+            "hash": "40ad98c4e9af033931ce708d655897e0dab91c0f8a3f64bf924f41f61c82ded0"
+        },
+        {
+            "date": 1718685738366,
+            "name": "src/logs/projectServices-2024-06-18-11-42.error.log",
+            "hash": "500cdd0dc71016bcba5d55979ed8962f343eac0971cd3ba28cd28db442cfdad8"
+        },
+        {
+            "date": 1718685906160,
+            "name": "src/logs/projectServices-2024-06-18-11-45.error.log",
+            "hash": "cdba30d6e5f9d7ac5bc9dcdc9466de7e4bfea75f5877159fe794489ac30ce738"
+        },
+        {
+            "date": 1718686097635,
+            "name": "src/logs/projectServices-2024-06-18-11-48.error.log",
+            "hash": "b605431df30d1f2c59bea1500fd91f77fc3b4c44f114d690429d662cc5e5e264"
+        },
+        {
+            "date": 1718686145124,
+            "name": "src/logs/projectServices-2024-06-18-11-49.error.log",
+            "hash": "82ca7054c5262fbdcf52602b604cfb3a15e30af738bc4082dcdc13f6e5672520"
+        },
+        {
+            "date": 1718686216097,
+            "name": "src/logs/projectServices-2024-06-18-11-50.error.log",
+            "hash": "ae53c7b109d9b8f0e83b46a6499e6de764819d21131c64a36c75216774721bf7"
+        },
+        {
+            "date": 1718686278791,
+            "name": "src/logs/projectServices-2024-06-18-11-51.error.log",
+            "hash": "10d65914b11256e1a797b65feab90facd95a7b642fd9a4240e02314caea0c9a0"
+        },
+        {
+            "date": 1718686437897,
+            "name": "src/logs/projectServices-2024-06-18-11-53.error.log",
+            "hash": "d22cf4dbb2a6a238a497600c7402eb01b7c914f976b0268b8e40ac9fe08a82eb"
+        },
+        {
+            "date": 1718686449034,
+            "name": "src/logs/projectServices-2024-06-18-11-54.error.log",
+            "hash": "bf0641c761f8d950a67f26ec13df180c21f1b0ff55715536db8124cbc62b6cf9"
+        }
+    ],
+    "hashType": "sha256"
+}

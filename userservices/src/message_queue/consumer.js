@@ -5,6 +5,7 @@ const {
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
 const {
+<<<<<<< HEAD
   emailTopicsOnDemand,
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic");
@@ -13,6 +14,12 @@ const {
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic");
 const {
+=======
+  emailTopicsContinuous,
+  emailProducerTopic,
+} = require("../configs/kafkaEmailTopic");
+const {
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   activityTopicsContinuous,
   activityProducerTopic,
 } = require("../configs/kafkaActivityTopic");
@@ -23,6 +30,11 @@ const {
   assignmentTopicsContinuous,
   assignmentProducerTopic,
 } = require("../configs/kafkaAssignmentTopic");
+const {
+  uploadTopicsContinuous,
+  uploadTopicsOnDemand,
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic");
 
 const kafka = new Kafka({
   clientId: "user-services",
@@ -46,6 +58,18 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(emailTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -92,7 +116,11 @@ const continuousConsumer = async () => {
             await UserService.update({ id, data });
           }
           break;
+<<<<<<< HEAD
         case emailTopicsOnDemand.sendEmailToken:
+=======
+        case emailTopicsContinuous.sendEmailToken:
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
           const sendEmailTokenData = JSON.parse(message.value.toString());
           console.log("Message receive:::", sendEmailTokenData);
           const emailRequestResultPromises = sendEmailTokenData.map(
@@ -112,6 +140,7 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
+<<<<<<< HEAD
         // case uploadTopicsOnDemand.uploadAvatarFromLocal:
         //   const uploadAvatarFromLocalData = JSON.parse(
         //     message.value.toString()
@@ -179,6 +208,14 @@ const continuousConsumer = async () => {
                 throw new Error("Missing required data - user_id hoặc avatar");
               }
               return await UserService.update(user_id, avatarPath);
+=======
+        case uploadTopicsOnDemand.uploadImageFromLocal:
+          const uploadImageFromLocalData = JSON.parse(message.value.toString());
+          console.log("Message receive:::", uploadImageFromLocalData);
+          const uploadRequestResultPromises = uploadImageFromLocalData.map(
+            async (item) => {
+              return await UserService.update(item);
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
             }
           );
           const uploadRequestResults = await Promise.all(
@@ -186,13 +223,21 @@ const continuousConsumer = async () => {
           );
           try {
             await runProducer(
+<<<<<<< HEAD
               uploadProducerTopic.uploadAvatarFromLocal,
+=======
+              uploadProducerTopic.uploadImageFromLocal,
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
               uploadRequestResults
             );
           } catch (err) {
             console.log(err);
           }
           break;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

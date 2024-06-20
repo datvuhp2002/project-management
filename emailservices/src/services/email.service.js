@@ -84,28 +84,14 @@ const verifyToken = async ({ token, email }) => {
   throw new BadRequestError("Hệ thống gặp trục trặc, vui lòng thử lại");
 };
 
-const forgetPassword = async ({ email }) => {
-  // Generate OTP token
-  const token = await newOtp({ email });
-
-  // Get email template
-  const template = await getTemplate({ name: "HTML_MAIL_TOKEN" });
-  if (!template) {
-    throw new NotFoundError("Template not found");
-  }
-  // Replace placeholders in the email template with token and email
-  const content = replacePlaceholder(template.html, {
-    link_verify: token,
-    email,
-  });
-  // Send verification email
-  await sendEmailLinkVerify({
-    html: content,
-    toEmail: email,
-    subject: "Vui lòng xác nhận địa chỉ email đăng ký",
+runEmailConsumerOnDemand()
+  .then(() => {
+    console.log(
+      "Kafka consumer for emailServices is running and listening for messages."
+    );
+  })
+  .catch((error) => {
+    console.error("Error starting Kafka consumer for emailServices:", error);
   });
 
-  return true;
-};
-
-module.exports = { sendEmailToken, verifyToken, forgetPassword };
+module.exports = { sendEmailToken, verifyToken };

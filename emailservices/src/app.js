@@ -5,12 +5,6 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
-// const {
-//   runAssignmentConsumerOnDemand,
-// } = require("./message_queue/consumer.assignment.demand");
-const {
-  runEmailConsumerOnDemand,
-} = require("./message_queue/consumer.user.demand");
 const { v4: uuidv4 } = require("uuid");
 const UserLogger = require("./loggers/user.log");
 const initElasticsearch = require("./dbs/init.elasticsearch");
@@ -66,5 +60,4 @@ app.use((err, req, res, next) => {
   });
 });
 continuousConsumer().catch(console.error);
-
 module.exports = app;

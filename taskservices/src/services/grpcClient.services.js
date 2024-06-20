@@ -17,7 +17,7 @@ const assignmentProto = grpc.loadPackageDefinition(
   packageAssignmentDefinition
 ).assignment;
 const assignmentClient = new assignmentProto.AssignmentService(
-  "0.0.0.0:50056",
+  process.env.ASSIGNMENT_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
 async function GetAllTaskFromProject(project_id) {

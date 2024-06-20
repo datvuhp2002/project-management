@@ -17,7 +17,7 @@ const assignmentProto = grpc.loadPackageDefinition(
   packageAssignmentDefinition
 ).assignment;
 const assignmentClient = new assignmentProto.AssignmentService(
-  "0.0.0.0:50056",
+  process.env.ASSIGNMENT_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
 async function GetAllUserFromProject(project_id) {
@@ -27,7 +27,6 @@ async function GetAllUserFromProject(project_id) {
       if (err) {
         reject(err.message);
       } else {
-        console.log("RESPONSE:::", response);
         resolve(response.ids);
       }
     });

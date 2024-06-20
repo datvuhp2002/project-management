@@ -1,6 +1,6 @@
 const app = require("./src/app");
 const prisma = require("./src/prisma");
-const port = process.env.PORT;
+const port = process.env.PORT || 3056;
 const hostname = "0.0.0.0";
 
 async function main() {}

@@ -3,18 +3,10 @@ const AccessService = require("../services/access.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response");
 class AccessController {
   login = async (req, res, next) => {
-    const sendDate = Object.assign(
-      {
-        requestId: req.requestId,
-      },
-      req.body
-    );
     new SuccessResponse({
-      message: "Đăng nhập thành công",
-      data: await AccessService.login(sendDate),
+      data: await AccessService.login(req.body),
     }).send(res);
   };
-
   reportForDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Báo cáo thành công",

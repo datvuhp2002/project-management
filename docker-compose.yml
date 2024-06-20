@@ -56,7 +56,6 @@ services:
       - zookeeper
     networks:
       - kafka-network
-
   gateway:
     build:
       context: ./gateway
@@ -80,6 +79,8 @@ services:
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - PUBLIC_KEY=abcdefgh123
+      - PRIVATE_KEY=12345678abc
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -95,7 +96,6 @@ services:
       - elasticsearch
     networks:
       - kafka-network
-
   userservices:
     build:
       context: ./userservices
@@ -114,6 +114,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -137,10 +138,12 @@ services:
     image: datvudinhtrong/departmentservices
     container_name: departmentservices
     environment:
+      - PORT=3057
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/departmentService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - USER_GRPC_PORT=userservices:50053
 
     labels:
       co.elastic.logs/module: filebeat
@@ -171,6 +174,9 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50056
+      - USER_GRPC_PORT=userservices:50053
+      - TASK_GRPC_PORT=taskservices:50054
+      - PROJECT_GRPC_PORT=projectservices:50055
 
     labels:
       co.elastic.logs/module: filebeat
@@ -201,6 +207,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50055
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -289,6 +296,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50054
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
 
     labels:
       co.elastic.logs/module: filebeat
@@ -318,6 +326,7 @@ services:
       - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/activityService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - USER_GRPC_PORT=userservices:50053
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -327,20 +336,6 @@ services:
       - "3061:3061"
     depends_on:
       - kafka
-      - elasticsearch
-    networks:
-      - kafka-network
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.10.0
-    container_name: filebeat
-    user: root
-    init: true
-    volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-    depends_on:
       - elasticsearch
     networks:
       - kafka-network

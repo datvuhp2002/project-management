@@ -1,7 +1,7 @@
 "use strict";
-const userTopicsOnDemand = {};
-const userTopicsContinuous = {
+const userTopicsOnDemand = {
   sendEmailToken: "send-email-token",
 };
+const userTopicsContinuous = {};
 
 module.exports = { userTopicsOnDemand, userTopicsContinuous };

@@ -397,7 +397,9 @@ class AssignmentService {
     };
   };
   // consumer handle request
-  static getTotalTaskWithStatusFromProject = async (project_id) => {
+  static getTotalTaskWithStatusFromProjectAndTotalStaff = async (
+    project_id
+  ) => {
     const listOfAssignmentIsNotDone = await this.listOfAssignmentFromProject(
       project_id,
       false
@@ -406,6 +408,7 @@ class AssignmentService {
       project_id,
       true
     );
+    const totalStaff = await this.getAllUserFromProject(project_id);
     if (
       listOfAssignmentIsNotDone.assignments &&
       listOfAssignmentIsDone.assignments
@@ -417,6 +420,7 @@ class AssignmentService {
         (assignment) => assignment.task_id
       );
       return {
+        total_user: totalStaff.total,
         total_task_is_done: taskIdsIsDone.length,
         total_task_is_not_done: taskIdsIsNotDone.length,
       };

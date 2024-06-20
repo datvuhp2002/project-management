@@ -20,10 +20,6 @@ const continuousConsumer = async () => {
       const parsedMessage = JSON.parse(message.value.toString());
       console.log("Before handle :::", parsedMessage);
       switch (topic) {
-        case userTopicsContinuous.sendEmailToken: {
-          await EmailService.forgetPassword({ email: parsedMessage });
-          break;
-        }
         default:
           console.log("Topic không được xử lý:", topic);
       }

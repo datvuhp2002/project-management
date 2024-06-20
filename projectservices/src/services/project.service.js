@@ -9,6 +9,9 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
+const {
+  getTotalTaskWithStatusFromProjectAndTotalStaff,
+} = require("./grpcClient.services");
 class ProjectService {
   static select = {
     project_id: true,
@@ -176,6 +179,7 @@ class ProjectService {
     }
     return null;
   };
+<<<<<<< HEAD
   // upload file to cloud and store it in db
   // static uploadFile = async (project_id, { path, filename }) => {
   //   const existingProject = await prisma.project.findUnique({
@@ -196,6 +200,8 @@ class ProjectService {
   //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
   //   }
   // };
+=======
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   static async uploadFile(project_id, fileData) {
     try {
       // Prepare the message payload
@@ -320,10 +326,22 @@ class ProjectService {
         createdAt: "desc",
       },
     });
+    if (isNotTrash) {
+      const projectPromise = projects.map(async (project, index) => {
+        const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
+          project.project_id
+        );
+        project.total_staff = result.total_staff;
+        project.total_task = {
+          total_task_is_done: result.total_task_is_done,
+          total_task_is_not_done: result.total_task_is_not_done,
+        };
+      });
+      await Promise.all(projectPromise);
+    }
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
-
     return {
       data: projects,
       total,

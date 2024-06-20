@@ -20,13 +20,7 @@ class EmailController {
   sendEmailToken = async (req, res, next) => {
     new SuccessResponse({
       message: "Send Email Token",
-      data: await sendEmailToken(req.body),
-    }).send(res);
-  };
-  forgetPassword = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Vui lòng kiểm tra email của bạn",
-      data: await forgetPassword({ email: req.body.email }),
+      data: await this.sendEmailToken(req.body),
     }).send(res);
   };
 }
