@@ -5,21 +5,10 @@ const {
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
 const {
-<<<<<<< HEAD
-  emailTopicsOnDemand,
-  emailProducerTopic,
-} = require("../configs/kafkaEmailTopic");
-const {
-  uploadTopicsOnDemand,
-  uploadProducerTopic,
-} = require("../configs/kafkaUploadTopic");
-const {
-=======
   emailTopicsContinuous,
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic");
 const {
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   activityTopicsContinuous,
   activityProducerTopic,
 } = require("../configs/kafkaActivityTopic");
@@ -116,11 +105,7 @@ const continuousConsumer = async () => {
             await UserService.update({ id, data });
           }
           break;
-<<<<<<< HEAD
-        case emailTopicsOnDemand.sendEmailToken:
-=======
         case emailTopicsContinuous.sendEmailToken:
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
           const sendEmailTokenData = JSON.parse(message.value.toString());
           console.log("Message receive:::", sendEmailTokenData);
           const emailRequestResultPromises = sendEmailTokenData.map(
@@ -140,82 +125,12 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
-<<<<<<< HEAD
-        // case uploadTopicsOnDemand.uploadAvatarFromLocal:
-        //   const uploadAvatarFromLocalData = JSON.parse(
-        //     message.value.toString()
-        //   );
-        //   console.log("Message receive:::", uploadAvatarFromLocalData);
-        //   const uploadRequestResultPromises = uploadAvatarFromLocalData.map(
-        //     async (item) => {
-        //       return await UserService.update(item);
-        //     }
-        //   );
-        //   const uploadRequestResults = await Promise.all(
-        //     uploadRequestResultPromises
-        //   );
-        //   try {
-        //     await runProducer(
-        //       uploadProducerTopic.uploadAvatarFromLocal,
-        //       uploadRequestResults
-        //     );
-        //   } catch (err) {
-        //     console.log(err);
-        //   }
-        //   break;
-
-        // case uploadTopicsOnDemand.uploadAvatarFromLocal:
-        //   const uploadAvatarFromLocalData = JSON.parse(
-        //     message.value.toString()
-        //   );
-        //   console.log("Message receive:::", uploadAvatarFromLocalData);
-
-        //   const uploadRequestResultPromises = uploadAvatarFromLocalData.map(
-        //     async (item) => {
-        //       const { user_id, avatar } = item;
-        //       if (!user_id || !avatar) {
-        //         throw new Error("Missing required data - user_id or avatar");
-        //       }
-        //       const path = avatar; // Assuming avatar holds the file path
-        //       return await UserService.uploadAvatarFromLocal({
-        //         id: user_id,
-        //         data: { avatar: path },
-        //       });
-        //     }
-        //   );
-        //   const uploadRequestResults = await Promise.all(
-        //     uploadRequestResultPromises
-        //   );
-        //   try {
-        //     await runProducer(
-        //       uploadProducerTopic.uploadAvatarFromLocal,
-        //       uploadRequestResults
-        //     );
-        //   } catch (err) {
-        //     console.log(err);
-        //   }
-        //   break;
-        case uploadTopicsOnDemand.uploadAvatarFromLocal:
-          const uploadAvatarFromLocalData = JSON.parse(
-            message.value.toString()
-          );
-          console.log("Message receive:::", uploadAvatarFromLocalData);
-
-          const uploadRequestResultPromises = uploadAvatarFromLocalData.map(
-            async (item) => {
-              const { user_id, avatarPath } = item;
-              if (!user_id || !avatarPath) {
-                throw new Error("Missing required data - user_id hoặc avatar");
-              }
-              return await UserService.update(user_id, avatarPath);
-=======
         case uploadTopicsOnDemand.uploadImageFromLocal:
           const uploadImageFromLocalData = JSON.parse(message.value.toString());
           console.log("Message receive:::", uploadImageFromLocalData);
           const uploadRequestResultPromises = uploadImageFromLocalData.map(
             async (item) => {
               return await UserService.update(item);
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
             }
           );
           const uploadRequestResults = await Promise.all(
@@ -223,21 +138,13 @@ const continuousConsumer = async () => {
           );
           try {
             await runProducer(
-<<<<<<< HEAD
-              uploadProducerTopic.uploadAvatarFromLocal,
-=======
               uploadProducerTopic.uploadImageFromLocal,
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
               uploadRequestResults
             );
           } catch (err) {
             console.log(err);
           }
           break;
-<<<<<<< HEAD
-=======
-
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

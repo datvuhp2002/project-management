@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 const initElasticsearch = require("./dbs/init.elasticsearch");
 const { router, registerRouterServices } = require("./routes");
 const {
-  emailRoutes,
+  emailServices,
   roleRoutes,
   userServicesRoutes,
   departmentServicesRoutes,
@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 // init routes
 app.use(router);
 registerRouterServices("/departments", departmentServicesRoutes, app);
-registerRouterServices("/email", emailRoutes, app);
+registerRouterServices("/email", emailServices, app);
 registerRouterServices("/roles", roleRoutes, app);
 registerRouterServices("/users", userServicesRoutes, app);
 registerRouterServices("/assignments", assignmentServicesRoutes, app);

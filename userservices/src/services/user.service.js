@@ -1,14 +1,7 @@
 "use strict";
-<<<<<<< HEAD
-// const { Kafka } = require("kafkajs");
-const prisma = require("../prisma");
-const RoleService = require("./role.service");
-=======
-const { Kafka } = require("kafkajs");
 const prisma = require("../prisma");
 const RoleService = require("./role.service");
 // const { sendEmailToken } = require("../message_queue/producer.email");
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
 const bcrypt = require("bcrypt");
 const {
   BadRequestError,
@@ -79,75 +72,25 @@ class UserService {
     return newUser;
   };
 
-<<<<<<< HEAD
-  // static forgetPassword = async ({ email = null, captcha = null }) => {
-=======
   // static async forgetPassword({ email = null, captcha = null }) {
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   //   const holderUser = await prisma.user.findFirst({ where: { email } });
   //   if (!holderUser) {
   //     throw new NotFoundError("User not found");
   //   }
-<<<<<<< HEAD
-  //   // send mail
-  //   const result = await sendEmailToken({ email });
-  //   if (result) return true;
-  //   throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại");
-  // };
-  static forgetPassword = async ({ email = null, captcha = null }) => {
-=======
   //   // Gửi thông điệp tới emailServices
   //   await sendEmailToken({ email });
   //   return true;
   // }
   static async forgetPassword({ email = null, captcha = null }) {
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
     const holderUser = await prisma.user.findFirst({ where: { email } });
     // return holderUser;
     if (!holderUser) {
       throw new NotFoundError("User not found");
     }
-<<<<<<< HEAD
-    try {
-      await runProducer(emailProducerTopic.sendEmailToken, email);
-      return true;
-    } catch (error) {
-      console.log(error.message);
-      throw new BadRequestError("Hệ thống lỗi, vui lòng thử lại:");
-    }
-  };
-=======
-
-    // Khởi tạo Kafka Producer
-    const kafka = new Kafka({
-      clientId: "user-services",
-      brokers: [process.env.KAFKA_BROKER],
-    });
-    const producer = kafka.producer();
-
-    // Gửi thông điệp tới Kafka topic
-    try {
-      await producer.connect();
-      await producer.send({
-        topic: "send-email-token", // Đặt tên Kafka topic mà `emailServices` sẽ lắng nghe
-        messages: [
-          {
-            value: JSON.stringify({ email }), // Chuyển đổi dữ liệu thành chuỗi JSON
-          },
-        ],
-      });
-      console.log("Message sent to emailServices:", { email });
-    } catch (error) {
-      console.error("Error sending message to emailServices:", error);
-      throw error;
-    } finally {
-      await producer.disconnect();
-    }
-
+    await runProducer(emailProducerTopic.sendEmailToken, holderUser.email);
     return true;
   }
 
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   static changePassword = async ({ password, email }) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const changePassword = await prisma.user.update({
