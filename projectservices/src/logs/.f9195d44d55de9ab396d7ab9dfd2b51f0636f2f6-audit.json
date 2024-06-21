@@ -54,6 +54,11 @@
             "date": 1718686449034,
             "name": "src/logs/projectServices-2024-06-18-11-54.error.log",
             "hash": "bf0641c761f8d950a67f26ec13df180c21f1b0ff55715536db8124cbc62b6cf9"
+        },
+        {
+            "date": 1718955694627,
+            "name": "src/logs/projectServices-2024-06-21-14-41.error.log",
+            "hash": "a64032aa2027b2c9c0f33b4f51460436efd846bc1f7bf6e2c2843f3ae7fa72b4"
         }
     ],
     "hashType": "sha256"
