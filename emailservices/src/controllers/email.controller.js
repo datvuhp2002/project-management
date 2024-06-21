@@ -1,8 +1,9 @@
 "use strict";
-
 const { SuccessResponse } = require("../core/success.response");
 const { newTemplate } = require("../services/template.service");
 const { verifyToken } = require("../services/email.service");
+const { forgetPassword } = require("../services/email.service");
+const { sendEmailToken } = require("../services/email.service");
 class EmailController {
   newTemplate = async (req, res, next) => {
     new SuccessResponse({

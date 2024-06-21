@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 {
     "keep": {
         "days": true,
@@ -133,3 +135,4 @@
     ],
     "hashType": "sha256"
 }
+>>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c

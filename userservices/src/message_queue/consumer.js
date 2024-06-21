@@ -145,7 +145,6 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
-
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

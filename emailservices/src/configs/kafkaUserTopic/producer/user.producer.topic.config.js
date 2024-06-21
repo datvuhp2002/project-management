@@ -1,6 +1,6 @@
 "use strict";
 const userProducerTopic = {
-  senEmailToken: "send-email-token",
+  sendEmailToken: "send-email-token",
 };
 
 module.exports = { userProducerTopic };

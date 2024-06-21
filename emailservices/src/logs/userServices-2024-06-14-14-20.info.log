@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-14T07:20:22.055Z","context":"/services/api/email/forget-password/","ecs.version":"8.10.0","log.level":"error","message":"404:-:1ms:-:Response:{\"status\":404,\"now\":1718349622051}","metadata":{"message":"Email record not found"},"requestId":"df86fe11-f9dd-45e2-bc45-3f9da23f87b2","timestamp":"2024-06-14 02:20:055 PM"}

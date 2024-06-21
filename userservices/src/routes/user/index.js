@@ -41,7 +41,7 @@ router.post(
 router.post(
   "/uploadAvatarFromLocal",
   upload.single("file"),
-  asyncHandler(UserController.uploadFileAvatarFromLocal)
+  asyncHandler(UserController.uploadAvatarFromLocal)
 );
 router.post("/getAvatar", asyncHandler(UserController.getAvatar));
 router.post(

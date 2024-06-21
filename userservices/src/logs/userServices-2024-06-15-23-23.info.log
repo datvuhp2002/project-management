@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-15T16:23:14.175Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"400:-:1ms:-:Response:{\"status\":400,\"now\":1718468594170}","metadata":{"message":"Upload avatar không thành công: Missing required parameter - file"},"requestId":"b84d2d8e-4375-403b-858c-589c161965c6"}

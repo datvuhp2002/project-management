@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-14T07:55:37.426Z","context":"/services/api/user/forget-password/","ecs.version":"8.10.0","log.level":"error","message":"400:-:0ms:-:Response:{\"status\":400,\"now\":1718351737425}","metadata":{"message":"Hệ thống lỗi, vui lòng thử lại"},"requestId":"b6101bf6-1f76-4023-acc7-4bfc6cd6f0e7"}

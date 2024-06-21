@@ -7,7 +7,7 @@ const kafka = new Kafka({
   clientId: "email-services",
   brokers: [process.env.KAFKA_BROKER],
 });
-const consumer = kafka.consumer({ groupId: "email-continuous-group" });
+const consumer = kafka.consumer({ groupId: "email-group" });
 
 const continuousConsumer = async () => {
   await consumer.connect();
@@ -16,15 +16,17 @@ const continuousConsumer = async () => {
     fromBeginning: false,
   });
   await consumer.run({
-    eachMessage: async ({ topic, partition, message, heartbeat }) => {
+    eachMessage: async ({ topic, partition, message }) => {
       const parsedMessage = JSON.parse(message.value.toString());
       console.log("Before handle :::", parsedMessage);
       switch (topic) {
+        case userTopicsContinuous.sendEmailToken: {
+          await EmailService.sendEmailToken({ email: parsedMessage });
+          break;
+        }
         default:
           console.log("Topic không được xử lý:", topic);
       }
-
-      await heartbeat();
     },
   });
 };

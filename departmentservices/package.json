@@ -27,6 +27,7 @@
     "lodash": "^4.17.21",
     "mongodb": "^6.5.0",
     "mongoose": "^8.2.4",
+    "prisma": "^5.15.0",
     "uuid": "^9.0.1",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0"
