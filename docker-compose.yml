@@ -77,6 +77,7 @@ services:
       - CLIENT_REQUEST_URL=http://projectservices:3059/services/api/project/client
       - TASK_SERVICES_REQUEST_URL=http://taskservices:3060/services/api/task
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
+      - EMAIL_SERVICES_REQUEST_URL=http://localhost:3069/services/api/email
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - PUBLIC_KEY=abcdefgh123
@@ -233,10 +234,10 @@ services:
       - PORT=3069
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/emailService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-
+      - EMAIL_PASS=bwwk zwuo qfqw ciyf
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -249,35 +250,34 @@ services:
       - elasticsearch
     networks:
       - kafka-network
-    
-  uploadservices:
-    build:
-      context: ./uploadservices
-      dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    image: datvudinhtrong/emailservices
-    container_name: emailservices
-    environment:
-      - PORT=3068
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
-    ports:
-      - "3068:3068"
-    depends_on:
-      - kafka
-      - elasticsearch
-    networks:
-      - kafka-network
+  # uploadservices:
+  #   build:
+  #     context: ./uploadservices
+  #     dockerfile: Dockerfile
+  #     platforms:
+  #       - linux/amd64
+  #   image: datvudinhtrong/emailservices
+  #   container_name: emailservices
+  #   environment:
+  #     - PORT=3068
+  #     - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+  #     - KAFKA_BROKER=kafkaMQ:9092
+  #     - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
+  #     - DOCKER_DEFAULT_PLATFORM=linux/amd64
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  # labels:
+  #   co.elastic.logs/module: filebeat
+  #   co.elastic.logs/json.keys_under_root: true
+  #   co.elastic.logs/json.add_error_key: true
+  #   co.elastic.logs/json.expand_keys: true
+  # ports:
+  #   - "3068:3068"
+  # depends_on:
+  #   - kafka
+  #   - elasticsearch
+  # networks:
+  #   - kafka-network
 
   taskservices:
     build:

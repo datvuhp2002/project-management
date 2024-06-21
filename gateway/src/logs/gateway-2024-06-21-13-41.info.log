@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-21T06:41:46.496Z","context":"/gateway/api/access/login","ecs.version":"8.10.0","log.level":"error","message":"400:-:6ms:-:Response:{\"status\":400,\"now\":1718952106487}","metadata":{"message":"Failed to fetch user by email"},"requestId":"6411047d-d0ea-47fc-b561-1587598299c6","timestamp":"2024-06-21 01:41:496 PM"}
