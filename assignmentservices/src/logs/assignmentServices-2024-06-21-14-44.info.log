@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-21T07:44:05.002Z","context":"/services/api/assignment/getAllTaskFromProject/6668cb28f92afdfa38006289","ecs.version":"8.10.0","log.level":"info","message":"input params:-:GET:-:","metadata":{"items_per_page":"\"ALL\""},"requestId":"f8c04bfe-82e5-4f7b-af69-fbabd13797c5","timestamp":"2024-06-21 02:44:002 PM"}

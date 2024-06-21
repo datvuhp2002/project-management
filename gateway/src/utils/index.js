@@ -74,9 +74,7 @@ const addActivitiesToTasks = async (tasks) => {
   try {
     const tasksWithActivities = await Promise.all(
       tasks.map(async (task) => {
-        const activities = await getAllActivitiesForTask(
-          task.TaskProperty.task_property_id
-        );
+        const activities = await getAllActivitiesForTask(task.task_id);
         return { ...task, activities };
       })
     );
