@@ -94,6 +94,51 @@
             "date": 1718956053781,
             "name": "src\\logs\\userServices-2024-06-21-14-47.error.log",
             "hash": "bdeaa3ed607e4a1be7463fea452d107c1911b69a761b55d026b3aa44aa824f37"
+        },
+        {
+            "date": 1718959186643,
+            "name": "src\\logs\\userServices-2024-06-21-15-39.error.log",
+            "hash": "185ac1b0fa100ca7a983d9786b3a570a412b1094f378eb0c94f8bd595c0a1812"
+        },
+        {
+            "date": 1718959221532,
+            "name": "src\\logs\\userServices-2024-06-21-15-40.error.log",
+            "hash": "258e0a0064dd06d6fc771bb19beb6284feee2eea713c83e0862bc3434db3ae69"
+        },
+        {
+            "date": 1718960003744,
+            "name": "src\\logs\\userServices-2024-06-21-15-53.error.log",
+            "hash": "f480c263a81cda0ffd08a43c6fd2af1ddbd1d9cbf70a5fa7b1174f8cb60e8694"
+        },
+        {
+            "date": 1718963690818,
+            "name": "src\\logs\\userServices-2024-06-21-16-54.error.log",
+            "hash": "5f3f8fff9be7c8ad2d7f324ba46efce3bb3e4b070a2aebfc59267d83582b75ee"
+        },
+        {
+            "date": 1718965434038,
+            "name": "src\\logs\\userServices-2024-06-21-17-23.error.log",
+            "hash": "45dcd6e58ea1bdb7c59246b91d36a79db23d0f4003f470d18749dae9fc177431"
+        },
+        {
+            "date": 1719053378502,
+            "name": "src\\logs\\userServices-2024-06-22-17-49.error.log",
+            "hash": "f2df0083fef634fcb93e8f45b4882ca548638c6973eb83508ce97cdb1430fdaf"
+        },
+        {
+            "date": 1719243762522,
+            "name": "src\\logs\\userServices-2024-06-24-22-42.error.log",
+            "hash": "a3a0468692e1cf67265d6f2a7efa3194a1997005f3ff28943a4bf68ee7293dd2"
+        },
+        {
+            "date": 1719281264669,
+            "name": "src\\logs\\userServices-2024-06-25-09-07.error.log",
+            "hash": "dc53e47f23ad3ff5f85e5467258647885962b09476b3e1f6d258c7c2d56ccb2f"
+        },
+        {
+            "date": 1719281299385,
+            "name": "src\\logs\\userServices-2024-06-25-09-08.error.log",
+            "hash": "0ef2f49d48bcde60ca7440cd14f9e8ae0c2613079a8093c83713220690d2ae1a"
         }
     ],
     "hashType": "sha256"

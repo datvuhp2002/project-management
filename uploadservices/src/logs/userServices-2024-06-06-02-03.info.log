@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-05T19:03:14.174Z","context":"/services/api/user/create/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"createdBy is not defined"},"requestId":"2ad0d445-f696-4461-869f-e31c35e54f52","timestamp":"2024-06-06 02:03:174 AM"}

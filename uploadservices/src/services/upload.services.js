@@ -20,7 +20,7 @@ const uploadImageFromUrl = async ({ urlImage }, userId) => {
 };
 
 // // 2.upload image from local
-const uploadImageFromLocal = async (path, userId) => {
+const uploadAvartarFromLocal = async (userId, path) => {
   const folderName = `avatar/${userId}`;
   console.log("FolderName:::", folderName);
   try {
@@ -42,6 +42,7 @@ const uploadImageFromLocal = async (path, userId) => {
     throw new BadRequestError("Upload avatar không thành công");
   }
 };
+
 // // 3.upload image from local
 const uploadImageFromLocalFiles = async (files, userId) => {
   const folderName = `avatar/${userId}`;
@@ -91,7 +92,7 @@ const uploadFile = async (project_id, { path, filename }) => {
 };
 
 module.exports = {
-  uploadImageFromLocal,
+  uploadAvartarFromLocal,
   uploadImageFromUrl,
   uploadImageFromLocalFiles,
   uploadFile,

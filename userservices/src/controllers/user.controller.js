@@ -151,19 +151,19 @@ class UserController {
   //     data: await uploadImageFromUrl(req.body, req.headers.user),
   //   }).send(res);
   // };
-  // uploadFileAvatarFromLocal = async (req, res, next) => {
-  //   const { file } = req;
-  //   if (!file) {
-  //     throw new BadRequestError("File is missing");
-  //   }
-  //   new SuccessResponse({
-  //     message: "Tải ảnh đại diện lên thành công",
-  //     data: await UserService.update({
-  //       id: req.headers.user,
-  //       data: { avatar: file.filename },
-  //     }),
-  //   }).send(res);
-  // };
+  uploadAvartarFromLocal = async (req, res, next) => {
+    const { file } = req;
+    if (!file) {
+      throw new BadRequestError("File is missing");
+    }
+    new SuccessResponse({
+      message: "Tải ảnh đại diện lên thành công",
+      data: await UserService.uploadAvartarFromLocal({
+        id: req.headers.user,
+        data: { avatar: file.filename },
+      }),
+    }).send(res);
+  };
   getAvatar = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ảnh đại diện về thành công",

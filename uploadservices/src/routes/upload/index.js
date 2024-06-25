@@ -10,11 +10,11 @@ router.post(
 );
 router.post(
   "/upload-avatar-from-local",
-  asyncHandler(UploadController.uploadAvatarFromLocal)
+  asyncHandler(UploadController.uploadFileAvatarFromLocal)
 );
 router.post(
   "/upload-avatar-from-local-files",
-  asyncHandler(UploadController.uploadAvatarFromLocalFiles)
+  asyncHandler(UploadController.uploadImageFromLocalFiles)
 );
 router.post("/upload-file", asyncHandler(UploadController.uploadFile));
 module.exports = router;

@@ -14,24 +14,15 @@ datasource db {
 }
 
 model User {
-<<<<<<< HEAD
   user_id       String    @id @default(auto()) @map("_id") @db.ObjectId
   username      String    @unique
   password      String
   email         String    @unique
   status        Boolean   @default(true)
-=======
-  user_id       String        @id @default(auto()) @map("_id") @db.ObjectId
-  username      String        @unique
-  password      String
-  email         String        @unique
-  status        Boolean       @default(true)
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   phone         String?
   avatar        String?
   name          String?
   birthday      DateTime?
-<<<<<<< HEAD
   createdBy     String?   @db.ObjectId
   modifiedBy    String?   @db.ObjectId
   createdAt     DateTime  @default(now())
@@ -41,18 +32,6 @@ model User {
   role          Role      @relation(fields: [role_id], references: [role_id])
   role_id       String    @db.ObjectId
   department_id String?   @db.ObjectId
-=======
-  createdBy     String?       @db.ObjectId
-  modifiedBy    String?       @db.ObjectId
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime?     @updatedAt
-  deletedAt     DateTime?
-  deletedMark   Boolean       @default(false)
-  role          Role          @relation(fields: [role_id], references: [role_id])
-  role_id       String        @db.ObjectId
-  department_id String?       @db.ObjectId
-  UserProperty  UserProperty?
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
 }
 
 enum RolesEnum {
@@ -63,7 +42,6 @@ enum RolesEnum {
 }
 
 model Role {
-<<<<<<< HEAD
   role_id   String    @id @default(auto()) @map("_id") @db.ObjectId
   name      RolesEnum @unique @default(STAFF)
   createdAt DateTime  @default(now())
@@ -78,26 +56,17 @@ model otp {
   email    String    @unique
   expireAt DateTime?
   status   Boolean   @default(true)
-=======
-  role_id      String         @id @default(auto()) @map("_id") @db.ObjectId
-  name         RolesEnum      @unique @default(STAFF)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime?      @updatedAt
-  deletedAt    DateTime?
-  UserProperty UserProperty[]
-  User         User[]
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
 }
 
-model UserProperty {
-  user_property_id String    @id @default(auto()) @map("_id") @db.ObjectId
-  author           User      @relation(fields: [user_id], references: [user_id]) // Chỉ định User là one-to-one
-  user_id          String    @unique @db.ObjectId
-  role             Role      @relation(fields: [role_id], references: [role_id])
-  role_id          String    @db.ObjectId
-  department_id    String?   @db.ObjectId
-  createdAt        DateTime? @default(now())
-  updatedAt        DateTime? @updatedAt
-  deletedAt        DateTime?
-  deletedMark      Boolean   @default(false)
-}
+// model UserProperty {
+//   user_property_id String    @id @default(auto()) @map("_id") @db.ObjectId
+//   author           User      @relation(fields: [user_id], references: [user_id]) // Chỉ định User là one-to-one
+//   user_id          String    @unique @db.ObjectId
+//   role             Role      @relation(fields: [role_id], references: [role_id])
+//   role_id          String    @db.ObjectId
+//   department_id    String?   @db.ObjectId
+//   createdAt        DateTime? @default(now())
+//   updatedAt        DateTime? @updatedAt
+//   deletedAt        DateTime?
+//   deletedMark      Boolean   @default(false)
+// }

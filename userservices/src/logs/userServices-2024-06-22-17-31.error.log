@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-22T10:31:09.419Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"400:-:0ms:-:Response:{\"status\":400,\"now\":1719052269415}","metadata":{"message":"File is missing"},"requestId":"f8e42392-e113-4cba-a65b-033051b3fba5"}
