@@ -14,6 +14,26 @@
             "date": 1718955736372,
             "name": "src/logs/departmentServices-2024-06-21-14-42.error.log",
             "hash": "b2042540aeb606801623f3bb3282d8269440468f18117c5dd393b5eec133ef43"
+        },
+        {
+            "date": 1719073069028,
+            "name": "src/logs/departmentServices-2024-06-22-23-17.error.log",
+            "hash": "f49ac3a3be39dd755f080551990a6674947c7a7528deb18c1f8ec9ff7d966898"
+        },
+        {
+            "date": 1719073126720,
+            "name": "src/logs/departmentServices-2024-06-22-23-18.error.log",
+            "hash": "9bd7b1f7805288f23618840bfe27c896338f1d793d4770992e046d75e5d5c9f3"
+        },
+        {
+            "date": 1719073140033,
+            "name": "src/logs/departmentServices-2024-06-22-23-19.error.log",
+            "hash": "57820a4fa5e6e28a8b5128e434fa527dbc12e9a8de46e19f01e9de5352b92358"
+        },
+        {
+            "date": 1719112705158,
+            "name": "src/logs/departmentServices-2024-06-23-10-18.error.log",
+            "hash": "67212dabd55a2735f54424cb78f445da38285e9d3e484759b03a77cd361879ca"
         }
     ],
     "hashType": "sha256"

@@ -21,7 +21,7 @@ const continuousConsumer = async () => {
       console.log("Before handle :::", parsedMessage);
       switch (topic) {
         case userTopicsContinuous.sendEmailToken: {
-          await EmailService.sendEmailToken({ email: parsedMessage });
+          await EmailService.sendEmailToken(parsedMessage);
           break;
         }
         default:

@@ -179,7 +179,6 @@ class ProjectService {
     }
     return null;
   };
-<<<<<<< HEAD
   // upload file to cloud and store it in db
   // static uploadFile = async (project_id, { path, filename }) => {
   //   const existingProject = await prisma.project.findUnique({
@@ -200,8 +199,6 @@ class ProjectService {
   //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
   //   }
   // };
-=======
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   static async uploadFile(project_id, fileData) {
     try {
       // Prepare the message payload

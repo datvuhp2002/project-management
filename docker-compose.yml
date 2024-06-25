@@ -32,30 +32,60 @@ services:
       - kafka-network
 
   zookeeper:
-    image: bitnami/zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.4.4
     container_name: zookeeper
     ports:
-      - "2181:2181"
+      - "22181:2181"
     environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     networks:
       - kafka-network
 
   kafka:
-    image: bitnami/kafka:latest
+    image: confluentinc/cp-kafka:7.4.4
     container_name: kafkaMQ
-    ports:
-      - "9092:9092"
-    environment:
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafkaMQ:9092"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
     depends_on:
       - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkaMQ:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - kafka-network
+
+  connect:
+    image: quay.io/debezium/connect:2.0
+    container_name: debezium
+    ports:
+      - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafkaMQ:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafkaMQ:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - kafka-network
+
   gateway:
     build:
       context: ./gateway
@@ -77,6 +107,7 @@ services:
       - CLIENT_REQUEST_URL=http://projectservices:3059/services/api/project/client
       - TASK_SERVICES_REQUEST_URL=http://taskservices:3060/services/api/task
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
+      - EMAIL_SERVICES_REQUEST_URL=http://emailservices:3069/services/api/email
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - PUBLIC_KEY=abcdefgh123
@@ -96,6 +127,7 @@ services:
       - elasticsearch
     networks:
       - kafka-network
+
   userservices:
     build:
       context: ./userservices
@@ -233,10 +265,10 @@ services:
       - PORT=3069
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/emailService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-
+      - EMAIL_PASS=bwwk zwuo qfqw ciyf
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -244,35 +276,6 @@ services:
       co.elastic.logs/json.expand_keys: true
     ports:
       - "3069:3069"
-    depends_on:
-      - kafka
-      - elasticsearch
-    networks:
-      - kafka-network
-    
-  uploadservices:
-    build:
-      context: ./uploadservices
-      dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    image: datvudinhtrong/emailservices
-    container_name: emailservices
-    environment:
-      - PORT=3068
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
-    ports:
-      - "3068:3068"
     depends_on:
       - kafka
       - elasticsearch
@@ -340,17 +343,6 @@ services:
     networks:
       - kafka-network
 
-  # projectmanagementwebui:
-  #   build:
-  #     dockerfile: Dockerfile
-  #   platform: linux/amd64
-  #   image: nambndpx000/projectmanagementwebui
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - VITE_REQUEST_API_URL=http://10.100.1.153:3050/
-  #   networks:
-  #     - kafka-network
 volumes:
   esdata:
     driver: local

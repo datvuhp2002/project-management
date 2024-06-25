@@ -61,10 +61,29 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
-
+  await consumer.subscribe({
+    topic: "listen.debezium_app.stocks",
+    fromBeginning: true,
+  });
   await consumer.run({
-    eachMessage: async ({ topic, partition, message, heartbeat }) => {
+    eachMessage: async ({ topic, partition, message }) => {
       const parsedMessage = JSON.parse(message.value.toString());
+      const value = message.value ? JSON.parse(message.value.toString()) : null;
+      const operation = value?.payload?.op;
+      let operationType;
+      switch (operation) {
+        case "c":
+          operationType = "Insert";
+          break;
+        case "u":
+          operationType = "Update";
+          break;
+        case "d":
+          operationType = "Delete";
+          break;
+        default:
+          operationType = "Unknown";
+      }
       switch (topic) {
         case departmentTopicsContinuous.getAllUserInDepartmentAndDetailManager:
           const departmentData = JSON.parse(message.value.toString());
@@ -201,7 +220,12 @@ const continuousConsumer = async () => {
         default:
           console.log("Topic không được xử lý:", topic);
       }
-      await heartbeat();
+      console.log({
+        key: message.key ? message.key.toString() : null,
+        value: value,
+        operation: operationType,
+        headers: message?.headers,
+      });
     },
   });
 };
