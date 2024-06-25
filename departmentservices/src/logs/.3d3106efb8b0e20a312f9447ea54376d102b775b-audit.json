@@ -9,6 +9,11 @@
             "date": 1718683942080,
             "name": "src/logs/departmentServices-2024-06-18-11-12.error.log",
             "hash": "f2ffc9b0f6e3615c2f0d6b6b5af8ef814401c911be192666061f02808cf5184d"
+        },
+        {
+            "date": 1718955736372,
+            "name": "src/logs/departmentServices-2024-06-21-14-42.error.log",
+            "hash": "b2042540aeb606801623f3bb3282d8269440468f18117c5dd393b5eec133ef43"
         }
     ],
     "hashType": "sha256"
