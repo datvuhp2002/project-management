@@ -10,5 +10,10 @@ const uploadServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
+  "/get-file": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/get-file`,
+    authRequired: true,
+    permissions: null,
+  },
 };
 module.exports = uploadServicesRoutes;

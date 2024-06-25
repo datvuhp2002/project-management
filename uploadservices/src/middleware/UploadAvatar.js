@@ -13,8 +13,8 @@ const storage = new CloudinaryStorage({
     public_id: (req, file) => file.originalname,
   },
 });
-const upload = multer({
+const uploadAvatar = multer({
   storage: storage,
 });
 
-module.exports = { upload };
+module.exports = { uploadAvatar };

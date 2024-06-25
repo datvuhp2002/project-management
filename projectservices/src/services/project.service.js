@@ -179,7 +179,6 @@ class ProjectService {
     }
     return null;
   };
-<<<<<<< HEAD
   // upload file to cloud and store it in db
   // static uploadFile = async (project_id, { path, filename }) => {
   //   const existingProject = await prisma.project.findUnique({
@@ -200,16 +199,10 @@ class ProjectService {
   //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
   //   }
   // };
-=======
->>>>>>> 3bc158a77ef698d9c7c11abee4c4664686ef8c7c
   static async uploadFile(project_id, fileData) {
     try {
-      // Prepare the message payload
       const messagePayload = { project_id, ...fileData };
-
-      // Send the message to the upload topic
       await runProducer(uploadProducerTopic.uploadFile, messagePayload);
-
       console.log("Upload request sent:", messagePayload);
     } catch (error) {
       console.error("Failed to send upload request:", error);

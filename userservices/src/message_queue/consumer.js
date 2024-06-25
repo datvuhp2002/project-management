@@ -125,27 +125,10 @@ const continuousConsumer = async () => {
           }
           break;
         case uploadTopicsContinuous.uploadAvartarFromLocal:
-          const messageData = JSON.parse(message.value.toString());
-          console.log("Message receive:::", messageData);
-          const uploadImageFromLocalData = Array.isArray(messageData)
-            ? messageData
-            : [messageData];
-          console.log("Upload Data:::", uploadImageFromLocalData);
-          const uploadImageFromLocalRequestResultPromises =
-            uploadImageFromLocalData.map(async (item) => {
-              return await UserService.uploadAvartarFromLocal(item);
-            });
-          const uploadImageFromLocalRequestResults = await Promise.all(
-            uploadImageFromLocalRequestResultPromises
-          );
-          try {
-            await runProducer(
-              uploadProducerTopic.uploadAvartarFromLocal,
-              uploadImageFromLocalRequestResults
-            );
-          } catch (err) {
-            console.log(err);
-          }
+          await UserService.update({
+            id: parsedMessage.user_id,
+            data: { avatar: parsedMessage.file },
+          });
           break;
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(

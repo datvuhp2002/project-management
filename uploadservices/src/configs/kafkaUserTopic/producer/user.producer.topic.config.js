@@ -1,7 +1,6 @@
 "use strict";
 const userProducerTopic = {
-  uploadAvartarFromLocal: "upload-image-from-local",
-  uploadImageFromUrl: "upload-image-from-url",
+  uploadAvartarFromLocal: "upload-avatar-from-local",
   getAvatar: "get-avatar",
   deleteAvatarInCloud: "delete-avatar-in-cloud",
 };

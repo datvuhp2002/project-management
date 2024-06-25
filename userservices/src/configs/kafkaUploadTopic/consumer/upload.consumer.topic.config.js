@@ -1,7 +1,6 @@
 "use strict";
 const uploadTopicsContinuous = {
-  uploadAvartarFromLocal: "upload-image-from-local",
-  uploadImageFromLocalFiles: "upload-image-from-local-files",
+  uploadAvartarFromLocal: "upload-avatar-from-local",
   getAvatar: "get-avatar",
   deleteAvatarInCloud: "delete-avatar-in-cloud",
 };
