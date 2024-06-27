@@ -8,9 +8,11 @@ const { runProducer } = require("../message_queue/producer");
 const {
   userProducerTopic,
 } = require("../configs/kafkaUserTopic/producer/user.producer.topic.config");
+const {
+  projectProducerTopic,
+} = require("../configs/kafkaProjectTopic/producer/project.producer.topic.config");
 const { getfile } = require("../services/upload.services");
 class UserController {
-  // 2. Upload file avatar from local
   uploadAvartarFromLocal = async (req, res, next) => {
     try {
       const { file } = req;
@@ -22,36 +24,86 @@ class UserController {
         user_id: req.headers.user,
       });
       new SuccessResponse({
-        message: "Tải ảnh đại diện lên thành công",
+        message: "Tải ảnh đại diện cho người dùng thành công",
         data: file.path,
       }).send(res);
     } catch (error) {
       next(error);
     }
   };
+
+  uploadAvartarClient = async (req, res, next) => {
+    try {
+      const { file } = req;
+      if (!file) {
+        throw new BadRequestError("File is missing");
+      }
+      await runProducer(projectProducerTopic.uploadAvartarClient, {
+        file: file.filename,
+        client_id: req.params.clientId,
+      });
+      new SuccessResponse({
+        message: "Tải ảnh đại diện cho khách hàng thành công",
+        data: file.path,
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  uploadFileForProject = async (req, res, next) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        throw new BadRequestError("Path và filename không được để trống");
+      }
+      const { path, filename } = file;
+      const projectId = req.params.projectId;
+      await runProducer(projectProducerTopic.uploadFileForProject, {
+        file: filename,
+        project_id: projectId,
+      });
+      new SuccessResponse({
+        message: "Tải tệp file dự án thành công",
+        data: {
+          path,
+          filename,
+        },
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  uploadFileForTask = async (req, res, next) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        throw new BadRequestError("Path và filename không được để trống");
+      }
+      const { path, filename } = file;
+      const taskId = req.params.taskId;
+      await runProducer(projectProducerTopic.uploadFile, {
+        file: filename,
+        task_id: taskId,
+      });
+      new SuccessResponse({
+        message: "Tải file nhiệm vụ thành công",
+        data: {
+          path,
+          filename,
+        },
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getFile = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy file về thành công",
       data: await getfile(req.body.file),
     }).send(res);
-  };
-
-  // 4. Upload file
-  uploadFile = async (req, res, next) => {
-    try {
-      const { path, filename } = req.body;
-      const projectId = req.params.projectId;
-      if (!path || !filename) {
-        throw new BadRequestError("Path và filename không được để trống");
-      }
-      const result = await uploadFile(projectId, { path, filename });
-      new SuccessResponse({
-        message: "Tải tệp lên dự án thành công",
-        data: result,
-      }).send(res);
-    } catch (error) {
-      next(error);
-    }
   };
 
   deleteAvatarInCloud = async (req, res, next) => {

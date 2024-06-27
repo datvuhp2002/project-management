@@ -151,34 +151,34 @@ class UserController {
   //     data: await uploadImageFromUrl(req.body, req.headers.user),
   //   }).send(res);
   // };
-  uploadAvartarFromLocal = async (req, res, next) => {
-    const { file } = req;
-    if (!file) {
-      throw new BadRequestError("File is missing");
-    }
-    new SuccessResponse({
-      message: "Tải ảnh đại diện lên thành công",
-      data: await UserService.uploadAvartarFromLocal({
-        id: req.headers.user,
-        data: { avatar: file.filename },
-      }),
-    }).send(res);
-  };
-  getAvatar = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Lấy ảnh đại diện về thành công",
-      data: await UserService.getAvatar(req.body.avatar),
-    }).send(res);
-  };
-  deleteAvatarInCloud = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Xóa ảnh đại diện thành công",
-      data: await UserService.deleteAvatarInCloud(
-        req.body.avatar,
-        req.headers.user
-      ),
-    }).send(res);
-  };
+  // uploadAvartarFromLocal = async (req, res, next) => {
+  //   const { file } = req;
+  //   if (!file) {
+  //     throw new BadRequestError("File is missing");
+  //   }
+  //   new SuccessResponse({
+  //     message: "Tải ảnh đại diện lên thành công",
+  //     data: await UserService.uploadAvartarFromLocal({
+  //       id: req.headers.user,
+  //       data: { avatar: file.filename },
+  //     }),
+  //   }).send(res);
+  // };
+  // getAvatar = async (req, res, next) => {
+  //   new SuccessResponse({
+  //     message: "Lấy ảnh đại diện về thành công",
+  //     data: await UserService.getAvatar(req.body.avatar),
+  //   }).send(res);
+  // };
+  // deleteAvatarInCloud = async (req, res, next) => {
+  //   new SuccessResponse({
+  //     message: "Xóa ảnh đại diện thành công",
+  //     data: await UserService.deleteAvatarInCloud(
+  //       req.body.avatar,
+  //       req.headers.user
+  //     ),
+  //   }).send(res);
+  // };
 }
 
 module.exports = new UserController();

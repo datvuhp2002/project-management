@@ -15,5 +15,25 @@ const uploadServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
+  "/upload-file-for-project": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-file-for-project`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/upload-file-for-task": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-file-for-task`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/upload-avatar-client": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-avatar-client`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/delete-avatar-in-cloud": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/delete-file`,
+    authRequired: true,
+    permissions: null,
+  },
 };
 module.exports = uploadServicesRoutes;

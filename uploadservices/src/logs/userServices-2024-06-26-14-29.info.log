@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-26T07:29:54.190Z","context":"/services/api/upload/upload-file/","ecs.version":"8.10.0","log.level":"error","message":"400:-:1ms:-:Response:{\"status\":400,\"now\":1719386994184}","metadata":{"message":"Path và filename không được để trống"},"requestId":"087012bd-c3dd-4c15-b5ff-31830ea02541","timestamp":"2024-06-26 02:29:190 PM"}

@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-26T10:05:03.063Z","context":"/services/api/user/information/6661d549ff5afbcafaa873a0","ecs.version":"8.10.0","log.level":"error","message":"404:-:1ms:-:Response:{\"status\":404,\"now\":1719396303052}","metadata":{"message":"User not found"},"requestId":"2171897b-d236-4063-9960-a87a6d150346"}

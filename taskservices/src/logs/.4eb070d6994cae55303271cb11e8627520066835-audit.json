@@ -24,6 +24,16 @@
             "date": 1718955845094,
             "name": "src/logs/taskServices-2024-06-21-14-44.info.log",
             "hash": "c8651ff498e9d540a1081a231e8b513e3598cfc94682891c149783c36536c994"
+        },
+        {
+            "date": 1719394733201,
+            "name": "src\\logs\\taskServices-2024-06-26-16-38.info.log",
+            "hash": "2b8237e09ff5620fc418d6669dc3fed66f15a9b4e92b920361e4895295d299cb"
+        },
+        {
+            "date": 1719395972800,
+            "name": "src\\logs\\taskServices-2024-06-26-16-59.info.log",
+            "hash": "ce199026a807a2e0bb6cbae6fa2b5be832285285d5d807961d09b11b4ce8c5a7"
         }
     ],
     "hashType": "sha256"

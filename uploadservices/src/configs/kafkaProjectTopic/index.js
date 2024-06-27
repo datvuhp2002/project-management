@@ -1,11 +1,13 @@
 const {
-  userTopicsContinuous,
-  userTopicsOnDemand,
-} = require("./consumer/user.consumer.topic.config");
-const { userProducerTopic } = require("./producer/user.producer.topic.config");
+  projectTopicsContinuous,
+  projectTopicsOnDemand,
+} = require("./consumer/project.consumer.topic.config");
+const {
+  projectProducerTopic,
+} = require("./producer/project.producer.topic.config");
 
 module.exports = {
-  userTopicsContinuous,
-  userTopicsOnDemand,
-  userProducerTopic,
+  projectTopicsContinuous,
+  projectTopicsOnDemand,
+  projectProducerTopic,
 };

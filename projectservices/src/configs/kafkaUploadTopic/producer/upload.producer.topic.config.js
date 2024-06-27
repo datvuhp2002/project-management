@@ -1,6 +1,7 @@
 "use strict";
 const uploadProducerTopic = {
-  uploadFile: "upload-file",
+  uploadFileForProject: "upload-file-for-project",
+  uploadAvartarClient: "upload-avartar-client",
   getAvatar: "get-file",
   deleteAvatarInCloud: "delete-file-in-cloud",
 };

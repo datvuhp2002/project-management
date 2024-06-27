@@ -64,6 +64,11 @@
             "date": 1718955746696,
             "name": "src/logs/assignmentServices-2024-06-21-14-42.error.log",
             "hash": "d6717cee158ef4c7e132f2a9ef3af3d05c430fddbd2dea3a30644fe6025b2f95"
+        },
+        {
+            "date": 1719395314304,
+            "name": "src\\logs\\assignmentServices-2024-06-26-16-48.error.log",
+            "hash": "aaace96595872bc99ec712a5ce5044583dcc1b2e976f9c2d2a22dafee1e0eea5"
         }
     ],
     "hashType": "sha256"

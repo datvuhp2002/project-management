@@ -74,6 +74,11 @@
             "date": 1718955845002,
             "name": "src/logs/assignmentServices-2024-06-21-14-44.info.log",
             "hash": "a3b6cadbb3d4d95170fbf7ba1f3d443bfa2adedeb2b4b67e84fb05896d59392a"
+        },
+        {
+            "date": 1719395314290,
+            "name": "src\\logs\\assignmentServices-2024-06-26-16-48.info.log",
+            "hash": "4e2f7cfef666ee50521234247ef270d0fc884829d4111fee86ef959597e51c7c"
         }
     ],
     "hashType": "sha256"

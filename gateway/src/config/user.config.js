@@ -97,20 +97,20 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  "/upload-avatar-from-local": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/uploadAvatarFromLocal`,
-    authRequired: true,
-    permissions: null,
-  },
-  "/get-avatar": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/getAvatar`,
-    authRequired: true,
-    permissions: null,
-  },
-  "/delete-avatar-in-cloud": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/deleteAvatarInCloud`,
-    authRequired: true,
-    permissions: null,
-  },
+  // "/upload-avatar-from-local": {
+  //   target: `${process.env.USER_SERVICES_REQUEST_URL}/uploadAvatarFromLocal`,
+  //   authRequired: true,
+  //   permissions: null,
+  // },
+  // "/get-avatar": {
+  //   target: `${process.env.USER_SERVICES_REQUEST_URL}/getAvatar`,
+  //   authRequired: true,
+  //   permissions: null,
+  // },
+  // "/delete-avatar-in-cloud": {
+  //   target: `${process.env.USER_SERVICES_REQUEST_URL}/deleteAvatarInCloud`,
+  //   authRequired: true,
+  //   permissions: null,
+  // },
 };
 module.exports = userServicesRoutes;

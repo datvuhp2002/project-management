@@ -1,13 +1,11 @@
 const {
-  departmentTopicsContinuous,
-  departmentTopicsOnDemand,
-} = require("./consumer/department.consumer.topic.config");
-const {
-  departmentProducerTopic,
-} = require("./producer/department.producer.topic.config");
+  taskTopicsContinuous,
+  taskTopicsOnDemand,
+} = require("./consumer/task.topic.config");
+const { taskProducerTopic } = require("./producer/task.producer.topic.config");
 
 module.exports = {
-  departmentTopicsContinuous,
-  departmentTopicsOnDemand,
-  departmentProducerTopic,
+  taskTopicsContinuous,
+  taskTopicsOnDemand,
+  taskProducerTopic,
 };

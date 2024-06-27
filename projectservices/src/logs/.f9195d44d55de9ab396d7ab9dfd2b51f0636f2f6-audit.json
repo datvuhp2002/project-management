@@ -59,6 +59,61 @@
             "date": 1718955694627,
             "name": "src/logs/projectServices-2024-06-21-14-41.error.log",
             "hash": "a64032aa2027b2c9c0f33b4f51460436efd846bc1f7bf6e2c2843f3ae7fa72b4"
+        },
+        {
+            "date": 1719385382227,
+            "name": "src\\logs\\projectServices-2024-06-26-14-03.error.log",
+            "hash": "48b629ebafe909144a105b287fd3d49c4a452935ea54f8402a3c78e0ca686a0c"
+        },
+        {
+            "date": 1719385577632,
+            "name": "src\\logs\\projectServices-2024-06-26-14-06.error.log",
+            "hash": "12fce7ffb8ce436a175cf28c10fa42b4371afc4e2ffb31c393c5cefda15ba324"
+        },
+        {
+            "date": 1719385629137,
+            "name": "src\\logs\\projectServices-2024-06-26-14-07.error.log",
+            "hash": "97f51a52af6baf615074a03562b3f9faa6891fa09df5a1e706573f78f9101200"
+        },
+        {
+            "date": 1719385718372,
+            "name": "src\\logs\\projectServices-2024-06-26-14-08.error.log",
+            "hash": "f0aa806ccea62370a547ee9cd6924b5d0040f4396b89032af8c8b9b5ae9067aa"
+        },
+        {
+            "date": 1719386130047,
+            "name": "src\\logs\\projectServices-2024-06-26-14-15.error.log",
+            "hash": "4613d7477d0738b01c00bf11757210f8268719472c353825b3f22518d0c855f8"
+        },
+        {
+            "date": 1719387689462,
+            "name": "src\\logs\\projectServices-2024-06-26-14-41.error.log",
+            "hash": "afef285cb7ee9ada282ba0b92214f2214cb4bbad704768e4da3ba48a3fc59451"
+        },
+        {
+            "date": 1719394628511,
+            "name": "src\\logs\\projectServices-2024-06-26-16-37.error.log",
+            "hash": "d122c1fd96bddc28d10a325feb7c2f29649a9397a7ffacda5c75ba2d050d23ef"
+        },
+        {
+            "date": 1719395207604,
+            "name": "src\\logs\\projectServices-2024-06-26-16-46.error.log",
+            "hash": "e3aa131b0398ba3a1e4e8d29170021304a33944ac92a93744c72ba6287941860"
+        },
+        {
+            "date": 1719397281290,
+            "name": "src\\logs\\projectServices-2024-06-26-17-21.error.log",
+            "hash": "32f8db4e8ec5af9e7a7c5b349ba2456177e5045f28cef5b43d2517af7243fc15"
+        },
+        {
+            "date": 1719397499638,
+            "name": "src\\logs\\projectServices-2024-06-26-17-24.error.log",
+            "hash": "21998cda658e8d329383e336bb3340c1817150935560c85d427c9e96c5644b68"
+        },
+        {
+            "date": 1719397708807,
+            "name": "src\\logs\\projectServices-2024-06-26-17-28.error.log",
+            "hash": "54336c05ca49b5489aa1683f8af4f645d5a51e22ae9f6c7ada582998944796a5"
         }
     ],
     "hashType": "sha256"

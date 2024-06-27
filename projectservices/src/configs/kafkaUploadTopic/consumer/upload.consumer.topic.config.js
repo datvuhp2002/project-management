@@ -1,8 +1,9 @@
 "use strict";
 const uploadTopicsContinuous = {
-  uploadFile: "upload-file",
-  getAvatar: "get-file",
-  deleteAvatarInCloud: "delete-file-in-cloud",
+  uploadFileForProject: "upload-file-for-project",
+  uploadAvartarClient: "upload-avartar-client",
+  getFile: "get-file",
+  deleteFileInCloud: "delete-file-in-cloud",
 };
 const uploadTopicsOnDemand = {};
 module.exports = { uploadTopicsContinuous, uploadTopicsOnDemand };

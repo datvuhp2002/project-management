@@ -432,24 +432,24 @@ class UserService {
     });
     return detailUser;
   };
-  static uploadAvartarFromLocal = async ({ id, data }) => {
-    console.log("id:::", id);
-    console.log("avatarFileName:::", data.avatar);
-    try {
-      const message = {
-        user_id: id,
-        avatar: data.avatar,
-      };
-      const result = await runProducer(
-        uploadProducerTopic.uploadAvartarFromLocal,
-        message
-      );
-      return result;
-    } catch (error) {
-      console.error("Error uploading user avatar to Kafka:", error);
-      throw error;
-    }
-  };
+  // static uploadAvartarFromLocal = async ({ id, data }) => {
+  //   console.log("id:::", id);
+  //   console.log("avatarFileName:::", data.avatar);
+  //   try {
+  //     const message = {
+  //       user_id: id,
+  //       avatar: data.avatar,
+  //     };
+  //     const result = await runProducer(
+  //       uploadProducerTopic.uploadAvartarFromLocal,
+  //       message
+  //     );
+  //     return result;
+  //   } catch (error) {
+  //     console.error("Error uploading user avatar to Kafka:", error);
+  //     throw error;
+  //   }
+  // };
   //update user information
   static update = async ({ id, data }) => {
     if (data.avatar) {
@@ -459,10 +459,6 @@ class UserService {
           data,
           select: this.select,
         });
-        // await runProducer(uploadProducerTopic.uploadImageFromLocal, {
-        //   user_id: id,
-        //   avatar: data.avatar,
-        // });
         return updatedUser;
       } catch (err) {
         cloudinary.uploader.destroy(data.avatar);
@@ -556,26 +552,26 @@ class UserService {
   // }
 
   // get avatar by public id
-  static getAvatar = async (avatar) => {
-    // Return colors in the response
-    const options = {
-      height: 100,
-      width: 100,
-      format: "jpg",
-    };
-    try {
-      const result = await cloudinary.url(avatar, options);
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  // delete avatar in cloud
-  static deleteAvatarInCloud = async (avatar, user_id) => {
-    // Return colors in the response
-    await prisma.user.update({ where: { user_id }, data: { avatar: null } });
-    return await cloudinary.uploader.destroy(avatar);
-  };
+  // static getAvatar = async (avatar) => {
+  //   // Return colors in the response
+  //   const options = {
+  //     height: 100,
+  //     width: 100,
+  //     format: "jpg",
+  //   };
+  //   try {
+  //     const result = await cloudinary.url(avatar, options);
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  // // delete avatar in cloud
+  // static deleteAvatarInCloud = async (avatar, user_id) => {
+  //   // Return colors in the response
+  //   await prisma.user.update({ where: { user_id }, data: { avatar: null } });
+  //   return await cloudinary.uploader.destroy(avatar);
+  // };
   static queryUser = async ({
     query,
     items_per_page,
