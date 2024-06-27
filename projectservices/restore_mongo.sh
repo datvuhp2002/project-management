@@ -8,7 +8,7 @@ SOURCE_DATABASE="projectService"
 # Destination Database Name (where backup will be restored)
 BACKUPS_DIR="/var/backups"
 # MongoDB Atlas connection string for destination
-DESTINATION_MONGO_URI="mongodb+srv://datvuhp2002:ZRsh0pm9oxwNuVjB@databasebackup.4o9hedq.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=databasebackup"
+DESTINATION_MONGO_URI="mongodb://mongoadmin:secret@10.100.1.153:27017/$SOURCE_DATABASE?authSource=mongoadmin"
 #=====================================================================
 
 # List the backup archive files in the backup directory

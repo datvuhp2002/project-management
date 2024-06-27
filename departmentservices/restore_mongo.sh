@@ -8,7 +8,9 @@ SOURCE_DATABASE="departmentService"
 # Destination Database Name (where backup will be restored)
 BACKUPS_DIR="/var/backups"
 # MongoDB Atlas connection string for destination
-DESTINATION_MONGO_URI="mongodb+srv://datvuhp2002:ZRsh0pm9oxwNuVjB@databasebackup.4o9hedq.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=databasebackup"
+# DESTINATION_MONGO_URI="mongodb+srv://datvuhp2002:ZRsh0pm9oxwNuVjB@databasebackup.4o9hedq.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=databasebackup"
+DESTINATION_MONGO_URI="mongodb://$localhost:27021/$SOURCE_DATABASE?replicaSet=dbrs"
+
 #=====================================================================
 
 # List the backup archive files in the backup directory
