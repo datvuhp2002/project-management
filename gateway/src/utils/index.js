@@ -31,29 +31,24 @@ const getAllActivitiesForTask = async (task_id) => {
       `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivitiesByYear/${task_id}?items_per_page=ALL`
     );
     let activities = response.data.data;
-
     try {
       // Lấy danh sách user_id và lọc trùng
       const user_ids = [
         ...new Set(
           Object.values(activities).flatMap((dateActivities) =>
-            dateActivities.map((activity) => activity.ActivityProperty.user_id)
+            dateActivities.map((activity) => activity.user_id)
           )
         ),
       ];
-      console.log("user_ids:", user_property_ids);
-
-      // Lấy thông tin người dùng dựa trên user_property_ids
-      const userInformation = await getAllUsersForActivity(user_property_ids);
+      console.log("user_ids:", user_ids);
+      // Lấy thông tin người dùng dựa trên user_ids
+      const userInformation = await getAllUsersForActivity(user_ids);
       console.log("userInformation:", userInformation);
-
       // Gắn thông tin người dùng vào mỗi hoạt động
       for (const dateActivities of Object.values(activities)) {
         for (const activity of dateActivities) {
           const correspondingUser = userInformation.find(
-            (user) =>
-              user.UserProperty.user_property_id ===
-              activity.ActivityProperty.user_property_id
+            (user) => user.user_id === activity.user_id
           );
           activity.user_information = correspondingUser;
         }
