@@ -2,8 +2,7 @@
   "name": "inventory-connector",
   "config": {
     "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
-    "mongodb.connection.string": "mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-    "topic.prefix": "fullfillment",
-    "collection.include.list": "inventory[.]*"
+    "mongodb.connection.string": "mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=dbrs",
+    "topic.prefix": "lachong"
   }
 }
