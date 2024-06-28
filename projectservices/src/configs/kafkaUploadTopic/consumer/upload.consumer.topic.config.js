@@ -1,8 +1,9 @@
 "use strict";
-const uploadTopicsContinuous = {};
-const uploadTopicsOnDemand = {
-  uploadFile: "upload-file",
-  uploadImageFromLocal: "upload-image-from-local",
-  uploadImageFromLocalFiles: "upload-image-from-local-files",
+const uploadTopicsContinuous = {
+  uploadFileForProject: "upload-file-for-project",
+  uploadAvartarClient: "upload-avartar-client",
+  getFile: "get-file",
+  deleteFileInCloud: "delete-file-in-cloud",
 };
+const uploadTopicsOnDemand = {};
 module.exports = { uploadTopicsContinuous, uploadTopicsOnDemand };

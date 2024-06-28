@@ -4,95 +4,43 @@ const { result } = require("lodash");
 const cloudinary = require("../configs/cloudinary.config");
 const { BadRequestError } = require("../core/error.response");
 const { publicDecrypt } = require("crypto");
-// 1.upload from url image
 
-const uploadImageFromUrl = async ({ urlImage }, userId) => {
-  console.log("URL:::", urlImage);
+const getfile = async (filename) => {
   try {
-    const folderName = `avatar/${userId}`;
-    const result = await cloudinary.uploader.upload(urlImage, {
-      folder: folderName,
-    });
+    const result = await cloudinary.url(filename, { resource_type: "raw" });
     return result;
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.error(error);
   }
 };
-
-// // 2.upload image from local
-const uploadImageFromLocal = async (path, userId) => {
-  const folderName = `avatar/${userId}`;
-  console.log("FolderName:::", folderName);
+const getAvatar = async ({ avatar }) => {
+  console.log(avatar);
+  // Return colors in the response
+  const options = {
+    format: "jpg",
+  };
   try {
-    const result = await cloudinary.uploader.upload(await path, {
-      public_id: userId,
-      folder: folderName,
-    });
-    return {
-      image_url: result.secure_url,
-      public_id: result.public_id,
-      thumb_url: await cloudinary.url(result.public_id, {
-        height: 100,
-        width: 100,
-        format: "jpg",
-      }),
-    };
-  } catch (err) {
-    console.log(err);
-    throw new BadRequestError("Upload avatar không thành công");
+    const result = await cloudinary.url(avatar, options);
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.error(error);
   }
 };
-// // 3.upload image from local
-const uploadImageFromLocalFiles = async (files, userId) => {
-  const folderName = `avatar/${userId}`;
+const getFileImage = async ({ filename }) => {
+  const options = {
+    format: "jpg",
+    quality: "auto",
+  };
   try {
-    console.log("Files::", files);
-    const uploadedUrls = [];
-    if (!files.length) return;
-    for (const file of files) {
-      const result = await cloudinary.uploader.upload(file.path, {
-        public_id: `${userId}-${file.size}`,
-        folder: folderName,
-      });
-      uploadedUrls.push({
-        image_url: result.secure_url,
-        public_id: result.public_id,
-        thumb_url: await cloudinary.url(result.public_id, {
-          height: 100,
-          width: 100,
-          format: "jpg",
-        }),
-      });
-    }
-    return uploadedUrls;
-  } catch (err) {
-    console.log(err);
+    const result = await cloudinary.url(filename, options);
+    return result;
+  } catch (error) {
+    console.error(error);
   }
 };
-// // 4.upload file
-const uploadFile = async (project_id, { path, filename }) => {
-  const existingProject = await prisma.project.findUnique({
-    where: { project_id },
-  });
-  if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
-  try {
-    const uploadFile = await prisma.project.update({
-      where: { project_id },
-      data: {
-        document: [...existingProject.document, filename],
-      },
-    });
-    if (uploadFile) return true;
-    cloudinary.uploader.destroy(filename);
-    return false;
-  } catch (e) {
-    throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-  }
-};
-
 module.exports = {
-  uploadImageFromLocal,
-  uploadImageFromUrl,
-  uploadImageFromLocalFiles,
-  uploadFile,
+  getfile,
+  getFileImage,
+  getAvatar,
 };

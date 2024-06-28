@@ -143,12 +143,6 @@ class ClientService {
   static update = async (client_id, data, modifiedBy) => {
     if (data.avatar) {
       try {
-        // Gửi thông báo tải lên hình ảnh tới Kafka
-        await runProducer(uploadProducerTopic.uploadImageFromLocal, {
-          client_id,
-          avatar: data.avatar,
-        });
-
         return await prisma.client.update({
           where: { client_id },
           data: { ...data, modifiedBy },
@@ -167,23 +161,23 @@ class ClientService {
       select: this.select,
     });
   };
-  static uploadImageFromLocal = async (client_id, avatar) => {
-    try {
-      // Thực hiện upload ảnh lên cloudinary hoặc xử lý tùy ý
-      const result = await cloudinary.uploader.upload(avatar);
+  // static uploadImageFromLocal = async (client_id, avatar) => {
+  //   try {
+  //     // Thực hiện upload ảnh lên cloudinary hoặc xử lý tùy ý
+  //     const result = await cloudinary.uploader.upload(avatar);
 
-      // Cập nhật thông tin avatar của client trong cơ sở dữ liệu
-      await prisma.client.update({
-        where: { client_id },
-        data: { avatar: result.secure_url },
-      });
+  //     // Cập nhật thông tin avatar của client trong cơ sở dữ liệu
+  //     await prisma.client.update({
+  //       where: { client_id },
+  //       data: { avatar: result.secure_url },
+  //     });
 
-      return true;
-    } catch (error) {
-      console.error("Failed to upload image from local:", error);
-      return false;
-    }
-  };
+  //     return true;
+  //   } catch (error) {
+  //     console.error("Failed to upload image from local:", error);
+  //     return false;
+  //   }
+  // };
   static delete = async (client_id) => {
     const deleteClient = await prisma.client.update({
       where: { client_id },
@@ -202,21 +196,21 @@ class ClientService {
     if (restoreClient) return true;
     return null;
   };
-  static getAvatar = async (avatar) => {
-    // Return colors in the response
-    const options = {
-      height: 100,
-      width: 100,
-      format: "jpg",
-    };
-    try {
-      const result = await cloudinary.url(avatar, options);
-      console.log(result);
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // static getAvatar = async (avatar) => {
+  //   // Return colors in the response
+  //   const options = {
+  //     height: 100,
+  //     width: 100,
+  //     format: "jpg",
+  //   };
+  //   try {
+  //     const result = await cloudinary.url(avatar, options);
+  //     console.log(result);
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
   static queryClient = async ({
     query,
     items_per_page,

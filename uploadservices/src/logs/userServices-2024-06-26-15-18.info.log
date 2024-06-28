@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-26T08:18:06.354Z","context":"/services/api/upload/upload-avatar-client/666827032a97188e1f42d031","ecs.version":"8.10.0","log.level":"error","message":"400:-:1ms:-:Response:{\"status\":400,\"now\":1719389886349}","metadata":{"message":"File is missing"},"requestId":"b4f349d5-d6df-491c-99ce-f706536bb00a","timestamp":"2024-06-26 03:18:354 PM"}

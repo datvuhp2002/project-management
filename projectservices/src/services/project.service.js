@@ -9,6 +9,7 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
+const { uploadProducerTopic } = require("../configs/kafkaUploadTopic");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
 } = require("./grpcClient.services");
@@ -180,39 +181,35 @@ class ProjectService {
     return null;
   };
   // upload file to cloud and store it in db
-  // static uploadFile = async (project_id, { path, filename }) => {
-  //   const existingProject = await prisma.project.findUnique({
-  //     where: { project_id },
-  //   });
-  //   if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
-  //   try {
-  //     const uploadFile = await prisma.project.update({
-  //       where: { project_id },
-  //       data: {
-  //         document: [...existingProject.document, filename],
-  //       },
-  //     });
-  //     if (uploadFile) return true;
-  //     cloudinary.uploader.destroy(filename);
-  //     return false;
-  //   } catch (e) {
-  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-  //   }
-  // };
-  static async uploadFile(project_id, fileData) {
+
+  static uploadFile = async (project_id, filename) => {
+    const existingProject = await prisma.project.findUnique({
+      where: { project_id },
+    });
+    if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
     try {
-      // Prepare the message payload
-      const messagePayload = { project_id, ...fileData };
-
-      // Send the message to the upload topic
-      await runProducer(uploadProducerTopic.uploadFile, messagePayload);
-
-      console.log("Upload request sent:", messagePayload);
-    } catch (error) {
-      console.error("Failed to send upload request:", error);
-      throw new Error("Failed to send upload request");
+      const uploadFile = await prisma.project.update({
+        where: { project_id },
+        data: {
+          document: [...existingProject.document, filename],
+        },
+      });
+      if (uploadFile) return true;
+      return false;
+    } catch (e) {
+      throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
     }
-  }
+  };
+  // static async uploadFile(project_id, fileData) {
+  //   try {
+  //     const messagePayload = { project_id, ...fileData };
+  //     await runProducer(uploadProducerTopic.uploadFile, messagePayload);
+  //     console.log("Upload request sent:", messagePayload);
+  //   } catch (error) {
+  //     console.error("Failed to send upload request:", error);
+  //     throw new Error("Failed to send upload request");
+  //   }
+  // }
 
   static async update({ project_id, data, modifiedBy }) {
     if (data.document) {
@@ -235,52 +232,52 @@ class ProjectService {
     });
   }
   // get Image File from cloudinary
-  static getFileImage = async ({ filename }) => {
-    const options = {
-      height: 500,
-      width: 500,
-      format: "jpg",
-      quality: "auto",
-    };
-    try {
-      const result = await cloudinary.url(filename, options);
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  static getFile = async ({ filename }) => {
-    try {
-      const result = await cloudinary.url(filename, { resource_type: "raw" });
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  static deleteFile = async (project_id, { filename }) => {
-    const existingProject = await prisma.project.findUnique({
-      where: { project_id },
-    });
-    if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
-    try {
-      const updatedDocument = existingProject.document.filter(
-        (file) => file !== filename
-      );
-      const uploadFile = await prisma.project.update({
-        where: { project_id },
-        data: {
-          document: updatedDocument,
-        },
-      });
-      if (uploadFile) {
-        cloudinary.uploader.destroy(filename);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-    }
-  };
+  // static getFileImage = async ({ filename }) => {
+  //   const options = {
+  //     height: 500,
+  //     width: 500,
+  //     format: "jpg",
+  //     quality: "auto",
+  //   };
+  //   try {
+  //     const result = await cloudinary.url(filename, options);
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  // static getFile = async ({ filename }) => {
+  //   try {
+  //     const result = await cloudinary.url(filename, { resource_type: "raw" });
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  // static deleteFile = async (project_id, { filename }) => {
+  //   const existingProject = await prisma.project.findUnique({
+  //     where: { project_id },
+  //   });
+  //   if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
+  //   try {
+  //     const updatedDocument = existingProject.document.filter(
+  //       (file) => file !== filename
+  //     );
+  //     const uploadFile = await prisma.project.update({
+  //       where: { project_id },
+  //       data: {
+  //         document: updatedDocument,
+  //       },
+  //     });
+  //     if (uploadFile) {
+  //       cloudinary.uploader.destroy(filename);
+  //       return true;
+  //     }
+  //     return false;
+  //   } catch (e) {
+  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
+  //   }
+  // };
   static queryProject = async (
     { query, items_per_page, page, search, nextPage, previousPage },
     isNotTrash = true

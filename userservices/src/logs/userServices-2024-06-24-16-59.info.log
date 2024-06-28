@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-24T09:59:56.359Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Cannot read properties of undefined (reading 'avatar')"},"requestId":"3388a264-dc66-4786-b052-631b2c95b0a2"}

@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-21T10:15:49.443Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"fn is not a function"},"requestId":"92ca4e84-99d2-45fc-b6c2-1a606b7b1142"}

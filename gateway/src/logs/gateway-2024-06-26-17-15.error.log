@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-26T10:15:17.827Z","context":"/users/update","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{\"name\":\"TokenExpiredError\",\"message\":\"jwt expired\",\"expiredAt\":\"2024-06-08T08:28:00.000Z\"}","metadata":{"message":"jwt expired"},"requestId":"3dc46d5e-3a5a-4f22-a1ae-0c6172297f95","timestamp":"2024-06-26 05:15:827 PM"}

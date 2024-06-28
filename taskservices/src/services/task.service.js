@@ -126,10 +126,23 @@ class TaskService {
   };
   // update task
   static update = async ({ task_id, data }, modifiedBy) => {
-    const updateTask = await prisma.task.update({
-      where: { task_id },
-      data: { ...data, modifiedBy },
-    });
+    console.log(task_id);
+    const existingTask = await prisma.task.findUnique({ where: { task_id } });
+    if (!existingTask) throw new BadRequestError("Task not found");
+    let updateTask;
+    if (data.document) {
+      updateTask = await prisma.task.update({
+        where: { task_id },
+        data: {
+          document: [...existingTask.document, data.document],
+        },
+      });
+    } else {
+      updateTask = await prisma.task.update({
+        where: { id: task_id },
+        data: { ...data, modifiedBy },
+      });
+    }
     if (updateTask) {
       await runProducer(ActivityProducerTopic.taskUpdated, {
         task_id: updateTask.task_id,
@@ -170,76 +183,53 @@ class TaskService {
     }
     return true;
   };
-  // upload file to cloud and store it in db
-  static uploadFile = async (task_id, { path, filename }) => {
-    const existingTask = await prisma.task.findUnique({
-      where: { task_id },
-    });
-    if (!existingTask) {
-      await cloudinary.uploader.destroy(filename);
-      throw new BadRequestError("Nhiệm vụ không tồn tại");
-    }
-    try {
-      const uploadFile = await prisma.task.update({
-        where: { task_id },
-        data: {
-          document: [...existingTask.document, filename],
-        },
-      });
-      if (uploadFile) return true;
-      await cloudinary.uploader.destroy(filename);
-      return false;
-    } catch (e) {
-      throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-    }
-  };
   // get Image File from cloudinary
-  static getFileImage = async ({ filename }) => {
-    const options = {
-      height: 500,
-      width: 500,
-      format: "jpg",
-    };
-    try {
-      const result = await cloudinary.url(filename, options);
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-    return await cloudinary.image(filename);
-  };
-  static getFile = async ({ filename }) => {
-    try {
-      const result = await cloudinary.url(filename, { resource_type: "raw" });
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  static deleteFile = async (task_id, { filename }) => {
-    const existingTask = await prisma.task.findUnique({
-      where: { task_id },
-    });
-    if (!existingTask) throw new BadRequestError("Nhiệm vụ không tồn tại");
-    try {
-      const updatedDocument = existingTask.document.filter(
-        (file) => file !== filename
-      );
-      const uploadFile = await prisma.task.update({
-        where: { task_id },
-        data: {
-          document: updatedDocument,
-        },
-      });
-      if (uploadFile) {
-        cloudinary.uploader.destroy(filename);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-    }
-  };
+  // static getFileImage = async ({ filename }) => {
+  //   const options = {
+  //     height: 500,
+  //     width: 500,
+  //     format: "jpg",
+  //   };
+  //   try {
+  //     const result = await cloudinary.url(filename, options);
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   return await cloudinary.image(filename);
+  // };
+  // static getFile = async ({ filename }) => {
+  //   try {
+  //     const result = await cloudinary.url(filename, { resource_type: "raw" });
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  // static deleteFile = async (task_id, { filename }) => {
+  //   const existingTask = await prisma.task.findUnique({
+  //     where: { task_id },
+  //   });
+  //   if (!existingTask) throw new BadRequestError("Nhiệm vụ không tồn tại");
+  //   try {
+  //     const updatedDocument = existingTask.document.filter(
+  //       (file) => file !== filename
+  //     );
+  //     const uploadFile = await prisma.task.update({
+  //       where: { task_id },
+  //       data: {
+  //         document: updatedDocument,
+  //       },
+  //     });
+  //     if (uploadFile) {
+  //       cloudinary.uploader.destroy(filename);
+  //       return true;
+  //     }
+  //     return false;
+  //   } catch (e) {
+  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
+  //   }
+  // };
   static queryTask = async ({
     query,
     items_per_page,

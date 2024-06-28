@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-24T15:18:37.708Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Cannot destructure property 'data' of 'undefined' as it is undefined."},"requestId":"849e0ea9-faf6-4ce1-936f-43a14c536a9a"}

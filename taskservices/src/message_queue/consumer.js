@@ -5,6 +5,10 @@ const {
   assignmentTopicsContinuous,
   assignmentProducerTopic,
 } = require("../configs/kafkaAssignmentTopic");
+const {
+  uploadTopicsContinuous,
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic");
 const TaskService = require("../services/task.service");
 const { runProducer } = require("./producer");
 const kafka = new Kafka({
@@ -17,6 +21,10 @@ const continuousConsumer = async () => {
   await consumer.connect();
   await consumer.subscribe({
     topics: convertObjectToArray(assignmentTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
   await consumer.run({
@@ -45,6 +53,16 @@ const continuousConsumer = async () => {
               console.log(err);
             }
           }
+          break;
+        case uploadTopicsContinuous.uploadFileForTask:
+          console.log(parsedMessage);
+          await TaskService.update(
+            {
+              task_id: parsedMessage.task_id,
+              data: { document: parsedMessage.file },
+            },
+            parsedMessage.modifiedBy
+          );
           break;
         default:
           console.log("Topic không được xử lý:", topic);

@@ -16,6 +16,7 @@ const {
   clientRoutes,
   taskServicesRoutes,
   activityServicesRoutes,
+  uploadServicesRoutes,
 } = require("./config");
 const cors = require("cors");
 const app = express();
@@ -46,6 +47,7 @@ registerRouterServices("/projects", projectServicesRoutes, app);
 registerRouterServices("/clients", clientRoutes, app);
 registerRouterServices("/tasks", taskServicesRoutes, app);
 registerRouterServices("/activities", activityServicesRoutes, app);
+registerRouterServices("/upload", uploadServicesRoutes, app);
 
 app.use((req, res, next) => {
   const requestId = req.user;

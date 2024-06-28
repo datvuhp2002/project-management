@@ -1,8 +1,9 @@
 "use strict";
 const uploadProducerTopic = {
-  uploadFile: "upload-file",
-  uploadImageFromLocal: "upload-image-from-local",
-  uploadImageFromLocalFiles: "upload-image-from-local-files",
+  uploadFileForProject: "upload-file-for-project",
+  uploadAvartarClient: "upload-avartar-client",
+  getAvatar: "get-file",
+  deleteAvatarInCloud: "delete-file-in-cloud",
 };
 
 module.exports = { uploadProducerTopic };

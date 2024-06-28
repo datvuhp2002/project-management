@@ -1,9 +1,9 @@
 "use strict";
-const uploadTopicsContinuous = {};
-const uploadTopicsOnDemand = {
-  uploadImageFromLocal: "upload-image-from-local",
-  uploadImageFromLocalFiles: "upload-image-from-local-files",
+const uploadTopicsContinuous = {
+  uploadAvartarFromLocal: "upload-avatar-from-local",
   getAvatar: "get-avatar",
   deleteAvatarInCloud: "delete-avatar-in-cloud",
+  updateAvatar: "update-avatar",
 };
+const uploadTopicsOnDemand = {};
 module.exports = { uploadTopicsContinuous, uploadTopicsOnDemand };

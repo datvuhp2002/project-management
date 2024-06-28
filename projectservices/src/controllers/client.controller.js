@@ -61,25 +61,25 @@ class ClientController {
       ),
     }).send(res);
   };
-  uploadFileAvatarFromLocal = async (req, res, next) => {
-    const { file } = req;
-    if (!file) {
-      throw new BadRequestError("File is missing");
-    }
-    new SuccessResponse({
-      message: "Tải ảnh đại diện lên thành công",
-      data: getInfoData({
-        fields: ["path", "filename"],
-        object: file,
-      }),
-    }).send(res);
-  };
-  getAvatar = async (req, res, next) => {
-    new SuccessResponse({
-      message: "Lấy ảnh đại diện về thành công",
-      data: await ClientService.getAvatar(req.body.avatar),
-    }).send(res);
-  };
+  // uploadFileAvatarFromLocal = async (req, res, next) => {
+  //   const { file } = req;
+  //   if (!file) {
+  //     throw new BadRequestError("File is missing");
+  //   }
+  //   new SuccessResponse({
+  //     message: "Tải ảnh đại diện lên thành công",
+  //     data: getInfoData({
+  //       fields: ["path", "filename"],
+  //       object: file,
+  //     }),
+  //   }).send(res);
+  // };
+  // getAvatar = async (req, res, next) => {
+  //   new SuccessResponse({
+  //     message: "Lấy ảnh đại diện về thành công",
+  //     data: await ClientService.getAvatar(req.body.avatar),
+  //   }).send(res);
+  // };
   delete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá khách hàng thành công",

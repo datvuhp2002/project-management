@@ -1,9 +1,9 @@
 "use strict";
 const userProducerTopic = {
-  uploadFileAvatarFromLocal: "upload-file-avatar-from-local",
-  uploadImageFromUrl: "upload-image-from-url",
+  uploadAvartarFromLocal: "upload-avatar-from-local",
   getAvatar: "get-avatar",
   deleteAvatarInCloud: "delete-avatar-in-cloud",
+  updateAvatar: "update-avatar",
 };
 
 module.exports = { userProducerTopic };

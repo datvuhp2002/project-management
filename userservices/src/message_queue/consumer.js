@@ -21,7 +21,6 @@ const {
 } = require("../configs/kafkaAssignmentTopic");
 const {
   uploadTopicsContinuous,
-  uploadTopicsOnDemand,
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic");
 
@@ -144,26 +143,17 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
-        case uploadTopicsOnDemand.uploadImageFromLocal:
-          const uploadImageFromLocalData = JSON.parse(message.value.toString());
-          console.log("Message receive:::", uploadImageFromLocalData);
-          const uploadRequestResultPromises = uploadImageFromLocalData.map(
-            async (item) => {
-              return await UserService.update(item);
-            }
-          );
-          const uploadRequestResults = await Promise.all(
-            uploadRequestResultPromises
-          );
+        case uploadTopicsContinuous.uploadAvartarFromLocal: {
           try {
-            await runProducer(
-              uploadProducerTopic.uploadImageFromLocal,
-              uploadRequestResults
-            );
-          } catch (err) {
-            console.log(err);
+            await UserService.update({
+              id: parsedMessage.user_id,
+              data: { avatar: parsedMessage.file },
+            });
+          } catch (error) {
+            console.error("Lỗi khi cập nhật avatar:", error);
           }
           break;
+        }
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

@@ -35,11 +35,11 @@ router.delete("/admin/delete/:id", asyncHandler(TaskController.delete));
 // Khôi phục một task đã bị xoá
 router.put("/admin/restore/:id", asyncHandler(TaskController.restore));
 
-router.post(
-  "/uploadFileFromLocal/:id",
-  uploadFile.single("file"),
-  asyncHandler(TaskController.uploadFileFromLocal)
-);
-router.post("/getFileImage", asyncHandler(TaskController.getFileImage));
-router.post("/deleteFile/:id", asyncHandler(TaskController.deleteFile));
+// router.post(
+//   "/uploadFileFromLocal/:id",
+//   uploadFile.single("file"),
+//   asyncHandler(TaskController.uploadFileFromLocal)
+// );
+// router.post("/getFileImage", asyncHandler(TaskController.getFileImage));
+// router.post("/deleteFile/:id", asyncHandler(TaskController.deleteFile));
 module.exports = router;

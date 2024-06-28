@@ -27,11 +27,11 @@ router.post("/detail/:id", asyncHandler(ClientController.detail));
 router.put("/update/:id", asyncHandler(ClientController.update));
 
 // upload avatar on cloud
-router.post(
-  "/uploadAvatarFromLocal/:id",
-  uploadClient.single("file"),
-  asyncHandler(ClientController.uploadFileAvatarFromLocal)
-);
-// get avatar from cloud
-router.post("/getAvatar", asyncHandler(ClientController.getAvatar));
+// router.post(
+//   "/uploadAvatarFromLocal/:id",
+//   uploadClient.single("file"),
+//   asyncHandler(ClientController.uploadFileAvatarFromLocal)
+// );
+// // get avatar from cloud
+// router.post("/getAvatar", asyncHandler(ClientController.getAvatar));
 module.exports = router;

@@ -1,0 +1,1 @@
+{"@timestamp":"2024-06-24T08:28:45.436Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"userId and avatarFileName must be provided"},"requestId":"d8ba55fa-1a64-4abc-8767-b0bed477294b"}
