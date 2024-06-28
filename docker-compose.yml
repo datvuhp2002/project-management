@@ -1,6 +1,51 @@
 version: "3.8"
 
 services:
+  # MongoDB Replica Set
+  mongo1:
+    container_name: mongo1
+    image: mongo:4.4
+    volumes:
+      - ~/mongors/data1:/data/db
+      - ./rs-init.sh:/scripts/rs-init.sh
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: prisma
+      MONGO_REPLICA_HOST: host.docker.internal
+    networks:
+      - kafka-network
+    ports:
+      - "27021:27017"
+    links:
+      - mongo2
+      - mongo3
+    restart: always
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+  mongo2:
+    container_name: mongo2
+    image: mongo:4.4
+    volumes:
+      - ~/mongors/data2:/data/db
+    networks:
+      - kafka-network
+    ports:
+      - 27022:27017
+    restart: always
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+
+  mongo3:
+    container_name: mongo3
+    image: mongo:4.4
+    volumes:
+      - ~/mongors/data3:/data/db
+    networks:
+      - kafka-network
+    ports:
+      - 27023:27017
+    restart: always
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+
+  # Elasticsearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
     container_name: elasticsearch
@@ -21,6 +66,7 @@ services:
     networks:
       - kafka-network
 
+  # Kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:7.10.0
     container_name: kibana
@@ -31,6 +77,7 @@ services:
     networks:
       - kafka-network
 
+  # Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     container_name: zookeeper
@@ -42,6 +89,7 @@ services:
     networks:
       - kafka-network
 
+  # Kafka
   kafka:
     image: confluentinc/cp-kafka:7.4.4
     container_name: kafkaMQ
@@ -59,6 +107,7 @@ services:
     networks:
       - kafka-network
 
+  # Debezium
   connect:
     image: quay.io/debezium/connect:2.0
     container_name: debezium
@@ -74,6 +123,8 @@ services:
       - kafka
     networks:
       - kafka-network
+
+  # Kafka UI
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -86,6 +137,7 @@ services:
     networks:
       - kafka-network
 
+  # Gateway Service
   gateway:
     build:
       context: ./gateway
@@ -128,6 +180,7 @@ services:
     networks:
       - kafka-network
 
+  # User Services
   userservices:
     build:
       context: ./userservices
@@ -142,7 +195,7 @@ services:
       - EMAIL_PASS=ndnvbtjqkhenjugp
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/userService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/userService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
@@ -159,7 +212,7 @@ services:
       - elasticsearch
     networks:
       - kafka-network
-
+  # Department Services
   departmentservices:
     build:
       context: ./departmentservices
@@ -172,11 +225,10 @@ services:
     environment:
       - PORT=3057
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/departmentService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/departmentService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - USER_GRPC_PORT=userservices:50053
-
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -190,6 +242,7 @@ services:
     networks:
       - kafka-network
 
+  # Assignment Services
   assignmentservices:
     build:
       context: ./assignmentservices
@@ -202,14 +255,13 @@ services:
     environment:
       - PORT=3058
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/assignmentService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/assignmentService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50056
       - USER_GRPC_PORT=userservices:50053
       - TASK_GRPC_PORT=taskservices:50054
       - PROJECT_GRPC_PORT=projectservices:50055
-
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -223,6 +275,7 @@ services:
     networks:
       - kafka-network
 
+  # Project Services
   projectservices:
     build:
       context: ./projectservices
@@ -235,7 +288,7 @@ services:
       - PORT=3059
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/projectService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/projectService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50055
@@ -253,6 +306,7 @@ services:
     networks:
       - kafka-network
 
+  # Email Services
   emailservices:
     build:
       context: ./emailservices
@@ -265,7 +319,7 @@ services:
       - PORT=3069
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/emailService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/emailService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - EMAIL_PASS=bwwk zwuo qfqw ciyf
@@ -282,6 +336,7 @@ services:
     networks:
       - kafka-network
 
+  # Task Services
   taskservices:
     build:
       context: ./taskservices
@@ -295,12 +350,11 @@ services:
       - PORT=3060
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/taskService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/taskService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50054
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
-
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -314,6 +368,7 @@ services:
     networks:
       - kafka-network
 
+  # Activity Services
   activityservices:
     build:
       context: ./activityservices
@@ -326,7 +381,7 @@ services:
     environment:
       - PORT=3061
       - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/activityService?retryWrites=true&w=majority&appName=Cluster0
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/activityService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - USER_GRPC_PORT=userservices:50053
@@ -346,7 +401,6 @@ services:
 volumes:
   esdata:
     driver: local
-
 networks:
   kafka-network:
     driver: bridge
