@@ -12,6 +12,7 @@ const ProjectService = require("../services/project.service");
 const ClientService = require("../services/client.service");
 const { runProducer } = require("../message_queue/producer");
 
+
 const kafka = new Kafka({
   clientId: "project-services",
   brokers: [process.env.KAFKA_BROKER],
