@@ -1,6 +1,6 @@
 "use strict";
 const taskTopicsContinuous = {
-  uploadFile: "upload-file",
+  uploadFileForTask: "upload-file-for-task",
   getFile: "get-file",
   deleteFileInCloud: "delete-file-in-cloud",
 };

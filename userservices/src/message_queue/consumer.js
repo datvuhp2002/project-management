@@ -124,12 +124,17 @@ const continuousConsumer = async () => {
             console.log(err);
           }
           break;
-        case uploadTopicsContinuous.uploadAvartarFromLocal:
-          await UserService.update({
-            id: parsedMessage.user_id,
-            data: { avatar: parsedMessage.file },
-          });
+        case uploadTopicsContinuous.uploadAvartarFromLocal: {
+          try {
+            await UserService.update({
+              id: parsedMessage.user_id,
+              data: { avatar: parsedMessage.file },
+            });
+          } catch (error) {
+            console.error("Lỗi khi cập nhật avatar:", error);
+          }
           break;
+        }
         case assignmentTopicsContinuous.getUserInformation:
           const assignmentRequestResultPromises = parsedMessage.map(
             async (item) => {

@@ -9,15 +9,12 @@ const {
   uploadTask,
 } = require("../../middleware/UploadFile");
 const router = express.Router();
+router.post("/get-file", asyncHandler(UploadController.getFile));
+router.post("/get-avatar", asyncHandler(UploadController.getAvatar));
 router.post(
   "/upload-avatar-from-local",
   uploadAvatar.single("file"),
   asyncHandler(UploadController.uploadAvartarFromLocal)
-);
-router.post(
-  "/upload-file-for-project/:id",
-  uploadProject.single("file"),
-  asyncHandler(UploadController.uploadFileForProject)
 );
 router.post(
   "/upload-file-for-task/:id",
@@ -25,9 +22,14 @@ router.post(
   asyncHandler(UploadController.uploadFileForTask)
 );
 router.post(
+  "/upload-file-for-project/:id",
+  uploadProject.single("file"),
+  asyncHandler(UploadController.uploadFileForProject)
+);
+router.post(
   "/upload-avatar-client/:id",
   uploadClient.single("file"),
   asyncHandler(UploadController.uploadAvartarClient)
 );
-router.post("/get-file", asyncHandler(UploadController.getFile));
+router.post("/getFileImage", asyncHandler(UploadController.getFileImage));
 module.exports = router;

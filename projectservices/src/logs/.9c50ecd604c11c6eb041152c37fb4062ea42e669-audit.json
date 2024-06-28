@@ -159,6 +159,51 @@
             "date": 1719397708803,
             "name": "src\\logs\\projectServices-2024-06-26-17-28.info.log",
             "hash": "5f2298ce8a8fdaca3a5b65312d352f364256c2ef0cbda79b9d1a97fdd0e59c29"
+        },
+        {
+            "date": 1719544261691,
+            "name": "src\\logs\\projectServices-2024-06-28-10-11.info.log",
+            "hash": "9cf109e96cc6a87276072dad2b426718d9584276693886e7831699eb596e9717"
+        },
+        {
+            "date": 1719544349995,
+            "name": "src\\logs\\projectServices-2024-06-28-10-12.info.log",
+            "hash": "73d49124bbc093ee897dcb67d2242e06a501d322042b0ec3a75dc263f378080d"
+        },
+        {
+            "date": 1719544380707,
+            "name": "src\\logs\\projectServices-2024-06-28-10-13.info.log",
+            "hash": "8c69f5bd7c50a355fa5af596b32c6565df12d86bd0343dc00a5a80fc0fbc05b7"
+        },
+        {
+            "date": 1719550906302,
+            "name": "src\\logs\\projectServices-2024-06-28-12-01.info.log",
+            "hash": "eb523e76bfa0ef4f4a2e08fdf1f9949d005d622b50f10853ace3939d02206b40"
+        },
+        {
+            "date": 1719551040759,
+            "name": "src\\logs\\projectServices-2024-06-28-12-04.info.log",
+            "hash": "4c1676bd1f157ee9f1c7744f34f10284387e2ac8100ddcd6fb280349a15b1fcf"
+        },
+        {
+            "date": 1719551395788,
+            "name": "src\\logs\\projectServices-2024-06-28-12-09.info.log",
+            "hash": "c5b13af2ddb8babd45948bd402a92ddb18b990c07483df17405882e2f50594e8"
+        },
+        {
+            "date": 1719551441681,
+            "name": "src\\logs\\projectServices-2024-06-28-12-10.info.log",
+            "hash": "4b2349d9e9828f91b02d8aaa6ccffccccac4f5d2eed5bc0d971bfd772cb5df68"
+        },
+        {
+            "date": 1719551507844,
+            "name": "src\\logs\\projectServices-2024-06-28-12-11.info.log",
+            "hash": "66410e2adbf804dec1139e830b315b3f2afb299eee58ec04ec0410b6a99d9817"
+        },
+        {
+            "date": 1719551558689,
+            "name": "src\\logs\\projectServices-2024-06-28-12-12.info.log",
+            "hash": "ae91996de49e1c500af77149483b1127fd8f5ad3cbfa6f7870b2d5ba4bee4aa0"
         }
     ],
     "hashType": "sha256"

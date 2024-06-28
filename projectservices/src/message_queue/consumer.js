@@ -36,8 +36,6 @@ const continuousConsumer = async () => {
     eachMessage: async ({ topic, partition, message }) => {
       try {
         const parsedMessage = JSON.parse(message.value.toString());
-        console.log("Before handle :::", parsedMessage);
-
         switch (topic) {
           case assignmentTopicsContinuous.abc:
             if (parsedMessage !== null) {
@@ -45,100 +43,19 @@ const continuousConsumer = async () => {
             }
             break;
           case uploadTopicsContinuous.uploadFileForProject:
-            await ProjectService.update({
-              id: parsedMessage.project_id,
-              data: {
-                data: parsedMessage.fileData,
-                modifiedBy: parsedMessage.modifiedBy,
-              },
-            });
+            await ProjectService.uploadFile(
+              parsedMessage.project_id,
+              parsedMessage.file
+            );
             break;
           case uploadTopicsContinuous.uploadAvartarClient:
-            await ClientService.update({
-              id: parsedMessage.client_id,
-              data: {
-                data: parsedMessage.data,
-                modifiedBy: parsedMessage.modifiedBy,
-              },
-            });
+            console.log(parsedMessage);
+            await ClientService.update(
+              parsedMessage.client_id,
+              { avatar: parsedMessage.file },
+              parsedMessage.modifiedBy
+            );
             break;
-          // case uploadTopicsOnDemand.uploadFile:
-          //   const { project_id, path, filename } = parsedMessage;
-          //   const uploadSuccess = await ProjectService.uploadFile(project_id, {
-          //     path,
-          //     filename,
-          //   });
-          //   try {
-          //     await runProducer(uploadProducerTopic.uploadFile, {
-          //       project_id,
-          //       success: uploadSuccess,
-          //     });
-          //     console.log("Upload result sent:", {
-          //       project_id,
-          //       success: uploadSuccess,
-          //     });
-          //   } catch (error) {
-          //     console.error("Failed to send upload result:", error);
-          //   }
-          //   break;
-          // case uploadTopicsOnDemand.uploadImageFromLocal:
-          //   const { client_id, avatar } = parsedMessage;
-          //   const uploadImageSuccess = await ClientService.uploadImageFromLocal(
-          //     client_id,
-          //     avatar
-          //   );
-          //   try {
-          //     await runProducer(uploadProducerTopic.uploadImageFromLocal, {
-          //       client_id,
-          //       success: uploadImageSuccess,
-          //     });
-          //     console.log("Upload image result sent:", {
-          //       client_id,
-          //       success: uploadImageSuccess,
-          //     });
-          //   } catch (error) {
-          //     console.error("Failed to send upload image result:", error);
-          //   }
-          //   break;
-          // case uploadTopicsOnDemand.uploadFile:
-          //   const { project_id, path, filename } = parsedMessage;
-          //   const uploadSuccess = await ProjectService.uploadFile(project_id, {
-          //     path,
-          //     filename,
-          //   });
-          //   try {
-          //     await runProducer(uploadProducerTopic.uploadFile, {
-          //       project_id,
-          //       success: uploadSuccess,
-          //     });
-          //     console.log("Upload result sent:", {
-          //       project_id,
-          //       success: uploadSuccess,
-          //     });
-          //   } catch (error) {
-          //     console.error("Failed to send upload result:", error);
-          //   }
-          //   break;
-          // case uploadTopicsOnDemand.uploadImageFromLocal:
-          //   const { client_id, avatar } = parsedMessage;
-          //   const uploadImageSuccess = await ClientService.uploadImageFromLocal(
-          //     client_id,
-          //     avatar
-          //   );
-          //   try {
-          //     await runProducer(uploadProducerTopic.uploadImageFromLocal, {
-          //       client_id,
-          //       success: uploadImageSuccess,
-          //     });
-          //     console.log("Upload image result sent:", {
-          //       client_id,
-          //       success: uploadImageSuccess,
-          //     });
-          //   } catch (error) {
-          //     console.error("Failed to send upload image result:", error);
-          //   }
-          //   break;
-
           default:
             console.log("Unhandled topic:", topic);
         }

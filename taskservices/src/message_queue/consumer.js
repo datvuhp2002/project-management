@@ -55,13 +55,14 @@ const continuousConsumer = async () => {
           }
           break;
         case uploadTopicsContinuous.uploadFileForTask:
-          await TaskService.update({
-            id: parsedMessage.task_id,
-            data: {
-              fileData: parsedMessage.file,
-              modifiedBy: parsedMessage.modifiedBy,
+          console.log(parsedMessage);
+          await TaskService.update(
+            {
+              task_id: parsedMessage.task_id,
+              data: { document: parsedMessage.file },
             },
-          });
+            parsedMessage.modifiedBy
+          );
           break;
         default:
           console.log("Topic không được xử lý:", topic);

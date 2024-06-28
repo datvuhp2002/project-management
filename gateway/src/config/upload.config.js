@@ -15,6 +15,16 @@ const uploadServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
+  "/get-avatar": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/get-avatar`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/get-file-image": {
+    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/getFileImage`,
+    authRequired: true,
+    permissions: null,
+  },
   "/upload-file-for-project": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-file-for-project`,
     authRequired: true,
