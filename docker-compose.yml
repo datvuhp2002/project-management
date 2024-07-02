@@ -44,39 +44,32 @@ services:
       - 27023:27017
     restart: always
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+  # Loki
+  # loki:
+  #   image: grafana/loki:2.0.0
+  #   container_name: loki
+  #   ports:
+  #     - "3100:3100"
+  #   command:
+  #     - --config.file=/mnt/config/loki-config.yaml
+  #   volumes:
+  #     - ./loki-config.yaml:/mnt/config/loki-config.yaml:ro
+  #   networks:
+  #     - kafka-network
 
-  # Elasticsearch
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-    container_name: elasticsearch
-    environment:
-      - node.name=elasticsearch
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    networks:
-      - kafka-network
-
-  # Kibana
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.0
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - kafka-network
-
+  # # Grafana
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   ports:
+  #     - 5600:5600
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #   volumes:
+  #     - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
+  #   networks:
+  #     - kafka-network
   # Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
@@ -160,6 +153,7 @@ services:
       - TASK_SERVICES_REQUEST_URL=http://taskservices:3060/services/api/task
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - EMAIL_SERVICES_REQUEST_URL=http://emailservices:3069/services/api/email
+      - UPLOAD_SERVICES_REQUEST_URL=http://uploadservices:3068/services/api/upload
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - PUBLIC_KEY=abcdefgh123
@@ -176,7 +170,7 @@ services:
       - activityservices
       - departmentservices
       - taskservices
-      - elasticsearch
+
     networks:
       - kafka-network
 
@@ -192,7 +186,6 @@ services:
     container_name: userservices
     environment:
       - PORT=3056
-      - EMAIL_PASS=ndnvbtjqkhenjugp
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/userService?replicaSet=dbrs
@@ -200,6 +193,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - UPLOAD_GRPC_PORT=uploadservices:50057
     labels:
       co.elastic.logs/module: filebeat
       co.elastic.logs/json.keys_under_root: true
@@ -209,7 +203,7 @@ services:
       - "3056:3056"
     depends_on:
       - kafka
-      - elasticsearch
+
     networks:
       - kafka-network
   # Department Services
@@ -238,7 +232,7 @@ services:
       - "3057:3057"
     depends_on:
       - kafka
-      - elasticsearch
+
     networks:
       - kafka-network
 
@@ -271,7 +265,7 @@ services:
       - "3058:3058"
     depends_on:
       - kafka
-      - elasticsearch
+
     networks:
       - kafka-network
 
@@ -282,6 +276,7 @@ services:
       dockerfile: Dockerfile
       platforms:
         - linux/amd64
+    platform: linux/amd64
     image: datvudinhtrong/projectservices
     container_name: projectservices
     environment:
@@ -302,7 +297,7 @@ services:
       - "3059:3059"
     depends_on:
       - kafka
-      - elasticsearch
+
     networks:
       - kafka-network
 
@@ -313,6 +308,7 @@ services:
       dockerfile: Dockerfile
       platforms:
         - linux/amd64
+    platform: linux/amd64
     image: datvudinhtrong/emailservices
     container_name: emailservices
     environment:
@@ -332,7 +328,37 @@ services:
       - "3069:3069"
     depends_on:
       - kafka
-      - elasticsearch
+
+    networks:
+      - kafka-network
+
+  #Upload servicse
+  uploadservices:
+    build:
+      context: ./uploadservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/uploadservices
+    container_name: uploadservices
+    environment:
+      - PORT=3068
+      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GRPC_PORT=50057
+    labels:
+      co.elastic.logs/module: filebeat
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.expand_keys: true
+    ports:
+      - "3068:3068"
+    depends_on:
+      - kafka
+
     networks:
       - kafka-network
 
@@ -364,7 +390,7 @@ services:
       - "3060:3060"
     depends_on:
       - kafka
-      - elasticsearch
+
     networks:
       - kafka-network
 
@@ -394,10 +420,18 @@ services:
       - "3061:3061"
     depends_on:
       - kafka
-      - elasticsearch
     networks:
       - kafka-network
+  # projectmanagementwebui:
+  #   platform: linux/amd64
 
+  #   image: chicong42/projectmanagementwebui
+  #   environment:
+  #     - VITE_REQUEST_API_URL=gateway:3050
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - kafka-network
 volumes:
   esdata:
     driver: local
