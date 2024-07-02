@@ -1,0 +1,190 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.4eb070d6994cae55303271cb11e8627520066835-audit.json",
+    "files": [
+        {
+            "date": 1718955711341,
+            "name": "src/logs/taskServices-2024-06-21-14-41.info.log",
+            "hash": "56a8ae3219acf14165a507ee9f471e440e1528e1d9eaa59d9cd280a6c2fdc417"
+        },
+        {
+            "date": 1718955808952,
+            "name": "src/logs/taskServices-2024-06-21-14-43.info.log",
+            "hash": "2c4ca4f955c59c65fe335e644c6ebe942277e7d9dcce58793b5fed197ce9432e"
+        },
+        {
+            "date": 1718955845094,
+            "name": "src/logs/taskServices-2024-06-21-14-44.info.log",
+            "hash": "c8651ff498e9d540a1081a231e8b513e3598cfc94682891c149783c36536c994"
+        },
+        {
+            "date": 1719394733201,
+            "name": "src\\logs\\taskServices-2024-06-26-16-38.info.log",
+            "hash": "2b8237e09ff5620fc418d6669dc3fed66f15a9b4e92b920361e4895295d299cb"
+        },
+        {
+            "date": 1719395972800,
+            "name": "src\\logs\\taskServices-2024-06-26-16-59.info.log",
+            "hash": "ce199026a807a2e0bb6cbae6fa2b5be832285285d5d807961d09b11b4ce8c5a7"
+        },
+        {
+            "date": 1719544269865,
+            "name": "src\\logs\\taskServices-2024-06-28-10-11.info.log",
+            "hash": "d74d3a9502ace893388b9a76467cc110d62223a329143686dcc6fc5d92b49111"
+        },
+        {
+            "date": 1719544417227,
+            "name": "src\\logs\\taskServices-2024-06-28-10-13.info.log",
+            "hash": "95af17e8e7e0fd1d31e5c1b9b3f24b00f1f06e6a782edc3c8d21cca0dc7c1fa3"
+        },
+        {
+            "date": 1719544565091,
+            "name": "src\\logs\\taskServices-2024-06-28-10-16.info.log",
+            "hash": "c1f586f3d6bdd911f68b5fea6a28b2f5911173293d785c529ced91a512a3db3d"
+        },
+        {
+            "date": 1719544897693,
+            "name": "src\\logs\\taskServices-2024-06-28-10-21.info.log",
+            "hash": "24de31e2f7e60c5959e0bf5058c3cc3e83c88fa7f6d1e5207812cd0ab2b03104"
+        },
+        {
+            "date": 1719544940996,
+            "name": "src\\logs\\taskServices-2024-06-28-10-22.info.log",
+            "hash": "0c1d5f9d1ea9bc788eb89012492ca1d5b1d0bb929169b15bd628849e38487bee"
+        },
+        {
+            "date": 1719545203099,
+            "name": "src\\logs\\taskServices-2024-06-28-10-26.info.log",
+            "hash": "a8eb7cc8d531bd007c05ab9815aeb22ea236ed27d79ab24dcbb6d2d36c7c38d0"
+        },
+        {
+            "date": 1719545455768,
+            "name": "src\\logs\\taskServices-2024-06-28-10-30.info.log",
+            "hash": "9f5ebb258e9a78b0d829917d3556908e454a5a2a4f097254ad5cc7c687a0c821"
+        },
+        {
+            "date": 1719545489386,
+            "name": "src\\logs\\taskServices-2024-06-28-10-31.info.log",
+            "hash": "4a2d2f6558e3d460ecae75c5ebe3b58a7ad5e0bed77a304451824b135828e6cb"
+        },
+        {
+            "date": 1719545628761,
+            "name": "src\\logs\\taskServices-2024-06-28-10-33.info.log",
+            "hash": "e1f0a70e8c39bb114300652106a32ae37053bdded8d4b566c429af6aec2d9571"
+        },
+        {
+            "date": 1719546168862,
+            "name": "src\\logs\\taskServices-2024-06-28-10-42.info.log",
+            "hash": "dbd4d6033d189e55db868f9542cad1c511441458ef70353d385f70be4f672295"
+        },
+        {
+            "date": 1719546395032,
+            "name": "src\\logs\\taskServices-2024-06-28-10-46.info.log",
+            "hash": "50faad755c544a9ae537baf64188c37f5d98dd29d3556357e00a95d3f3e35771"
+        },
+        {
+            "date": 1719546734923,
+            "name": "src\\logs\\taskServices-2024-06-28-10-52.info.log",
+            "hash": "a35e449b80f52ed0a68bbe513be1f996c1dd07903fe8aa4753f2ae5b1f248f23"
+        },
+        {
+            "date": 1719546831909,
+            "name": "src\\logs\\taskServices-2024-06-28-10-53.info.log",
+            "hash": "95947479d81ba1a654f46f670225b27f4606fff57d4f567e69659b4bce033652"
+        },
+        {
+            "date": 1719546868882,
+            "name": "src\\logs\\taskServices-2024-06-28-10-54.info.log",
+            "hash": "4f08fee7b257c73ce02840f4ec146536828413b6103bee569318812fe89c41e0"
+        },
+        {
+            "date": 1719549107973,
+            "name": "src\\logs\\taskServices-2024-06-28-11-31.info.log",
+            "hash": "3356c9642384d343c6a4b06e1bbee45a19fc6810824821efde87ec265461cb86"
+        },
+        {
+            "date": 1719549334357,
+            "name": "src\\logs\\taskServices-2024-06-28-11-35.info.log",
+            "hash": "3e970aec31ac22c8855128f3337eeb89388a3d0c54692084c7a9c68dd3346b7b"
+        },
+        {
+            "date": 1719549634191,
+            "name": "src\\logs\\taskServices-2024-06-28-11-40.info.log",
+            "hash": "ff0a7824565b47ce4cd86271822c4163fc5f095754c4f0f4c1055421abe3b8ab"
+        },
+        {
+            "date": 1719549813600,
+            "name": "src\\logs\\taskServices-2024-06-28-11-43.info.log",
+            "hash": "5db8901b75bd3c0eaeca245b55f0ae49e85bd9ff1b34351f14f99305ebc5bf62"
+        },
+        {
+            "date": 1719549849048,
+            "name": "src\\logs\\taskServices-2024-06-28-11-44.info.log",
+            "hash": "5fb1483a7051e05a01085fc79f82d03d849b952ffd3ce70f17d906a6c596fc05"
+        },
+        {
+            "date": 1719549904592,
+            "name": "src\\logs\\taskServices-2024-06-28-11-45.info.log",
+            "hash": "65011ae46aa59d97fb87fa0a5e79307c7408cf95c5935a27a09178db0f0d96ca"
+        },
+        {
+            "date": 1719550207897,
+            "name": "src\\logs\\taskServices-2024-06-28-11-50.info.log",
+            "hash": "63d9e777a5465f84c15eb25ecd155559ba1cac8bab4c4b63b9d606061360287e"
+        },
+        {
+            "date": 1719550268989,
+            "name": "src\\logs\\taskServices-2024-06-28-11-51.info.log",
+            "hash": "3d4db755959e9c6adb378f465892af87dcd7252619f1a6339fb9309965a83433"
+        },
+        {
+            "date": 1719898321407,
+            "name": "src\\logs\\taskServices-2024-07-02-12-32.info.log",
+            "hash": "9173ddecbc3a5e4600cfc3eee2bc6df997403c319637d5e052f94ce687f356d0"
+        },
+        {
+            "date": 1719898474999,
+            "name": "src\\logs\\taskServices-2024-07-02-12-34.info.log",
+            "hash": "6d5703e74a41b2b3f04406b45365a3617dcf44f2ddd3592eac7b7b1f1a64c79f"
+        },
+        {
+            "date": 1719903551178,
+            "name": "src\\logs\\taskServices-2024-07-02-13-59.info.log",
+            "hash": "578e8f32318867fe1b2816a523fa0e0b31dbc292875ec0a3755de2dfd34facfc"
+        },
+        {
+            "date": 1719903604255,
+            "name": "src\\logs\\taskServices-2024-07-02-14-00.info.log",
+            "hash": "1afb0d5712da0c917f32f7ae36c99fc90dd80fd4ea4e36fee7c1ec03fa4f3e7c"
+        },
+        {
+            "date": 1719903708302,
+            "name": "src\\logs\\taskServices-2024-07-02-14-01.info.log",
+            "hash": "081407e29a078b5e676755916859649f0a813e88608e941413ab9c56ef7ec2e2"
+        },
+        {
+            "date": 1719903775232,
+            "name": "src\\logs\\taskServices-2024-07-02-14-02.info.log",
+            "hash": "8c51b07a9419ddb47ec8092d6793f598a233491b017e0d2df75fd00119ac8d4d"
+        },
+        {
+            "date": 1719904212314,
+            "name": "src\\logs\\taskServices-2024-07-02-14-10.info.log",
+            "hash": "c63ff57a18bef679a87dc84e9225fbc0501a2d0c1ae6f3959b5afa6a643f6d6d"
+        },
+        {
+            "date": 1719904602741,
+            "name": "src\\logs\\taskServices-2024-07-02-14-16.info.log",
+            "hash": "8d1d72cb7c01d321282d8859a0393d9b4f53ca64f0e16654cc982db5c0e7af7e"
+        },
+        {
+            "date": 1719905431713,
+            "name": "src\\logs\\taskServices-2024-07-02-14-30.info.log",
+            "hash": "aefd44e73e8300437d1efa5b162e9dd44add9d51ad9cdbc1b3cfb4771e97ca70"
+        }
+    ],
+    "hashType": "sha256"
+}
