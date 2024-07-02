@@ -9,7 +9,7 @@ const generatorTokenRandom = () => {
   // Convert the integer to a string and pad it with leading zeros if necessary
   return otp.toString().padStart(6, "0");
 };
-const newOtp = async ({ email }) => {
+const newOtp = async (email) => {
   // check otp exist
   const isOtpExist = await prisma.otp.findUnique({ where: { email } });
   if (isOtpExist) {

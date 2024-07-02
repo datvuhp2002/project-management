@@ -11,14 +11,24 @@
             "hash": "4f0ec3d93455c10a887409e8126ed758268867a8d00b51d25f2c203356fd9675"
         },
         {
-            "date": 1719904739263,
-            "name": "src\\logs\\departmentServices-2024-07-02-14-18.info.log",
-            "hash": "d00987a0ff75ee758770464db622a30bd233fb68cc8ed7253066e844cfbf9f42"
+            "date": 1719073069027,
+            "name": "src/logs/departmentServices-2024-06-22-23-17.info.log",
+            "hash": "5ab96927b9259e6bfd73305c57004bb75e07ac79f1698e33ebd6aab83002aadd"
         },
         {
-            "date": 1719904749421,
-            "name": "src\\logs\\departmentServices-2024-07-02-14-19.info.log",
-            "hash": "0f39568b62c9a233efe509b9da290b64e3bb810554569fba52c3186cceb14906"
+            "date": 1719073126718,
+            "name": "src/logs/departmentServices-2024-06-22-23-18.info.log",
+            "hash": "f4ebd27ecb513109c9672c4e10af435b7a2aff05647ccca653ca3125020f144c"
+        },
+        {
+            "date": 1719073140032,
+            "name": "src/logs/departmentServices-2024-06-22-23-19.info.log",
+            "hash": "ca17db45c498de4a59ec3bc1c34feefef2234dc538a1c81347e5ca10e23eacf7"
+        },
+        {
+            "date": 1719112705157,
+            "name": "src/logs/departmentServices-2024-06-23-10-18.info.log",
+            "hash": "09898b0b0edb5614aedb05eab8e449fc38fa7de1d75878d9d9b9df249b05d451"
         }
     ],
     "hashType": "sha256"

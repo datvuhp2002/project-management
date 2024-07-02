@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-14T04:08:17.725Z","context":"/user/forget-password","ecs.version":"8.10.0","log.level":"info","message":"input params:-:POST:-:","metadata":{"email":"detectiveduongz@gmail.com"},"requestId":"ec1b5f21-47a5-4a0d-ae77-253d05f2d0fa","timestamp":"2024-06-14 11:08:725 AM"}
