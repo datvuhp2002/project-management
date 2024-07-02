@@ -135,11 +135,12 @@ class TaskService {
         where: { task_id },
         data: {
           document: [...existingTask.document, data.document],
+          modifiedBy,
         },
       });
     } else {
       updateTask = await prisma.task.update({
-        where: { id: task_id },
+        where: { task_id },
         data: { ...data, modifiedBy },
       });
     }
@@ -153,6 +154,7 @@ class TaskService {
     }
     return false;
   };
+
   // delete task
   static delete = async (task_id) => {
     const deleteTask = await prisma.task.update({

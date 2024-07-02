@@ -6,11 +6,6 @@
     "auditLog": "src/logs/.4eb070d6994cae55303271cb11e8627520066835-audit.json",
     "files": [
         {
-            "date": 1718684221889,
-            "name": "src/logs/taskServices-2024-06-18-11-17.info.log",
-            "hash": "b99435d0db992b1d4e3a7bb68ddfc72282a2ce96a54a74f43f91d62bc740cb41"
-        },
-        {
             "date": 1718955711341,
             "name": "src/logs/taskServices-2024-06-21-14-41.info.log",
             "hash": "56a8ae3219acf14165a507ee9f471e440e1528e1d9eaa59d9cd280a6c2fdc417"
@@ -144,6 +139,46 @@
             "date": 1719550268989,
             "name": "src\\logs\\taskServices-2024-06-28-11-51.info.log",
             "hash": "3d4db755959e9c6adb378f465892af87dcd7252619f1a6339fb9309965a83433"
+        },
+        {
+            "date": 1719898321407,
+            "name": "src\\logs\\taskServices-2024-07-02-12-32.info.log",
+            "hash": "9173ddecbc3a5e4600cfc3eee2bc6df997403c319637d5e052f94ce687f356d0"
+        },
+        {
+            "date": 1719898474999,
+            "name": "src\\logs\\taskServices-2024-07-02-12-34.info.log",
+            "hash": "6d5703e74a41b2b3f04406b45365a3617dcf44f2ddd3592eac7b7b1f1a64c79f"
+        },
+        {
+            "date": 1719903551178,
+            "name": "src\\logs\\taskServices-2024-07-02-13-59.info.log",
+            "hash": "578e8f32318867fe1b2816a523fa0e0b31dbc292875ec0a3755de2dfd34facfc"
+        },
+        {
+            "date": 1719903604255,
+            "name": "src\\logs\\taskServices-2024-07-02-14-00.info.log",
+            "hash": "1afb0d5712da0c917f32f7ae36c99fc90dd80fd4ea4e36fee7c1ec03fa4f3e7c"
+        },
+        {
+            "date": 1719903708302,
+            "name": "src\\logs\\taskServices-2024-07-02-14-01.info.log",
+            "hash": "081407e29a078b5e676755916859649f0a813e88608e941413ab9c56ef7ec2e2"
+        },
+        {
+            "date": 1719903775232,
+            "name": "src\\logs\\taskServices-2024-07-02-14-02.info.log",
+            "hash": "8c51b07a9419ddb47ec8092d6793f598a233491b017e0d2df75fd00119ac8d4d"
+        },
+        {
+            "date": 1719904212314,
+            "name": "src\\logs\\taskServices-2024-07-02-14-10.info.log",
+            "hash": "c63ff57a18bef679a87dc84e9225fbc0501a2d0c1ae6f3959b5afa6a643f6d6d"
+        },
+        {
+            "date": 1719904602741,
+            "name": "src\\logs\\taskServices-2024-07-02-14-16.info.log",
+            "hash": "8d1d72cb7c01d321282d8859a0393d9b4f53ca64f0e16654cc982db5c0e7af7e"
         }
     ],
     "hashType": "sha256"
