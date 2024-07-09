@@ -1,2 +1,0 @@
-{"@timestamp":"2024-06-21T08:54:12.456Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"fn is not a function"},"requestId":"7146df49-80d3-44f0-89b3-ac026a8d7568"}
-{"@timestamp":"2024-06-21T08:54:19.376Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"fn is not a function"},"requestId":"00ecab02-47d5-4368-8b3c-9482336128bd"}

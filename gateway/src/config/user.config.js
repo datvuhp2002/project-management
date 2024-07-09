@@ -57,8 +57,8 @@ const userServicesRoutes = {
   },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
-    authRequired: null,
-    permissions: null,
+    authRequired: true,
+    permissions: ["ADMIN", "MANAGER"],
   },
   "/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/update`,

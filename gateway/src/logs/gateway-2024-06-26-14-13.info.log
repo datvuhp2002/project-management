@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-26T07:13:27.572Z","context":"/upload/upload-file","ecs.version":"8.10.0","log.level":"info","message":"input params:-:POST:-:","metadata":{},"requestId":"d9aba418-9773-4e34-be84-443d37f643ca","timestamp":"2024-06-26 02:13:572 PM"}

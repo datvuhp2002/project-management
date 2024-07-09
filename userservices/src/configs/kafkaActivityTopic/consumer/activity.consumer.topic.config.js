@@ -1,6 +1,4 @@
 "use strict";
-const activityTopicsContinuous = {
-  getUserInformationForActivity: "get-user-information-for-activity",
-};
+const activityTopicsContinuous = {};
 const activityTopicsOnDemand = {};
 module.exports = { activityTopicsContinuous, activityTopicsOnDemand };

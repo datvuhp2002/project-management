@@ -4,14 +4,6 @@ const {
   departmentTopicsContinuous,
   departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
-const {
-  emailTopicsContinuous,
-  emailProducerTopic,
-} = require("../configs/kafkaEmailTopic");
-const {
-  activityTopicsContinuous,
-  activityProducerTopic,
-} = require("../configs/kafkaActivityTopic");
 const UserService = require("../services/user.service");
 const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
@@ -19,10 +11,7 @@ const {
   assignmentTopicsContinuous,
   assignmentProducerTopic,
 } = require("../configs/kafkaAssignmentTopic");
-const {
-  uploadTopicsContinuous,
-  uploadProducerTopic,
-} = require("../configs/kafkaUploadTopic");
+const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
 
 const kafka = new Kafka({
   clientId: "user-services",
@@ -45,18 +34,6 @@ const continuousConsumer = async () => {
     fromBeginning: false,
   });
   await consumer.subscribe({
-    topics: convertObjectToArray(activityTopicsContinuous),
-    fromBeginning: false,
-  });
-  await consumer.subscribe({
-    topics: convertObjectToArray(activityTopicsContinuous),
-    fromBeginning: false,
-  });
-  await consumer.subscribe({
-    topics: convertObjectToArray(emailTopicsContinuous),
-    fromBeginning: false,
-  });
-  await consumer.subscribe({
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
@@ -64,29 +41,6 @@ const continuousConsumer = async () => {
     eachMessage: async ({ topic, partition, message }) => {
       const parsedMessage = JSON.parse(message.value.toString());
       switch (topic) {
-        case departmentTopicsContinuous.getAllUserInDepartmentAndDetailManager:
-          const departmentData = JSON.parse(message.value.toString());
-          console.log("Message receive:::", departmentData);
-          const departmentRequestResultPromises = departmentData.map(
-            async (item) => {
-              return await UserService.getDetailManagerAndTotalStaffInDepartment(
-                item,
-                false
-              );
-            }
-          );
-          const departmentRequestResults = await Promise.all(
-            departmentRequestResultPromises
-          );
-          try {
-            await runProducer(
-              departmentProducerTopic.informationDepartment,
-              departmentRequestResults
-            );
-          } catch (err) {
-            console.log(err);
-          }
-          break;
         case departmentTopicsContinuous.selectManagerToDepartment:
           console.log(
             `${departmentTopicsContinuous.selectManagerToDepartment}`,
@@ -103,27 +57,7 @@ const continuousConsumer = async () => {
             await UserService.update({ id, data });
           }
           break;
-        case emailTopicsContinuous.sendEmailToken:
-          const sendEmailTokenData = JSON.parse(message.value.toString());
-          console.log("Message receive:::", sendEmailTokenData);
-          const emailRequestResultPromises = sendEmailTokenData.map(
-            async (item) => {
-              return await UserService.forgetPassword(item);
-            }
-          );
-          const emailRequestResults = await Promise.all(
-            emailRequestResultPromises
-          );
-          try {
-            await runProducer(
-              emailProducerTopic.sendEmailToken,
-              emailRequestResults
-            );
-          } catch (err) {
-            console.log(err);
-          }
-          break;
-        case uploadTopicsContinuous.uploadAvartarFromLocal: {
+        case uploadTopicsContinuous.uploadAvatarFromLocal: {
           try {
             await UserService.update({
               id: parsedMessage.user_id,
@@ -134,25 +68,6 @@ const continuousConsumer = async () => {
           }
           break;
         }
-        case assignmentTopicsContinuous.getUserInformation:
-          const assignmentRequestResultPromises = parsedMessage.map(
-            async (item) => {
-              return await UserService.detail(item);
-            }
-          );
-          const assignmentRequestResults = await Promise.all(
-            assignmentRequestResultPromises
-          );
-          console.log(assignmentRequestResults);
-          try {
-            runProducer(
-              assignmentProducerTopic.receivedUserInformation,
-              assignmentRequestResults
-            );
-          } catch (err) {
-            console.log(err.message);
-          }
-          break;
         case departmentTopicsContinuous.addStaffIntoDepartment:
           console.log(
             `${departmentTopicsContinuous.addStaffIntoDepartment}`,
@@ -168,24 +83,6 @@ const continuousConsumer = async () => {
           await UserService.removeStaffFromDepartmentHasBeenDeleted(
             parsedMessage
           );
-          break;
-        case activityTopicsContinuous.getUserInformationForActivity:
-          const activityRequestResultPromises = parsedMessage.map(
-            async (item) => {
-              return await UserService.detail(item);
-            }
-          );
-          const activityRequestResults = await Promise.all(
-            activityRequestResultPromises
-          );
-          try {
-            runProducer(
-              activityProducerTopic.receivedInformationActivity,
-              activityRequestResults
-            );
-          } catch (err) {
-            console.log(err.message);
-          }
           break;
         default:
           console.log("Topic không được xử lý:", topic);

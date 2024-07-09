@@ -20,7 +20,7 @@ class EmailController {
   sendEmailToken = async (req, res, next) => {
     new SuccessResponse({
       message: "Send Email Token",
-      data: await this.sendEmailToken(req.body),
+      data: await sendEmailToken(req.body),
     }).send(res);
   };
 }

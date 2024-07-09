@@ -14,7 +14,7 @@ router.post("/get-avatar", asyncHandler(UploadController.getAvatar));
 router.post(
   "/upload-avatar-from-local",
   uploadAvatar.single("file"),
-  asyncHandler(UploadController.uploadAvartarFromLocal)
+  asyncHandler(UploadController.uploadAvatarFromLocal)
 );
 router.post(
   "/upload-file-for-task/:id",

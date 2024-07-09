@@ -1,7 +1,5 @@
 "use strict";
-const userTopicsOnDemand = {
-  receivedInformationActivity: "received-information-activity",
-};
+const userTopicsOnDemand = {};
 const userTopicsContinuous = {};
 
 module.exports = { userTopicsOnDemand, userTopicsContinuous };

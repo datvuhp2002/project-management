@@ -76,12 +76,10 @@ class ProjectService {
     { id }
   ) => {
     let query = [];
-    // Thêm điều kiện phòng ban và trạng thái xoá
     query.push({
       department_id: id,
       deletedMark: false,
     });
-    // Gọi phương thức queryProject với các tham số đã truyền vào
     return await this.queryProject(
       {
         query: query,
@@ -152,14 +150,10 @@ class ProjectService {
       },
     });
     if (deleteProject) {
-      const deleteProjectProperty = await ProjectPropertyService.delete(
-        project_id
-      );
-      if (deleteProjectProperty) return true;
-      await this.restore(project_id);
-      throw new BadRequestError("Xoá dự án không thành công");
+      return true;
     }
-    return null;
+    await this.restore(project_id);
+    throw new BadRequestError("Xoá dự án không thành công");
   };
   // restore project
   static restore = async (project_id) => {
@@ -171,14 +165,10 @@ class ProjectService {
       },
     });
     if (restoreProject) {
-      const restoreProjectProperty = await ProjectPropertyService.restore(
-        project_id
-      );
-      if (restoreProjectProperty) return true;
-      await this.delete(project_id);
-      throw new BadRequestError("Khôi phục dự án không thành công");
+      return true;
     }
-    return null;
+    await this.delete(project_id);
+    throw new BadRequestError("Khôi phục dự án không thành công");
   };
   // upload file to cloud and store it in db
 
@@ -200,17 +190,6 @@ class ProjectService {
       throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
     }
   };
-  // static async uploadFile(project_id, fileData) {
-  //   try {
-  //     const messagePayload = { project_id, ...fileData };
-  //     await runProducer(uploadProducerTopic.uploadFile, messagePayload);
-  //     console.log("Upload request sent:", messagePayload);
-  //   } catch (error) {
-  //     console.error("Failed to send upload request:", error);
-  //     throw new Error("Failed to send upload request");
-  //   }
-  // }
-
   static async update({ project_id, data, modifiedBy }) {
     if (data.document) {
       try {
@@ -231,53 +210,6 @@ class ProjectService {
       select: this.select,
     });
   }
-  // get Image File from cloudinary
-  // static getFileImage = async ({ filename }) => {
-  //   const options = {
-  //     height: 500,
-  //     width: 500,
-  //     format: "jpg",
-  //     quality: "auto",
-  //   };
-  //   try {
-  //     const result = await cloudinary.url(filename, options);
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // static getFile = async ({ filename }) => {
-  //   try {
-  //     const result = await cloudinary.url(filename, { resource_type: "raw" });
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // static deleteFile = async (project_id, { filename }) => {
-  //   const existingProject = await prisma.project.findUnique({
-  //     where: { project_id },
-  //   });
-  //   if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
-  //   try {
-  //     const updatedDocument = existingProject.document.filter(
-  //       (file) => file !== filename
-  //     );
-  //     const uploadFile = await prisma.project.update({
-  //       where: { project_id },
-  //       data: {
-  //         document: updatedDocument,
-  //       },
-  //     });
-  //     if (uploadFile) {
-  //       cloudinary.uploader.destroy(filename);
-  //       return true;
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-  //   }
-  // };
   static queryProject = async (
     { query, items_per_page, page, search, nextPage, previousPage },
     isNotTrash = true

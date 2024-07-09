@@ -5,7 +5,7 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
-const UserLogger = require("./loggers/user.log");
+const UploadLog = require("./loggers/upload.log");
 const initElasticsearch = require("./dbs/init.elasticsearch");
 
 const app = express();
@@ -21,15 +21,13 @@ app.use(express.urlencoded({ extended: true }));
 // initElasticsearch.init({
 //   ELASTICSEARCH_IS_ENABLED: true,
 // });
-// init db
-require(`./dbs/init.dbs`);
 // init routes
 app.use("", require("./routes"));
 // // init logger
 app.use((req, res, next) => {
   const requestId = req.headers.user;
   req.requestId = requestId ? requestId : uuidv4();
-  UserLogger.log(`input params:-:${req.method}:-:`, [
+  UploadLog.log(`input params:-:${req.method}:-:`, [
     req.path,
     { requestId: req.requestId },
     req.method === "POST" ? req.body : req.query,
@@ -42,7 +40,7 @@ app.use((err, req, res, next) => {
   const resMessage = `${err.status}:-:${
     Date.now() - err.now
   }ms:-:Response:${JSON.stringify(err)}`;
-  UserLogger.error(resMessage, [
+  UploadLog.error(resMessage, [
     req.path,
     {
       requestId: req.requestId,

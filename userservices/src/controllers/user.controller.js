@@ -32,6 +32,7 @@ class UserController {
       data: await UserService.findByEmail(req.params.email),
     }).send(res);
   };
+
   /**
    * @param {items_per_page}
    * @param {page}
@@ -143,6 +144,12 @@ class UserController {
         req.body,
         req.params.id
       ),
+    }).send(res);
+  };
+  getAllStaffByUserIds = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Danh sách nhân viên",
+      data: await UserService.getAllStaffByUserIds(req.query, req.body),
     }).send(res);
   };
   // uploadImageFromUrl = async (req, res, next) => {

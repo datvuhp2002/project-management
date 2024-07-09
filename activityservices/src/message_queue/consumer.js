@@ -1,7 +1,6 @@
 "use strict";
 const { Kafka } = require("kafkajs");
 const { convertObjectToArray } = require("../utils/index");
-const { userTopicsContinuous } = require("../configs/kafkaUserTopic");
 const { taskTopicsContinuous } = require("../configs/kafkaTaskTopic");
 const ActivityServices = require("../services/activity.service");
 const kafka = new Kafka({
@@ -13,10 +12,6 @@ const consumer = kafka.consumer({ groupId: "activity-continuous-group" });
 const continuousConsumer = async () => {
   await consumer.connect();
   await consumer.subscribe({
-    topics: convertObjectToArray(userTopicsContinuous),
-    fromBeginning: false,
-  });
-  await consumer.subscribe({
     topics: convertObjectToArray(taskTopicsContinuous),
     fromBeginning: false,
   });
@@ -27,13 +22,13 @@ const continuousConsumer = async () => {
       switch (topic) {
         case taskTopicsContinuous.taskCreated: {
           const { createdBy, description, ...data } = parsedMessage;
-          data.description = `Task '${description}' đã được tạo bởi: ${createdBy}`;
+          data.description = `Task '${description}' đã được tạo.`;
           await ActivityServices.create(data, createdBy);
           break;
         }
         case taskTopicsContinuous.taskUpdated: {
           const { modifiedBy, description, ...data } = parsedMessage;
-          data.description = `Task '${description}' đã được cập nhật bởi: ${modifiedBy}`;
+          data.description = `Task '${description}' đã được cập nhật.`;
           await ActivityServices.create(data, modifiedBy);
           break;
         }

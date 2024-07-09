@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package upload;
+
+service UploadService {
+  rpc getAvatar(getAvatarRequest) returns (getAvatarResponse);
+}
+
+message getAvatarRequest{
+  string avatar = 1;
+}
+
+message getAvatarResponse{
+  string avatar = 1;
+}
+

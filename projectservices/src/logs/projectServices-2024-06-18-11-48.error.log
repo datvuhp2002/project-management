@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-18T04:48:48.963Z","context":"/services/api/project/admin/getAll/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"projectDataReceived is not defined"},"requestId":"666bc4521bf13c5ab96bac15","timestamp":"2024-06-18 11:48:963 AM"}

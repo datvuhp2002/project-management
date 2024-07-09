@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-26T09:46:47.604Z","context":"/services/api/project/detail/663bbb4d6bd84b4b3cc75e69","ecs.version":"8.10.0","log.level":"error","message":"404:-:NaNms:-:Response:{\"status\":404}","metadata":{"message":"No project found"},"requestId":"667bc0baff3bc38af2f21e74","timestamp":"2024-06-26 04:46:604 PM"}

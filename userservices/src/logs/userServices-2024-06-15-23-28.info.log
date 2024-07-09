@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-15T16:28:49.067Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"400:-:1ms:-:Response:{\"status\":400,\"now\":1718468929063}","metadata":{"message":"Thiếu tham số bắt buộc - avatarPath"},"requestId":"19e53990-d6ae-4911-864f-43a67461fdce"}
