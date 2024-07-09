@@ -12,7 +12,6 @@ const ProjectService = require("../services/project.service");
 const ClientService = require("../services/client.service");
 const { runProducer } = require("../message_queue/producer");
 
-
 const kafka = new Kafka({
   clientId: "project-services",
   brokers: [process.env.KAFKA_BROKER],
@@ -49,7 +48,7 @@ const continuousConsumer = async () => {
               parsedMessage.file
             );
             break;
-          case uploadTopicsContinuous.uploadAvartarClient:
+          case uploadTopicsContinuous.uploadAvatarClient:
             console.log(parsedMessage);
             await ClientService.update(
               parsedMessage.client_id,

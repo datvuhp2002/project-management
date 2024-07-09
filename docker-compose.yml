@@ -422,16 +422,16 @@ services:
       - kafka
     networks:
       - kafka-network
-  # projectmanagementwebui:
-  #   platform: linux/amd64
+  projectmanagementwebui:
+    platform: linux/amd64
 
-  #   image: chicong42/projectmanagementwebui
-  #   environment:
-  #     - VITE_REQUEST_API_URL=gateway:3050
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - kafka-network
+    image: chicong42/projectmanagementwebui
+    environment:
+      - VITE_REQUEST_API_URL=https://677a-118-70-171-240.ngrok-free.app
+    ports:
+      - "3000:3000"
+    networks:
+      - kafka-network
 volumes:
   esdata:
     driver: local

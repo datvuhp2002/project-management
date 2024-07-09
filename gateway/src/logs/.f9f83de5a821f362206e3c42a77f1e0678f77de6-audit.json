@@ -6,16 +6,6 @@
     "auditLog": "src/logs/.f9f83de5a821f362206e3c42a77f1e0678f77de6-audit.json",
     "files": [
         {
-            "date": 1719112321406,
-            "name": "src/logs/gateway-2024-06-23-10-12.info.log",
-            "hash": "2d0b4a9fe2e843815c5620d72e7f38fb8b3a1600570f59c3e2de29d2ff22c122"
-        },
-        {
-            "date": 1719279541416,
-            "name": "src/logs/gateway-2024-06-25-08-39.info.log",
-            "hash": "5d16efdfca82e0e86ee4792abb1612483069d0dbff64a969271933a44d31d397"
-        },
-        {
             "date": 1719327780766,
             "name": "src/logs/gateway-2024-06-25-22-03.info.log",
             "hash": "269609ee0fe06db690b1809568daf4535e963081dcc7ca3deb13451159728db4"
@@ -49,6 +39,26 @@
             "date": 1719386020571,
             "name": "src/logs/gateway-2024-06-26-14-13.info.log",
             "hash": "2c6de175728be0a3541d693dffc319c5ec5a212058f09576bdb87d6c73ba6970"
+        },
+        {
+            "date": 1719916297072,
+            "name": "src\\logs\\gateway-2024-07-02-17-31.info.log",
+            "hash": "ca6c7d4ad56ab37bd473b0666701656ef844f78d059a931271996ff48e0a9cd4"
+        },
+        {
+            "date": 1720150822469,
+            "name": "src\\logs\\gateway-2024-07-05-10-40.info.log",
+            "hash": "6f8e4c0d96c40435599dff592aece4cab06464b670e95bc26442b7bcc1bd2190"
+        },
+        {
+            "date": 1720151126757,
+            "name": "src\\logs\\gateway-2024-07-05-10-45.info.log",
+            "hash": "3fce9eed4f2f85b68041cf447b3ee96f246efef0bd98c53bac83d2e83a4ec049"
+        },
+        {
+            "date": 1720490503005,
+            "name": "src\\logs\\gateway-2024-07-09-09-01.info.log",
+            "hash": "ea0a106d6605e92229de3e9bcfb143662eb9b0efc276e2082f456123fa59fa27"
         }
     ],
     "hashType": "sha256"

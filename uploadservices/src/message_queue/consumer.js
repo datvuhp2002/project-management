@@ -48,7 +48,7 @@ const continuousConsumer = async () => {
         const parsedMessage = JSON.parse(message.value.toString());
         console.log("Before handle :::", parsedMessage);
         switch (topic) {
-          case userTopicsContinuous.uploadAvartarFromLocal:
+          case userTopicsContinuous.uploadAvatarFromLocal:
             console.log(
               `Produced message to update avatar for user ID ${parsedMessage.user_id}`
             );
@@ -71,8 +71,8 @@ const continuousConsumer = async () => {
               `Produced message to update file for project ID ${parsedMessage.project_id}`
             );
             break;
-          case projectTopicsContinuous.uploadAvartarClient:
-            await runProducer(projectTopicsContinuous.uploadAvartarClient, {
+          case projectTopicsContinuous.uploadAvatarClient:
+            await runProducer(projectTopicsContinuous.uploadAvatarClient, {
               id: parsedMessage.client_id,
               file: parsedMessage.file,
             });
