@@ -32,7 +32,6 @@ class ActivityService {
     createdBy
   ) => {
     let query = [];
-    console.log(task_id);
     if (target && target == "user") {
       query.push({
         createdBy,

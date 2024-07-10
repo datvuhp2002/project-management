@@ -1,6 +1,5 @@
 const {
   uploadTopicsContinuous,
-  uploadTopicsOnDemand,
 } = require("./consumer/upload.consumer.topic.config");
 const {
   uploadProducerTopic,
@@ -8,6 +7,5 @@ const {
 
 module.exports = {
   uploadTopicsContinuous,
-  uploadTopicsOnDemand,
   uploadProducerTopic,
 };

@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-21T06:42:03.368Z","context":"/services/api/user/findByEmail/detectiveduongz@gmail.com","ecs.version":"8.10.0","log.level":"info","message":"input params:-:GET:-:","metadata":{},"requestId":"1c7887f3-8731-490b-acfc-3b04f5237f51","timestamp":"2024-06-21 01:42:368 PM"}

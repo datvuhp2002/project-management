@@ -20,7 +20,7 @@ const {
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
 
-const { GetAllUserFromProject } = require("./grpcClient.services");
+const { GetAllUserFromProject, GetAvatar } = require("./grpcClient.services");
 class UserService {
   static select = {
     user_id: true,
@@ -72,15 +72,6 @@ class UserService {
     return newUser;
   };
 
-  // static async forgetPassword({ email = null, captcha = null }) {
-  //   const holderUser = await prisma.user.findFirst({ where: { email } });
-  //   if (!holderUser) {
-  //     throw new NotFoundError("User not found");
-  //   }
-  //   // Gửi thông điệp tới emailServices
-  //   await sendEmailToken({ email });
-  //   return true;
-  // }
   static async forgetPassword({ email = null, captcha = null }) {
     const holderUser = await prisma.user.findFirst({ where: { email } });
     // return holderUser;
@@ -165,23 +156,33 @@ class UserService {
   // get All Staff in department for Manager
   static getAllStaffInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage, role = null },
-    { department_id, manager_id },
     userId
   ) => {
     let query = [];
     let listUser;
-    if (manager_id !== userId)
-      throw new AuthFailureError(
-        "Đây không phải phòng ban bạn của bạn, vui lòng rời đi."
-      );
+    const userDepartment = await prisma.user.findUnique({
+      where: { user_id: userId },
+      select: {
+        department_id: true,
+      },
+    });
+    if (
+      userDepartment.department_id == null ||
+      userDepartment.department_id == undefined
+    ) {
+      throw new BadRequestError("Bạn chưa có phòng ban!");
+    }
     if (role) {
       const role_data = await RoleService.findByName(role);
       listUser = await prisma.user.findMany({
-        where: { department_id, role_id: role_data.role_id },
+        where: {
+          department_id: userDepartment.department_id,
+          role_id: role_data.role_id,
+        },
       });
     } else {
       listUser = await prisma.user.findMany({
-        where: { department_id },
+        where: { department_id: userDepartment.department_id },
       });
     }
     query.push({
@@ -372,7 +373,7 @@ class UserService {
       managerInformation = await this.detailManager(manager_id);
       if (managerInformation) {
         if (managerInformation.avatar) {
-          managerInformation.avatar = await this.getAvatar(
+          managerInformation.avatar = await GetAvatar(
             managerInformation.avatar
           );
         }
@@ -421,6 +422,10 @@ class UserService {
       where: { user_id: id },
       select: this.select,
     });
+    if (detailUser.avatar) {
+      const avatar = await GetAvatar(detailUser.avatar);
+      detailUser.avatar = avatar;
+    }
     if (!detailUser) throw new NotFoundError("User not found");
     return detailUser;
   };
@@ -432,24 +437,6 @@ class UserService {
     });
     return detailUser;
   };
-  // static uploadAvartarFromLocal = async ({ id, data }) => {
-  //   console.log("id:::", id);
-  //   console.log("avatarFileName:::", data.avatar);
-  //   try {
-  //     const message = {
-  //       user_id: id,
-  //       avatar: data.avatar,
-  //     };
-  //     const result = await runProducer(
-  //       uploadProducerTopic.uploadAvartarFromLocal,
-  //       message
-  //     );
-  //     return result;
-  //   } catch (error) {
-  //     console.error("Error uploading user avatar to Kafka:", error);
-  //     throw error;
-  //   }
-  // };
   //update user information
   static update = async ({ id, data }) => {
     if (data.avatar) {
@@ -457,30 +444,25 @@ class UserService {
         const updatedUser = await prisma.user.update({
           where: { user_id: id },
           data,
-          select: this.select,
         });
         return updatedUser;
       } catch (err) {
-        cloudinary.uploader.destroy(data.avatar);
         throw new BadRequestError(
           "Cập nhật không thành công, vui lòng thử lại."
         );
       }
     }
-
     const { role, ...updateUserData } = data;
     if (role) {
       const role_data = await RoleService.findByName(role);
       if (!role_data) throw new BadRequestError("Role not found");
       updateUserData.role_id = role_data.role_id;
     }
-
     const updatedUser = await prisma.user.update({
       where: { user_id: id },
       data: updateUserData,
       select: this.select,
     });
-
     if (updatedUser) return updatedUser;
     throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
   };
@@ -525,53 +507,7 @@ class UserService {
     await this.delete(user_id);
     return null;
   };
-  // static async uploadImageFromLocal(data) {
-  //   const result = await uploadServices.uploadImageFromLocal(data);
-  //   await runProducer(uploadProducerTopic.uploadImageFromLocal, result);
-  //   return result;
-  // }
 
-  // static async uploadAvatarFromLocal(userId, avatarFileName) {
-  //   try {
-  //     const message = {
-  //       userId: userId,
-  //       avatarFileName: avatarFileName,
-  //     };
-  //     await runProducer(uploadProducerTopic.uploadAvatarFromLocal, message);
-  //     return null;
-  //   } catch (error) {
-  //     console.error("Error uploading user avatar to Kafka:", error);
-  //     throw error;
-  //   }
-  // }
-
-  // static async uploadImageFromLocalFile(file) {
-  //   const result = await uploadServices.uploadImageFromLocalFile(file);
-  //   await runProducer(uploadProducerTopic.uploadImageFromLocalFile, result);
-  //   return result;
-  // }
-
-  // get avatar by public id
-  // static getAvatar = async (avatar) => {
-  //   // Return colors in the response
-  //   const options = {
-  //     height: 100,
-  //     width: 100,
-  //     format: "jpg",
-  //   };
-  //   try {
-  //     const result = await cloudinary.url(avatar, options);
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // // delete avatar in cloud
-  // static deleteAvatarInCloud = async (avatar, user_id) => {
-  //   // Return colors in the response
-  //   await prisma.user.update({ where: { user_id }, data: { avatar: null } });
-  //   return await cloudinary.uploader.destroy(avatar);
-  // };
   static queryUser = async ({
     query,
     items_per_page,
@@ -618,6 +554,15 @@ class UserService {
         createdAt: "desc",
       },
     });
+    const getUsersAvatar = users.map(async (user) => {
+      if (user.avatar) {
+        console.log(user.avatar);
+        const avatar = await GetAvatar(user.avatar);
+        console.log(avatar);
+        user.avatar = avatar;
+      }
+    });
+    await Promise.all(getUsersAvatar);
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;

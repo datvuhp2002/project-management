@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-24T09:48:06.967Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"userId is not defined"},"requestId":"41b4b526-db5a-4b57-91a8-b9ff562e8d38"}

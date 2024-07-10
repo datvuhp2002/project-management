@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-21T07:35:32.804Z","context":"/services/api/email/verify-token/","ecs.version":"8.10.0","log.level":"error","message":"404:-:0ms:-:Response:{\"status\":404,\"now\":1718955332800}","metadata":{"message":"Mã không đúng hoặc đã hết hạn, vui lòng thử lại"},"requestId":"eb35a433-27c6-4b01-a88a-ec0c7e7af436","timestamp":"2024-06-21 02:35:804 PM"}

@@ -12,6 +12,8 @@ const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const { uploadProducerTopic } = require("../configs/kafkaUploadTopic");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
+  getUser,
+  getAllUserProject,
 } = require("./grpcClient.services");
 class ProjectService {
   static select = {
@@ -27,7 +29,6 @@ class ProjectService {
     createdBy: true,
     modifiedBy: true,
     createdAt: true,
-    project_id: true,
     project_manager_id: true,
     department_id: true,
     client_ownership: true,
@@ -69,19 +70,72 @@ class ProjectService {
       true
     );
   };
-
+  static getAllInfoProjectInDepartment = async (
+    { items_per_page, page, search, nextPage, previousPage },
+    { id }
+  ) => {
+    let query = [];
+    query.push({
+      department_id: id,
+      deletedMark: false,
+    });
+    const select = {
+      project_id: true,
+      name: true,
+      projectCode: true,
+      description: true,
+      project_manager_id: true,
+    };
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      false,
+      select
+    );
+  };
   // get all projects in department
   static getAllProjectInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage },
     { id }
   ) => {
     let query = [];
-    // Thêm điều kiện phòng ban và trạng thái xoá
     query.push({
       department_id: id,
       deletedMark: false,
     });
-    // Gọi phương thức queryProject với các tham số đã truyền vào
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
+  };
+  static getAllUserProjectInDepartment = async (
+    { items_per_page, page, search, nextPage, previousPage },
+    department_id,
+    user_id
+  ) => {
+    let query = [];
+    query.push({
+      department_id,
+      deletedMark: false,
+    });
+    const data = await getAllUserProject(user_id);
+    if (data.length === 0) return "Bạn chưa có dự án";
+    query.push({
+      project_id: { in: data },
+    });
     return await this.queryProject(
       {
         query: query,
@@ -152,14 +206,10 @@ class ProjectService {
       },
     });
     if (deleteProject) {
-      const deleteProjectProperty = await ProjectPropertyService.delete(
-        project_id
-      );
-      if (deleteProjectProperty) return true;
-      await this.restore(project_id);
-      throw new BadRequestError("Xoá dự án không thành công");
+      return true;
     }
-    return null;
+    await this.restore(project_id);
+    throw new BadRequestError("Xoá dự án không thành công");
   };
   // restore project
   static restore = async (project_id) => {
@@ -171,14 +221,10 @@ class ProjectService {
       },
     });
     if (restoreProject) {
-      const restoreProjectProperty = await ProjectPropertyService.restore(
-        project_id
-      );
-      if (restoreProjectProperty) return true;
-      await this.delete(project_id);
-      throw new BadRequestError("Khôi phục dự án không thành công");
+      return true;
     }
-    return null;
+    await this.delete(project_id);
+    throw new BadRequestError("Khôi phục dự án không thành công");
   };
   // upload file to cloud and store it in db
 
@@ -200,17 +246,6 @@ class ProjectService {
       throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
     }
   };
-  // static async uploadFile(project_id, fileData) {
-  //   try {
-  //     const messagePayload = { project_id, ...fileData };
-  //     await runProducer(uploadProducerTopic.uploadFile, messagePayload);
-  //     console.log("Upload request sent:", messagePayload);
-  //   } catch (error) {
-  //     console.error("Failed to send upload request:", error);
-  //     throw new Error("Failed to send upload request");
-  //   }
-  // }
-
   static async update({ project_id, data, modifiedBy }) {
     if (data.document) {
       try {
@@ -231,56 +266,10 @@ class ProjectService {
       select: this.select,
     });
   }
-  // get Image File from cloudinary
-  // static getFileImage = async ({ filename }) => {
-  //   const options = {
-  //     height: 500,
-  //     width: 500,
-  //     format: "jpg",
-  //     quality: "auto",
-  //   };
-  //   try {
-  //     const result = await cloudinary.url(filename, options);
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // static getFile = async ({ filename }) => {
-  //   try {
-  //     const result = await cloudinary.url(filename, { resource_type: "raw" });
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // static deleteFile = async (project_id, { filename }) => {
-  //   const existingProject = await prisma.project.findUnique({
-  //     where: { project_id },
-  //   });
-  //   if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
-  //   try {
-  //     const updatedDocument = existingProject.document.filter(
-  //       (file) => file !== filename
-  //     );
-  //     const uploadFile = await prisma.project.update({
-  //       where: { project_id },
-  //       data: {
-  //         document: updatedDocument,
-  //       },
-  //     });
-  //     if (uploadFile) {
-  //       cloudinary.uploader.destroy(filename);
-  //       return true;
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-  //   }
-  // };
   static queryProject = async (
     { query, items_per_page, page, search, nextPage, previousPage },
-    isNotTrash = true
+    isNotTrash = true,
+    anotherSelected
   ) => {
     const searchKeyword = search || "";
     let itemsPerPage = 10;
@@ -314,7 +303,7 @@ class ProjectService {
     const projects = await prisma.project.findMany({
       take: itemsPerPage,
       skip,
-      select: this.select,
+      select: anotherSelected || this.select,
       where: whereClause,
       orderBy: {
         createdAt: "desc",
@@ -325,6 +314,10 @@ class ProjectService {
         const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
           project.project_id
         );
+        const projectManagerInformation = await getUser(
+          project.project_manager_id
+        );
+        project.project_manager = projectManagerInformation;
         project.total_staff = result.total_staff;
         project.total_task = {
           total_task_is_done: result.total_task_is_done,

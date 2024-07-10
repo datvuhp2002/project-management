@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-24T10:03:13.418Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"UserService.uploadAvartarFromLocal is not a function"},"requestId":"186c49f6-660d-41f5-8b40-582d2dffbe06"}

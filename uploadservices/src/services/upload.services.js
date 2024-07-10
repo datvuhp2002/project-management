@@ -5,7 +5,7 @@ const cloudinary = require("../configs/cloudinary.config");
 const { BadRequestError } = require("../core/error.response");
 const { publicDecrypt } = require("crypto");
 
-const getfile = async (filename) => {
+const getFile = async (filename) => {
   try {
     const result = await cloudinary.url(filename, { resource_type: "raw" });
     return result;
@@ -14,14 +14,11 @@ const getfile = async (filename) => {
   }
 };
 const getAvatar = async ({ avatar }) => {
-  console.log(avatar);
-  // Return colors in the response
   const options = {
     format: "jpg",
   };
   try {
     const result = await cloudinary.url(avatar, options);
-    console.log(result);
     return result;
   } catch (error) {
     console.error(error);
@@ -40,7 +37,7 @@ const getFileImage = async ({ filename }) => {
   }
 };
 module.exports = {
-  getfile,
+  getFile,
   getFileImage,
   getAvatar,
 };

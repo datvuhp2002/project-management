@@ -15,19 +15,19 @@ const {
   taskProducerTopic,
 } = require("../configs/kafkaTaskTopic/producer/task.producer.topic.config");
 const {
-  getfile,
+  getFile,
   getFileImage,
   getAvatar,
 } = require("../services/upload.services");
 class UserController {
-  uploadAvartarFromLocal = async (req, res, next) => {
+  uploadAvatarFromLocal = async (req, res, next) => {
     try {
       const { file } = req;
       if (!file) {
         throw new BadRequestError("File is missing");
       }
       try {
-        await runProducer(userProducerTopic.uploadAvartarFromLocal, {
+        await runProducer(userProducerTopic.uploadAvatarFromLocal, {
           file: file.filename,
           user_id: req.headers.user,
         });
@@ -74,7 +74,7 @@ class UserController {
       if (!file) {
         throw new BadRequestError("File is missing");
       }
-      await runProducer(projectProducerTopic.uploadAvartarClient, {
+      await runProducer(projectProducerTopic.uploadAvatarClient, {
         file: file.filename,
         client_id: req.params.id,
         modifiedBy: req.headers.user,
@@ -114,7 +114,7 @@ class UserController {
   getFile = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy file về thành công",
-      data: await getfile(req.body.file),
+      data: await getFile(req.body.file),
     }).send(res);
   };
   getFileImage = async (req, res, next) => {

@@ -427,5 +427,17 @@ class AssignmentService {
     }
     return null;
   };
+  static getAllUserProject = async (user_id) => {
+    const list_project = await prisma.assignment.findMany({
+      where: { user_id },
+    });
+    if (list_project) {
+      const projectIds = list_project.map((item) => item.project_id);
+      const uniqueProjectIds = [...new Set(projectIds)];
+      return uniqueProjectIds;
+    } else {
+      return null;
+    }
+  };
 }
 module.exports = AssignmentService;

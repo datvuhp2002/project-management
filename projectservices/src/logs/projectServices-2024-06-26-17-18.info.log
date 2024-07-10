@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-26T10:18:17.231Z","context":"/services/api/project/client/admin/getAll/","ecs.version":"8.10.0","log.level":"info","message":"input params:-:GET:-:","metadata":{},"requestId":"667bc0baff3bc38af2f21e74","timestamp":"2024-06-26 05:18:231 PM"}

@@ -1,6 +1,4 @@
 "use strict";
-const userProducerTopic = {
-  getUserInformationForActivity: "get-user-information-for-activity",
-};
+const userProducerTopic = {};
 
 module.exports = { userProducerTopic };

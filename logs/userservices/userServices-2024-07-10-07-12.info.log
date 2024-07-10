@@ -1,0 +1,1 @@
+{"@timestamp":"2024-07-10T07:12:01.354Z","context":"/services/api/user/getAllStaffInDepartment/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"department_id is not defined"},"requestId":"d2351f02-f881-441c-aad1-984b7b14e2c7"}
