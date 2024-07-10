@@ -22,15 +22,7 @@ const continuousConsumer = async () => {
   const consumer = kafka.consumer({ groupId: "user-continuous-group" });
   await consumer.connect();
   await consumer.subscribe({
-    topics: convertObjectToArray(gatewayTopics),
-    fromBeginning: true,
-  });
-  await consumer.subscribe({
     topics: convertObjectToArray(departmentTopicsContinuous),
-    fromBeginning: false,
-  });
-  await consumer.subscribe({
-    topics: convertObjectToArray(assignmentTopicsContinuous),
     fromBeginning: false,
   });
   await consumer.subscribe({

@@ -156,23 +156,33 @@ class UserService {
   // get All Staff in department for Manager
   static getAllStaffInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage, role = null },
-    { department_id, manager_id },
     userId
   ) => {
     let query = [];
     let listUser;
-    if (manager_id !== userId)
-      throw new AuthFailureError(
-        "Đây không phải phòng ban bạn của bạn, vui lòng rời đi."
-      );
+    const userDepartment = await prisma.user.findUnique({
+      where: { user_id: userId },
+      select: {
+        department_id: true,
+      },
+    });
+    if (
+      userDepartment.department_id == null ||
+      userDepartment.department_id == undefined
+    ) {
+      throw new BadRequestError("Bạn chưa có phòng ban!");
+    }
     if (role) {
       const role_data = await RoleService.findByName(role);
       listUser = await prisma.user.findMany({
-        where: { department_id, role_id: role_data.role_id },
+        where: {
+          department_id: userDepartment.department_id,
+          role_id: role_data.role_id,
+        },
       });
     } else {
       listUser = await prisma.user.findMany({
-        where: { department_id },
+        where: { department_id: userDepartment.department_id },
       });
     }
     query.push({
@@ -360,7 +370,14 @@ class UserService {
       { department_id }
     );
     if (manager_id) {
-      managerInformation = await this.detail(manager_id);
+      managerInformation = await this.detailManager(manager_id);
+      if (managerInformation) {
+        if (managerInformation.avatar) {
+          managerInformation.avatar = await GetAvatar(
+            managerInformation.avatar
+          );
+        }
+      }
     } else {
       managerInformation = null;
     }
@@ -410,6 +427,14 @@ class UserService {
       detailUser.avatar = avatar;
     }
     if (!detailUser) throw new NotFoundError("User not found");
+    return detailUser;
+  };
+  static detailManager = async (id) => {
+    if (id === null || id === undefined) return null;
+    const detailUser = await prisma.user.findUnique({
+      where: { user_id: id, deletedMark: false },
+      select: this.select,
+    });
     return detailUser;
   };
   //update user information

@@ -1,0 +1,120 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.fb184230a43dc5db114ccc47fbf4079951606c0e-audit.json",
+    "files": [
+        {
+            "date": 1720495577939,
+            "name": "src/logs/gateway-2024-07-09-03-26.error.log",
+            "hash": "c12d351d3c84e2716037a824027411a91d746512814f56c430d7e3155da6dc0c"
+        },
+        {
+            "date": 1720495649685,
+            "name": "src/logs/gateway-2024-07-09-03-27.error.log",
+            "hash": "9b5e107b196eb11ebe4b5398ba21a13b8378c9d52681b7ebef7b0441bb26787f"
+        },
+        {
+            "date": 1720496631235,
+            "name": "src/logs/gateway-2024-07-09-03-43.error.log",
+            "hash": "82db6cceec56ee028a03b00fae91136f5ec62f9a2175d55acb455cff22a803ae"
+        },
+        {
+            "date": 1720496822175,
+            "name": "src/logs/gateway-2024-07-09-03-47.error.log",
+            "hash": "3ffce152a48033dd0997f7e87f70fc4330a2b2cb307b0aacacccb8fb7557ff45"
+        },
+        {
+            "date": 1720496974231,
+            "name": "src/logs/gateway-2024-07-09-03-49.error.log",
+            "hash": "9d66a553905764cc754bc7fd8577bfcc5c99b00c7fe17758240c81ff41c998a0"
+        },
+        {
+            "date": 1720497043284,
+            "name": "src/logs/gateway-2024-07-09-03-50.error.log",
+            "hash": "335795227a15a0585dbcd365e4b4713653a9e51cc346fd69bee832114ecd2701"
+        },
+        {
+            "date": 1720498221157,
+            "name": "src/logs/gateway-2024-07-09-04-10.error.log",
+            "hash": "a6dade23bc3e963614a0d437e056c5de432e3220d17613ecae050c4ca8d866a2"
+        },
+        {
+            "date": 1720507811748,
+            "name": "src/logs/gateway-2024-07-09-06-50.error.log",
+            "hash": "9fce9ebb846dd5703e7c585eb2c8cf34a61e1e95bd5537f6f6e3fa31fb739500"
+        },
+        {
+            "date": 1720510508087,
+            "name": "src/logs/gateway-2024-07-09-07-35.error.log",
+            "hash": "ff44288579c49046461e3a547e12ce96479b8364b8bc1f1704c0484d70d356e2"
+        },
+        {
+            "date": 1720510598498,
+            "name": "src/logs/gateway-2024-07-09-07-36.error.log",
+            "hash": "15b6d5700cda6ea2cd3d3af1425f8f8b931032c42b91caff34303123a213fe90"
+        },
+        {
+            "date": 1720594915555,
+            "name": "src/logs/gateway-2024-07-10-07-01.error.log",
+            "hash": "702a53e350ce8e312489c9690a24a06d969d4decba771cb1060483150f59a108"
+        },
+        {
+            "date": 1720594989611,
+            "name": "src/logs/gateway-2024-07-10-07-03.error.log",
+            "hash": "30585c196460a1f6186b00f5f59bd41d5838c561cc8815889f8bc10087ffafbe"
+        },
+        {
+            "date": 1720595464292,
+            "name": "src/logs/gateway-2024-07-10-07-11.error.log",
+            "hash": "7f9a01cce6de7da21e4061d20ce9d81074a2baa72dcebc4a9d618807b0e2ff82"
+        },
+        {
+            "date": 1720595879544,
+            "name": "src/logs/gateway-2024-07-10-07-17.error.log",
+            "hash": "b3a387fb55954c27a2fb835c7cb6e35db4b29dda95071e3ab66639407e1c6648"
+        },
+        {
+            "date": 1720596032651,
+            "name": "src/logs/gateway-2024-07-10-07-20.error.log",
+            "hash": "0e3d8818f79088c4c24938a71f0733d74172467f9c23f663fd87492a552678e2"
+        },
+        {
+            "date": 1720596148427,
+            "name": "src/logs/gateway-2024-07-10-07-22.error.log",
+            "hash": "7835bbfc454ec5e8a0227e918bf06de158dc17c012f01831994cbd80687acb35"
+        },
+        {
+            "date": 1720596188680,
+            "name": "src/logs/gateway-2024-07-10-07-23.error.log",
+            "hash": "deac23ea3806d8140eb0c17af8881d34b24270b6dc3621883e6240e0e383f9cc"
+        },
+        {
+            "date": 1720596326481,
+            "name": "src/logs/gateway-2024-07-10-07-25.error.log",
+            "hash": "876f005592d76ae89f930cb3e5da21f7f3a5b407da72f57966fe9053979eed74"
+        },
+        {
+            "date": 1720596699081,
+            "name": "src/logs/gateway-2024-07-10-07-31.error.log",
+            "hash": "10c1f5cfec8c2ff1e180113dfd716f7519f0120f19a5c3f5ae539df728ed4733"
+        },
+        {
+            "date": 1720604429086,
+            "name": "src/logs/gateway-2024-07-10-09-40.error.log",
+            "hash": "d378ddcaf78687dcc73aea75ef5d864aee452140f6d181ee777adc89547b1726"
+        },
+        {
+            "date": 1720604553969,
+            "name": "src/logs/gateway-2024-07-10-09-42.error.log",
+            "hash": "c3227b16f0e207a7e697bd4a20d9dfb2621391d111d5dceae1af488942875f89"
+        },
+        {
+            "date": 1720605672983,
+            "name": "src/logs/gateway-2024-07-10-10-01.error.log",
+            "hash": "a0e854903e606516b3bec88bfc47dd0f7ae0e746b006791b675dd0cd08788d1c"
+        }
+    ],
+    "hashType": "sha256"
+}

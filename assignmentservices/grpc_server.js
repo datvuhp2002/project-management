@@ -5,6 +5,7 @@ const {
   getAllTaskFromProject,
   getAllUserFromProject,
   getTotalTaskWithStatusFromProjectAndTotalStaff,
+  getAllUserProject,
 } = require("./src/services/grpc.service");
 const path = require("path");
 
@@ -26,6 +27,7 @@ function startGrpcServer() {
     getAllTaskFromProject,
     getAllUserFromProject,
     getTotalTaskWithStatusFromProjectAndTotalStaff,
+    getAllUserProject,
   });
   const host = "0.0.0.0";
   const port = process.env.GRPC_PORT;

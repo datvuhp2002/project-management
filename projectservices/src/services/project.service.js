@@ -12,6 +12,8 @@ const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const { uploadProducerTopic } = require("../configs/kafkaUploadTopic");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
+  getUser,
+  getAllUserProject,
 } = require("./grpcClient.services");
 class ProjectService {
   static select = {
@@ -27,7 +29,6 @@ class ProjectService {
     createdBy: true,
     modifiedBy: true,
     createdAt: true,
-    project_id: true,
     project_manager_id: true,
     department_id: true,
     client_ownership: true,
@@ -69,7 +70,35 @@ class ProjectService {
       true
     );
   };
-
+  static getAllInfoProjectInDepartment = async (
+    { items_per_page, page, search, nextPage, previousPage },
+    { id }
+  ) => {
+    let query = [];
+    query.push({
+      department_id: id,
+      deletedMark: false,
+    });
+    const select = {
+      project_id: true,
+      name: true,
+      projectCode: true,
+      description: true,
+      project_manager_id: true,
+    };
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      false,
+      select
+    );
+  };
   // get all projects in department
   static getAllProjectInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage },
@@ -79,6 +108,33 @@ class ProjectService {
     query.push({
       department_id: id,
       deletedMark: false,
+    });
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
+  };
+  static getAllUserProjectInDepartment = async (
+    { items_per_page, page, search, nextPage, previousPage },
+    department_id,
+    user_id
+  ) => {
+    let query = [];
+    query.push({
+      department_id,
+      deletedMark: false,
+    });
+    const data = await getAllUserProject(user_id);
+    if (data.length === 0) return "Bạn chưa có dự án";
+    query.push({
+      project_id: { in: data },
     });
     return await this.queryProject(
       {
@@ -212,7 +268,8 @@ class ProjectService {
   }
   static queryProject = async (
     { query, items_per_page, page, search, nextPage, previousPage },
-    isNotTrash = true
+    isNotTrash = true,
+    anotherSelected
   ) => {
     const searchKeyword = search || "";
     let itemsPerPage = 10;
@@ -246,7 +303,7 @@ class ProjectService {
     const projects = await prisma.project.findMany({
       take: itemsPerPage,
       skip,
-      select: this.select,
+      select: anotherSelected || this.select,
       where: whereClause,
       orderBy: {
         createdAt: "desc",
@@ -257,6 +314,10 @@ class ProjectService {
         const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
           project.project_id
         );
+        const projectManagerInformation = await getUser(
+          project.project_manager_id
+        );
+        project.project_manager = projectManagerInformation;
         project.total_staff = result.total_staff;
         project.total_task = {
           total_task_is_done: result.total_task_is_done,

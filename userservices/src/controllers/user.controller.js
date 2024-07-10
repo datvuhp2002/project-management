@@ -56,7 +56,10 @@ class UserController {
   getAllStaffInDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách người dùng thành công",
-      data: await UserService.getAllStaffInDepartment(req.query, req.body),
+      data: await UserService.getAllStaffInDepartment(
+        req.query,
+        req.headers.user
+      ),
     }).send(res);
   };
   getAllStaffInProject = async (req, res, next) => {

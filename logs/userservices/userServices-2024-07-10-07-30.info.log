@@ -1,0 +1,1 @@
+{"@timestamp":"2024-07-10T07:30:04.828Z","context":"/services/api/user/getAllStaffInDepartment/","ecs.version":"8.10.0","log.level":"error","message":"400:-:2ms:-:Response:{\"status\":400,\"now\":1720596604824}","metadata":{"message":"Bạn chưa có phòng ban!"},"requestId":"aa93b13e-5884-47cc-8048-0ea9fb2bc6dd"}

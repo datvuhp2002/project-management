@@ -291,6 +291,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50055
+      - USER_GRPC_PORT=userservices:50053
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
       - LOKI_HOST=http://loki:3100
     volumes:
