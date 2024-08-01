@@ -120,6 +120,12 @@ class UserController {
       data: await UserService.delete(req.params.id),
     }).send(res);
   };
+  deleteForever = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Xoá vĩnh viễn nhân viên thành công",
+      data: await UserService.deleteForever(req.params.id),
+    }).send(res);
+  };
   restore = async (req, res, next) => {
     new SuccessResponse({
       message: "Khôi phục thành công nhân viên",

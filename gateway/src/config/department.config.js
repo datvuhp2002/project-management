@@ -20,6 +20,11 @@ const departmentServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
+  "/admin/delete-forever": {
+    target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/admin/deleteForever`,
+    authRequired: true,
+    permissions: ["ADMIN"],
+  },
   "/admin/update": {
     target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/admin/update`,
     authRequired: true,

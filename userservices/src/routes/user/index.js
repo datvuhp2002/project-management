@@ -61,6 +61,11 @@ router.get("/detail", asyncHandler(UserController.detail));
 router.get("/information/:id", asyncHandler(UserController.information));
 // Xoá một người dùng theo id
 router.delete("/admin/delete/:id", asyncHandler(UserController.delete));
+// Xoá vĩnh viên một người dùng theo id
+router.delete(
+  "/admin/deleteForever/:id",
+  asyncHandler(UserController.deleteForever)
+);
 // Khôi phục một người dùng đã bị xoá
 router.put("/admin/restore/:id", asyncHandler(UserController.restore));
 

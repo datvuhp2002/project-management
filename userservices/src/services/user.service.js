@@ -510,6 +510,23 @@ class UserService {
     await this.restore(user_id);
     return null;
   };
+
+  static deleteForever = async (user_id) => {
+    const deleteUser = await prisma.user.delete({
+      where: { user_id },
+    });
+    if (deleteUser) {
+      const roleUser = await RoleService.findById(deleteUser);
+      if (roleUser.name === "ADMIN" || roleUser.name === "MANAGER") {
+        await runProducer(
+          departmentProducerTopic.deleteUserForever,
+          deleteUser.department_id
+        );
+        return true;
+      }
+    }
+    return null;
+  };
   // restore user account
   static restore = async (user_id) => {
     const restoreUser = await prisma.user.update({

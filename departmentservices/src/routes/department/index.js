@@ -24,6 +24,11 @@ router.get("/detail/:id", asyncHandler(DepartmentController.detail));
 // Xoá một department theo id
 router.delete("/admin/delete/:id", asyncHandler(DepartmentController.delete));
 
+router.delete(
+  "/admin/deleteForever/:id",
+  asyncHandler(DepartmentController.deleteForever)
+);
+
 // Khôi phục một department đã bị xoá
 router.put("/admin/restore/:id", asyncHandler(DepartmentController.restore));
 

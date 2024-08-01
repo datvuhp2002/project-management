@@ -25,6 +25,11 @@ const continuousConsumer = async () => {
             return await DepartmentService.deleteManagerId(parsedMessage);
           }
           break;
+        case userTopicsContinuous.deleteUserForever:
+          if (parsedMessage !== null) {
+            return await DepartmentService.deleteForever(parsedMessage);
+          }
+          break;
         default:
           console.log("Topic không được xử lý:", topic);
       }

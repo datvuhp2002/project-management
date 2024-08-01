@@ -228,6 +228,34 @@ class DepartmentService {
     }
     throw new BadRequestError("Xoá phòng ban không thành công");
   };
+
+  static deleteForever = async (department_id) => {
+    const get_department = await prisma.department.findUnique({
+      where: {
+        department_id,
+      },
+    });
+    const delete_department = await prisma.department.delete({
+      where: { department_id },
+    });
+    if (!delete_department) {
+      throw new BadRequestError("Xóa phòng ban không thành công");
+    } else {
+      if (get_department.manager_id) {
+        await runProducer(userProducerTopic.selectManagerToDepartment, {
+          old_manager_id: get_department.manager_id,
+          id: null,
+          data: null,
+        });
+      }
+      await runProducer(userProducerTopic.removeStaffOutOfDepartment, {
+        department_id: get_department.department_id,
+      });
+      return true;
+    }
+    throw new BadRequestError("Xoá phòng ban không thành công");
+  };
+
   // restore department
   static restore = async (department_id) => {
     const restoreDepartment = await prisma.department.update({

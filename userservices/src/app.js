@@ -4,7 +4,7 @@ const compression = require("compression");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
-const { continuousConsumer } = require("./message_queue/consumer");
+// const { continuousConsumer } = require("./message_queue/consumer");
 
 const { v4: uuidv4 } = require("uuid");
 const UserLogger = require("./loggers/user.log");
@@ -60,5 +60,5 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
-continuousConsumer().catch(console.error);
+// continuousConsumer().catch(console.error);
 module.exports = app;

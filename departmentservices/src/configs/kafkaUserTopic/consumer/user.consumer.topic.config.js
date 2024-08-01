@@ -4,6 +4,7 @@ const userTopicsOnDemand = {
 };
 const userTopicsContinuous = {
   deleteUser: "delete-user",
+  deleteUserForever: "delete-user-forever",
 };
 
 module.exports = { userTopicsOnDemand, userTopicsContinuous };
