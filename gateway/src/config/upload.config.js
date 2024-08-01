@@ -35,11 +35,6 @@ const uploadServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
-  "/upload-avatar-client": {
-    target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-avatar-client`,
-    authRequired: true,
-    permissions: null,
-  },
   "/delete-avatar-in-cloud": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/delete-file`,
     authRequired: true,

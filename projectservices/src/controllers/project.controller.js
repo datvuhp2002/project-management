@@ -39,8 +39,15 @@ class ProjectController {
       data: await ProjectService.getAllUserProjectInDepartment(
         req.query,
         req.params.id,
+
         req.headers.user
       ),
+    }).send(res);
+  };
+  getAllUserProject = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy ra danh sách dự án thành công",
+      data: await ProjectService.getUserProject(req.query, req.headers.user),
     }).send(res);
   };
   trash = async (req, res, next) => {

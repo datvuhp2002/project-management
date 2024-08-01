@@ -12,6 +12,10 @@ router.get(
   asyncHandler(ProjectController.getAllInfoProjectInDepartment)
 );
 router.get(
+  "/getAllUserProject",
+  asyncHandler(ProjectController.getAllUserProject)
+);
+router.get(
   "/getAllUserProjectInDepartment/:id",
   asyncHandler(ProjectController.getAllUserProjectInDepartment)
 );

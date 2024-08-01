@@ -56,7 +56,8 @@ async function getTotalTaskWithStatusFromProjectAndTotalStaff(project_id) {
       { project_id },
       (err, response) => {
         if (err) {
-          reject(err.message);
+          reject(err);
+          console.log(err);
         } else {
           resolve(response);
         }

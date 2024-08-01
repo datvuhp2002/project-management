@@ -32,7 +32,6 @@ async function GetDetailManagerAndTotalStaffInDepartment(
   department_id,
   manager_id
 ) {
-  console.log(department_id, manager_id);
   return new Promise((resolve, reject) => {
     userClient.GetDetailManagerAndTotalStaffInDepartment(
       { department_id, manager_id },
@@ -41,10 +40,9 @@ async function GetDetailManagerAndTotalStaffInDepartment(
           console.error(
             "Error in GetDetailManagerAndTotalStaffInDepartment:",
             err
-          ); // Thêm log
+          );
           reject(err);
         } else {
-          console.log(response);
           resolve(response);
         }
       }

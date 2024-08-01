@@ -26,10 +26,6 @@ router.post(
   uploadProject.single("file"),
   asyncHandler(UploadController.uploadFileForProject)
 );
-router.post(
-  "/upload-avatar-client/:id",
-  uploadClient.single("file"),
-  asyncHandler(UploadController.uploadAvartarClient)
-);
+
 router.post("/getFileImage", asyncHandler(UploadController.getFileImage));
 module.exports = router;

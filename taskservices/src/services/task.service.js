@@ -15,6 +15,7 @@ const { GetAllTaskFromProject } = require("./grpcClient.services");
 class TaskService {
   static select = {
     task_id: true,
+    name: true,
     description: true,
     document: true,
     createdBy: true,
@@ -29,7 +30,7 @@ class TaskService {
     if (newTask) {
       await runProducer(ActivityProducerTopic.taskCreated, {
         task_id: newTask.task_id,
-        description: newTask.description,
+        name: newTask.name,
         createdBy,
       });
       return newTask;
@@ -125,7 +126,6 @@ class TaskService {
   };
   // update task
   static update = async ({ task_id, data }, modifiedBy) => {
-    console.log(task_id);
     const existingTask = await prisma.task.findUnique({ where: { task_id } });
     if (!existingTask) throw new BadRequestError("Task not found");
     let updateTask;
@@ -145,7 +145,7 @@ class TaskService {
     if (updateTask) {
       await runProducer(ActivityProducerTopic.taskUpdated, {
         task_id: updateTask.task_id,
-        description: updateTask.description,
+        name: updateTask.name,
         modifiedBy,
       });
       return true;

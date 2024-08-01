@@ -1,1 +1,0 @@
-{"@timestamp":"2024-07-09T07:36:38.497Z","context":"/report/report-for-department/undefined","ecs.version":"8.10.0","log.level":"error","message":"400:-:2ms:-:Response:{\"status\":400,\"now\":1720510598489}","metadata":{"message":"Failed to fetch projects in department"},"requestId":"0491d0d0-b609-46ab-9010-57c14bcf1b12","timestamp":"2024-07-09 07:36:497 AM"}
