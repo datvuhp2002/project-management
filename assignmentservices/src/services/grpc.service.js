@@ -74,6 +74,7 @@ async function getTotalTaskWithStatusFromProjectAndTotalStaff(call, callback) {
 }
 async function getAllUserProject(call, callback) {
   const { user_id } = call.request;
+  console.log(user_id);
   try {
     const result = await AssignmentService.getAllUserProject(user_id);
     const response = {

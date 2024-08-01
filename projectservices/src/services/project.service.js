@@ -31,19 +31,31 @@ class ProjectService {
     createdAt: true,
     project_manager_id: true,
     department_id: true,
-    client_ownership: true,
   };
   // create a new project
-  static create = async (data, modifiedBy) => {
-    data.modifiedBy = modifiedBy;
-    const newProject = await prisma.project.create({
-      data,
-    });
-    if (!newProject) {
-      throw new BadRequestError(
-        "Tạo một dự án mới không thành công, vui lòng thử lại"
+  static create = async (data, createdBy) => {
+    data.createdBy = createdBy;
+    const currentDate = new Date();
+    const startDate = new Date(data.startAt);
+    const endDate = new Date(data.endAt);
+    if (startDate < currentDate) {
+      throw new BadRequestException(
+        "Start date cannot be less than current date"
       );
     }
+    if (endDate <= startDate) {
+      throw new BadRequestException(
+        "End date cannot be equal or less than start date"
+      );
+    }
+    const newProject = await prisma.project.create({ data });
+
+    if (!newProject) {
+      throw new BadRequestException(
+        "Failed to create a new project, please try again"
+      );
+    }
+
     return newProject;
   };
   // get all projects
@@ -148,7 +160,32 @@ class ProjectService {
       true
     );
   };
-
+  static getUserProject = async (
+    { items_per_page, page, search, nextPage, previousPage },
+    user_id
+  ) => {
+    let query = [];
+    query.push({
+      deletedMark: false,
+    });
+    const data = await getAllUserProject(user_id);
+    console.log(data);
+    if (data.length === 0) return "Bạn chưa có dự án";
+    query.push({
+      project_id: { in: data },
+    });
+    return await this.queryProject(
+      {
+        query: query,
+        items_per_page,
+        page,
+        search,
+        nextPage,
+        previousPage,
+      },
+      true
+    );
+  };
   // get all projects has been deleted
   static trash = async ({
     items_per_page,
@@ -194,7 +231,6 @@ class ProjectService {
     }
     throw new BadRequestError("Update project failed");
   };
-
   // delete project
   static delete = async (project_id) => {
     const deleteProject = await prisma.project.update({
@@ -311,21 +347,35 @@ class ProjectService {
     });
     if (isNotTrash) {
       const projectPromise = projects.map(async (project, index) => {
-        const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
-          project.project_id
-        );
-        const projectManagerInformation = await getUser(
-          project.project_manager_id
-        );
-        project.project_manager = projectManagerInformation;
-        project.total_staff = result.total_staff;
-        project.total_task = {
-          total_task_is_done: result.total_task_is_done,
-          total_task_is_not_done: result.total_task_is_not_done,
-        };
+        try {
+          const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
+            project.project_id
+          );
+          console.log(result);
+          const projectManagerInformation = await getUser(
+            project.project_manager_id
+          );
+          project.project_manager = projectManagerInformation;
+          project.total_staff = result.total_staff;
+          project.total_task = {
+            total_task_is_done: result.total_task_is_done,
+            total_task_is_not_done: result.total_task_is_not_done,
+          };
+        } catch (error) {
+          console.error(
+            `Error fetching details for project ${project.project_id}:`,
+            error
+          );
+          project.total_staff = "N/A";
+          project.total_task = {
+            total_task_is_done: "N/A",
+            total_task_is_not_done: "N/A",
+          };
+        }
       });
       await Promise.all(projectPromise);
     }
+
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;

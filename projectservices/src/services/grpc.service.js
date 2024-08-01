@@ -4,7 +4,6 @@ const grpc = require("@grpc/grpc-js");
 
 async function GetProject(call, callback) {
   const { project_id } = call.request;
-  console.log("Project ID:::", project_id);
   try {
     const project = await ProjectServices.detail(project_id);
     if (project) {

@@ -24,6 +24,7 @@ async function GetUser(call, callback) {
 }
 async function GetDetailManagerAndTotalStaffInDepartment(call, callback) {
   const { department_id, manager_id } = call.request;
+  console.log(department_id);
   try {
     const result = await UserServices.getDetailManagerAndTotalStaffInDepartment(
       {

@@ -8,6 +8,7 @@ SOURCE_DATABASE="userService"
 BACKUPS_DIR="/var/backups"
 # MongoDB Atlas connection string for source
 SOURCE_MONGO_URI="mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=Cluster0"
+DAYSTORETAINBACKUP="1"
 #=====================================================================
 
 TIMESTAMP=$(date +%F-%H%M)
@@ -35,6 +36,6 @@ fi
 # Clean up old backups (keep only the latest one)
 # List all backup archives, sort by time, keep the latest one, delete the rest
 ls -t "$BACKUPS_DIR/$SOURCE_DATABASE" | tail -n +2 | xargs -I {} rm "$BACKUPS_DIR/$SOURCE_DATABASE/{}"
-
+# find $BACKUPS_DIR -type f -mtime +$DAYSTORETAINBACKUP -exec rm {} +
 echo "--------------------------------------------"
 echo "Database backup complete to $BACKUPS_DIR/$SOURCE_DATABASE/$BACKUP_NAME.archive!"

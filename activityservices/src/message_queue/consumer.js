@@ -18,17 +18,16 @@ const continuousConsumer = async () => {
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
       const parsedMessage = JSON.parse(message.value.toString());
-      console.log("Before handle :::", parsedMessage);
       switch (topic) {
         case taskTopicsContinuous.taskCreated: {
-          const { createdBy, description, ...data } = parsedMessage;
-          data.description = `Task '${description}' đã được tạo.`;
+          const { createdBy, name, ...data } = parsedMessage;
+          data.description = `Task '${name}' has been created.`;
           await ActivityServices.create(data, createdBy);
           break;
         }
         case taskTopicsContinuous.taskUpdated: {
-          const { modifiedBy, description, ...data } = parsedMessage;
-          data.description = `Task '${description}' đã được cập nhật.`;
+          const { modifiedBy, name, ...data } = parsedMessage;
+          data.description = `Task '${name}' has been updated.`;
           await ActivityServices.create(data, modifiedBy);
           break;
         }

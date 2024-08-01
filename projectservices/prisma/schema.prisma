@@ -14,41 +14,24 @@ datasource db {
 }
 
 model Project {
-  project_id      String           @id @default(auto()) @map("_id") @db.ObjectId
-  name            String           
-  projectCode     String           @unique
-  description     String?
-  startAt         DateTime         @default(now())
-  endAt           DateTime
-  turnover        String?
-  document        String[]
-  investor        String?
-  createdBy       String?          @db.ObjectId
-  modifiedBy      String?          @db.ObjectId
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime?        @updatedAt
-  status          Boolean?         @default(true)
-  deletedAt       DateTime?
-  deletedMark     Boolean          @default(false)
-  client_ownership    Client?   @relation(fields: [client_id], references: [client_id])
+  project_id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name                String           
+  projectCode         String           @unique
+  description         String?
+  startAt             DateTime         @default(now())
+  endAt               DateTime
+  turnover            String?
+  document            String[]
+  investor            String?
+  createdBy           String?          @db.ObjectId
+  modifiedBy          String?          @db.ObjectId
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime?        @updatedAt
+  status              Boolean?         @default(true)
+  deletedAt           DateTime?
+  deletedMark         Boolean          @default(false)
   department_id       String?   @db.ObjectId
-  client_id           String?   @db.ObjectId
   project_manager_id String? @db.ObjectId
 }
 
-model Client {
-  client_id       String            @id @default(auto()) @map("_id") @db.ObjectId
-  fullname        String
-  email           String
-  avatar          String?
-  address         String?
-  phone           String?
-  createdBy       String?           @db.ObjectId
-  modifiedBy      String?           @db.ObjectId
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime?         @updatedAt
-  deletedAt       DateTime?
-  deletedMark     Boolean           @default(false)
-  Project Project[]
-}
 

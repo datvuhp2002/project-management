@@ -1,1 +1,0 @@
-{"@timestamp":"2024-07-09T07:37:27.666Z","context":"/users/get-avatar","ecs.version":"8.10.0","log.level":"info","message":"input params:-:POST:-:","metadata":{"avatar":"https://res.cloudinary.com/lachongtech/image/upload/s--xFiO5OQJ--/v1/avatar/667e229fd4292870bb3f75ce/45.png.jpg"},"requestId":"906421be-27ee-4e26-9478-c3e8593a3b41","timestamp":"2024-07-09 07:37:666 AM"}

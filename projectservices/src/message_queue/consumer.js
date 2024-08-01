@@ -2,7 +2,6 @@ const { Kafka } = require("kafkajs");
 const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
 const { convertObjectToArray } = require("../utils");
 const ProjectService = require("../services/project.service");
-const ClientService = require("../services/client.service");
 const { runProducer } = require("../message_queue/producer");
 
 const kafka = new Kafka({
@@ -29,13 +28,6 @@ const continuousConsumer = async () => {
             await ProjectService.uploadFile(
               parsedMessage.project_id,
               parsedMessage.file
-            );
-            break;
-          case uploadTopicsContinuous.uploadAvatarClient:
-            await ClientService.update(
-              parsedMessage.client_id,
-              { avatar: parsedMessage.file },
-              parsedMessage.modifiedBy
             );
             break;
           default:

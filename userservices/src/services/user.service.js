@@ -365,9 +365,9 @@ class UserService {
     manager_id,
   }) => {
     let managerInformation;
-    const totalStaffInDePartment = await this.getAllStaffInDepartment(
+    const totalStaffInDePartment = await this.getAllStaffInDepartmentForAdmin(
       { items_per_page: "ALL" },
-      { department_id }
+      department_id
     );
     if (manager_id) {
       managerInformation = await this.detailManager(manager_id);

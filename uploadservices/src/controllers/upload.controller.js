@@ -68,26 +68,6 @@ class UserController {
     }
   };
 
-  uploadAvartarClient = async (req, res, next) => {
-    try {
-      const { file } = req;
-      if (!file) {
-        throw new BadRequestError("File is missing");
-      }
-      await runProducer(projectProducerTopic.uploadAvatarClient, {
-        file: file.filename,
-        client_id: req.params.id,
-        modifiedBy: req.headers.user,
-      });
-      new SuccessResponse({
-        message: "Tải ảnh đại diện cho khách hàng thành công",
-        data: file.path,
-      }).send(res);
-    } catch (error) {
-      next(error);
-    }
-  };
-
   uploadFileForProject = async (req, res, next) => {
     try {
       const file = req.file;

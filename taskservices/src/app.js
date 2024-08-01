@@ -8,7 +8,6 @@ const { continuousConsumer } = require("./message_queue/consumer");
 
 const { v4: uuidv4 } = require("uuid");
 const TaskLogger = require("./loggers/task.log");
-const initElasticsearch = require("./dbs/init.elasticsearch");
 
 const app = express();
 
@@ -29,10 +28,6 @@ app.use((req, res, next) => {
   ]);
   next();
 });
-// init elasticsearch
-// initElasticsearch.init({
-//   ELASTICSEARCH_IS_ENABLED: true,
-// });
 // init db
 require(`./dbs/init.dbs`);
 // init routes
