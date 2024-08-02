@@ -427,7 +427,7 @@ services:
 
     image: chicong42/projectmanagementwebui
     environment:
-      - VITE_REQUEST_API_URL=http://10.100.1.153:3050/
+      - VITE_REQUEST_API_URL=http://118.70.171.240:9301/
     ports:
       - "3000:3000"
     networks:
