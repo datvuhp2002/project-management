@@ -18,10 +18,13 @@ const continuousConsumer = async () => {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const parsedMessage = JSON.parse(message.value.toString());
-      console.log("Before handle :::", parsedMessage);
       switch (topic) {
         case userTopicsContinuous.sendEmailToken: {
           await EmailService.sendEmailToken(parsedMessage);
+          break;
+        }
+        case userTopicsContinuous.createUser: {
+          await EmailService.sendEmailCreateUser(parsedMessage);
           break;
         }
         default:

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package activity;
+
+service ActivityService {
+  rpc TotalActivity (totalActivityRequest) returns (totalActivityResponse) {}
+}
+
+message totalActivityRequest {
+  string task_id = 1;
+}
+
+message totalActivityResponse {
+  int64 total = 1;
+}

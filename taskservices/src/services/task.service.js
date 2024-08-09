@@ -11,7 +11,10 @@ const { runProducer } = require("../message_queue/producer");
 const {
   ActivityProducerTopic,
 } = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
-const { GetAllTaskFromProject } = require("./grpcClient.services");
+const {
+  GetAllTaskFromProject,
+  TotalActivity,
+} = require("./grpcClient.services");
 class TaskService {
   static select = {
     task_id: true,
@@ -70,7 +73,6 @@ class TaskService {
   };
   static getAllTaskInProject = async (query, project_id) => {
     const task_ids = await GetAllTaskFromProject(project_id);
-    console.log("list task:", task_ids);
     return await this.getAllTaskByTaskIds(query, { task_ids });
   };
   // get all tasks
@@ -122,6 +124,8 @@ class TaskService {
       select: this.select,
     });
     if (!task) throw new BadRequestError("Task not found");
+    const total = await TotalActivity(task_id);
+    task.total_activities = total;
     return task;
   };
   // update task
@@ -225,11 +229,14 @@ class TaskService {
         createdAt: "desc",
       },
     });
-
+    const taskPromises = tasks.map(async (task, index) => {
+      const result = await TotalActivity(task.task_id);
+      task.total_activities = result;
+    });
+    await Promise.all(taskPromises);
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
-
     return {
       data: tasks,
       total,

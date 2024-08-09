@@ -7,4 +7,5 @@ const router = express.Router();
 router.post("/new_template", asyncHandler(EmailController.newTemplate));
 router.post("/verify-token", asyncHandler(EmailController.verifyToken));
 router.post("/send-email-token", asyncHandler(EmailController.sendEmailToken));
+
 module.exports = router;
