@@ -184,6 +184,7 @@ services:
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/userService?replicaSet=dbrs
+      # - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/userService?retryWrites=true&w=majority&appName=Cluster0
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
@@ -323,6 +324,7 @@ services:
       - PORT=3069
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
       - KAFKA_BROKER=kafkaMQ:9092
+      # - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/emailService?retryWrites=true&w=majority&appName=Cluster0
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/emailService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
@@ -395,6 +397,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50054
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - ACTIVITY_GRPC_PORT=activityservices:50058
       - LOKI_HOST=http://loki:3100
     volumes:
       - ./logs/taskservices:/app/src/log
@@ -429,6 +432,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - USER_GRPC_PORT=userservices:50053
       - LOKI_HOST=http://loki:3100
+      - GRPC_PORT=50058
     volumes:
       - ./logs/activityservices:/app/src/log
     labels:

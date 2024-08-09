@@ -23,7 +23,6 @@ const sendEmailLinkVerify = async ({
     const info = await transport.sendMail(mailOptions);
     return info;
   } catch (err) {
-    console.error("Error sending email:", err.message);
     throw err; // Re-throw the error after logging it
   }
 };
@@ -51,6 +50,29 @@ const sendEmailToken = async (email) => {
     subject: "Vui lòng xác nhận địa chỉ email đăng ký",
   });
 };
+const sendEmailCreateUser = async (data) => {
+  // 1. Check email
+  if (!data.email) {
+    throw new BadRequestError("Email is required");
+  }
+  // 2. Get email template
+  const template = await getTemplate({ name: "HTML_USER_ACCOUNT_INFO" });
+  if (!template) {
+    throw new NotFoundError("Template is not found");
+  }
+  // 3. Replace placeholder with params
+  const content = replacePlaceholder(template.html, {
+    email: `${data.email}`,
+    username: `${data.username}`,
+    password: `${data.password}`,
+  });
+  // 4. Send email
+  return await sendEmailLinkVerify({
+    html: content,
+    toEmail: data.email,
+    subject: "Thông tin tài khoản",
+  });
+};
 
 const verifyToken = async ({ token, email }) => {
   const getToken = await prisma.otp.findFirst({
@@ -72,4 +94,4 @@ const verifyToken = async ({ token, email }) => {
   throw new BadRequestError("Hệ thống gặp trục trặc, vui lòng thử lại");
 };
 
-module.exports = { sendEmailToken, verifyToken };
+module.exports = { sendEmailToken, verifyToken, sendEmailCreateUser };

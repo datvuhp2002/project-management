@@ -1,0 +1,65 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.9101c8fe1780e0e40a440eba353cc860255d514e-audit.json",
+    "files": [
+        {
+            "date": 1723081031802,
+            "name": "src/logs/emailServices-2024-08-08-08-37.error.log",
+            "hash": "4ff44bb265c9dc09a2baa3300783be4687562c4d94eb19fe71aad974fdfcda65"
+        },
+        {
+            "date": 1723081297042,
+            "name": "src/logs/emailServices-2024-08-08-08-41.error.log",
+            "hash": "9a410cc501d7380bf0ca79c6f8d746c1cb559b19c7c08c9fca45ef56a5dbc662"
+        },
+        {
+            "date": 1723081325552,
+            "name": "src/logs/emailServices-2024-08-08-08-42.error.log",
+            "hash": "9589f42a1c79564b6cdf454c5fd2e97dd1034972b4b37f0b617dd3624b87618b"
+        },
+        {
+            "date": 1723081428246,
+            "name": "src/logs/emailServices-2024-08-08-08-43.error.log",
+            "hash": "0af3de40f0694fa86a6ea377872a04a4c1878d5a74e24d2521f81940340bad4d"
+        },
+        {
+            "date": 1723081643798,
+            "name": "src/logs/emailServices-2024-08-08-08-47.error.log",
+            "hash": "7a011fbecff5b88a1f3461eb372f63506c6dbede855cc48e78b6cedeca21ba98"
+        },
+        {
+            "date": 1723081695094,
+            "name": "src/logs/emailServices-2024-08-08-08-48.error.log",
+            "hash": "424fa08d02f21e8480de2e5df2a73cf1ee5e8bde1d9b7b662020f889c3fc6e43"
+        },
+        {
+            "date": 1723081744445,
+            "name": "src/logs/emailServices-2024-08-08-08-49.error.log",
+            "hash": "bfeb8123a2e9f1bfa649133aac6ad44a39739f3340ad86a5680d76c388cb83e3"
+        },
+        {
+            "date": 1723081827675,
+            "name": "src/logs/emailServices-2024-08-08-08-50.error.log",
+            "hash": "3f59e7191d31ebb806ff3ecf2270a29b16b872afcd2b65052c324d7d813de3e3"
+        },
+        {
+            "date": 1723081870201,
+            "name": "src/logs/emailServices-2024-08-08-08-51.error.log",
+            "hash": "aee340023e99852d09f7218f492f284f44643792537041e3c4ff6486be44d6f3"
+        },
+        {
+            "date": 1723081928001,
+            "name": "src/logs/emailServices-2024-08-08-08-52.error.log",
+            "hash": "45b1f5652965ab9b72d16854348640fc6b0d1558c471213975be5363db2cff2a"
+        },
+        {
+            "date": 1723082010048,
+            "name": "src/logs/emailServices-2024-08-08-08-53.error.log",
+            "hash": "deb24131470533f212f2d7529a7495584660d8b92bf887676f00d78f61e9a30a"
+        }
+    ],
+    "hashType": "sha256"
+}

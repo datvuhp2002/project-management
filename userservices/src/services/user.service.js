@@ -9,6 +9,7 @@ const {
   ForbiddenError,
   NotFoundError,
 } = require("../core/error.response");
+const crypto = require("crypto");
 const cloudinary = require("../configs/cloudinary.config");
 const { runProducer } = require("../message_queue/producer");
 const { departmentProducerTopic } = require("../configs/kafkaDepartmentTopic");
@@ -42,20 +43,22 @@ class UserService {
     },
   };
   // create new user
-  static create = async (
-    { username, email, password, role, ...rest },
-    createdBy
-  ) => {
+  static create = async ({ username, email, role, ...rest }, createdBy) => {
     if (!role) throw new BadRequestError("Role is not defined");
     const role_data = await RoleService.findByName(role);
     if (!role) throw new BadRequestError("Role is not defined");
     if (!email) {
-      throw new BadRequestError("Error: Email is not defined");
+      throw new BadRequestError("Email is not defined");
     }
     const holderUser = await prisma.user.findFirst({ where: { email } });
     if (holderUser) {
-      throw new BadRequestError("Error: User Already registered");
+      throw new BadRequestError("User Already registered");
     }
+    const randomBytes = crypto.randomBytes(3);
+    // Convert the bytes to an integer
+    const genPass = randomBytes.readUIntBE(0, 3) % 1000000;
+    // Convert the integer to a string and pad it with leading zeros if necessary
+    const password = genPass.toString().padStart(6, "0");
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = await prisma.user.create({
       data: {
@@ -68,7 +71,13 @@ class UserService {
       },
       select: this.select,
     });
-    if (!newUser) throw new BadRequestError("Error: Cannot create new user");
+    if (!newUser) throw new BadRequestError("Cannot create new user");
+    const message = {
+      username: newUser.username,
+      email: newUser.email,
+      password: password,
+    };
+    await runProducer(emailProducerTopic.createUser, message);
     return newUser;
   };
 
