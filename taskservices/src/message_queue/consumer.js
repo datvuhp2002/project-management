@@ -34,6 +34,9 @@ const continuousConsumer = async () => {
             parsedMessage.modifiedBy
           );
           break;
+        case uploadTopicsContinuous.deleteTaskFileInCloud:
+          await TaskService.deleteFile(parsedMessage);
+          break;
         default:
           console.log("Topic không được xử lý:", topic);
       }

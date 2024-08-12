@@ -15,7 +15,6 @@ class TaskController {
       data: await TaskService.getAll(req.query),
     }).send(res);
   };
-
   getAllTaskByTaskIds = async (req, res, next) => {
     console.log(req.body);
     new CREATED({
@@ -51,6 +50,7 @@ class TaskController {
       ),
     }).send(res);
   };
+
   delete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công nhiệm vụ",
@@ -85,12 +85,12 @@ class TaskController {
   //     data: await TaskService.getFile(req.body),
   //   }).send(res);
   // };
-  // deleteFile = async (req, res, next) => {
-  //   new SuccessResponse({
-  //     message: "xoá file thành công",
-  //     data: await TaskService.deleteFile(req.params.id, req.body),
-  //   }).send(res);
-  // };
+  deleteFile = async (req, res, next) => {
+    new SuccessResponse({
+      message: "xoá file thành công",
+      data: await TaskService.deleteFile(req.params.id, req.body),
+    }).send(res);
+  };
 }
 
 module.exports = new TaskController();

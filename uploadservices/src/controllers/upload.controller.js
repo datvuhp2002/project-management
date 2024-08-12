@@ -18,6 +18,8 @@ const {
   getFile,
   getFileImage,
   getAvatar,
+  deleteFileForProject,
+  deleteFileForTask,
 } = require("../services/upload.services");
 class UserController {
   uploadAvatarFromLocal = async (req, res, next) => {
@@ -91,6 +93,19 @@ class UserController {
     }
   };
 
+  deleteFileForProject = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Xóa file thành công",
+      data: await deleteFileForProject(req.params.id, req.body.file),
+    }).send(res);
+  };
+
+  deleteFileForTask = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Xóa file thành công",
+      data: await deleteFileForTask(req.params.id, req.body.file),
+    }).send(res);
+  };
   getFile = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy file về thành công",
@@ -103,7 +118,6 @@ class UserController {
       data: await getFileImage(req.body),
     }).send(res);
   };
-
   getAvatar = async (req, res, next) => {
     new SuccessResponse({
       message: "lấy ảnh file thành công",

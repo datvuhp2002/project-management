@@ -2,7 +2,7 @@
 const taskProducerTopic = {
   uploadFileForTask: "upload-file-for-task",
   getFile: "get-file",
-  deleteFileInCloud: "delete-file-in-cloud",
+  deleteTaskFileInCloud: "delete-task-file-in-cloud",
 };
 
 module.exports = { taskProducerTopic };

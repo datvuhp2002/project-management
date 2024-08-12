@@ -1,6 +1,9 @@
 const { Kafka } = require("kafkajs");
 const { convertObjectToArray } = require("../utils");
 const { runProducer } = require("../message_queue/producer");
+const { deleteFile } = require("../services/upload.services");
+const { taskTopicsContinuous } = require("../configs/kafkaTaskTopic");
+const { projectTopicsContinuous } = require("../configs/kafkaProjectTopic");
 
 const kafka = new Kafka({
   clientId: "upload-services",

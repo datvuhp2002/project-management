@@ -41,11 +41,6 @@ const taskServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN"],
   },
-  "/upload-file-from-local": {
-    target: `${process.env.TASK_SERVICES_REQUEST_URL}/uploadFileFromLocal`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
-  },
   "/get-file-image": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getFileImage`,
     authRequired: true,
@@ -55,11 +50,6 @@ const taskServicesRoutes = {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getFile`,
     authRequired: true,
     permissions: null,
-  },
-  "/delete-file": {
-    target: `${process.env.TASK_SERVICES_REQUEST_URL}/deleteFile`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
   },
   "/get-all-task-in-project": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getAllTaskInProject`,

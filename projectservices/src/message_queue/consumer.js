@@ -30,6 +30,10 @@ const continuousConsumer = async () => {
               parsedMessage.file
             );
             break;
+          case uploadTopicsContinuous.deleteProjectFileInCloud: {
+            await ProjectService.deleteFile(parsedMessage);
+            break;
+          }
           default:
             console.log("Unhandled topic:", topic);
         }
