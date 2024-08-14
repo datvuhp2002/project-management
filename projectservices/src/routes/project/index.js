@@ -8,6 +8,18 @@ const router = express.Router();
 // Lấy ra hết tất cả project
 router.get("/admin/getAll", asyncHandler(ProjectController.getAll));
 router.get(
+  "/getAllInfoProjectInDepartment/:id",
+  asyncHandler(ProjectController.getAllInfoProjectInDepartment)
+);
+router.get(
+  "/getAllUserProject",
+  asyncHandler(ProjectController.getAllUserProject)
+);
+router.get(
+  "/getAllUserProjectInDepartment/:id",
+  asyncHandler(ProjectController.getAllUserProjectInDepartment)
+);
+router.get(
   "/getAllProjectInDepartment/:id",
   asyncHandler(ProjectController.getAllProjectInDepartment)
 );

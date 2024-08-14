@@ -1,0 +1,65 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.acf06622a528eb5003fc518bf1f5a71509a74006-audit.json",
+    "files": [
+        {
+            "date": 1722410189172,
+            "name": "src/logs/taskServices-2024-07-31-14-16.error.log",
+            "hash": "2edeca75ca4dee83b63f693072a295d613204466b7951b3d0baf0d6af01d3b99"
+        },
+        {
+            "date": 1722410303978,
+            "name": "src/logs/taskServices-2024-07-31-14-18.error.log",
+            "hash": "da3a33827d9401d13c18f0787f70432eda9a4e208709031ae3783759a5cb918e"
+        },
+        {
+            "date": 1722410365773,
+            "name": "src/logs/taskServices-2024-07-31-14-19.error.log",
+            "hash": "3da144de13ad71d3b6f61926b37cfbfc83b104322cc2e874615bea4cd3bc8a6a"
+        },
+        {
+            "date": 1722410437468,
+            "name": "src/logs/taskServices-2024-07-31-14-20.error.log",
+            "hash": "d0481b5a71eba2e24df4e047be7f40a32fe26ed0fc23699b539d726f491c4a1e"
+        },
+        {
+            "date": 1722410482883,
+            "name": "src/logs/taskServices-2024-07-31-14-21.error.log",
+            "hash": "2f85c6b7e7fd23f5f1426897938795093c230d8373d77ad12b5015569f4ad084"
+        },
+        {
+            "date": 1722410520921,
+            "name": "src/logs/taskServices-2024-07-31-14-22.error.log",
+            "hash": "868db47bcca9e0904a718094b5ad5591a3f676b37f64dfd26c180e8c68dcb57c"
+        },
+        {
+            "date": 1722410580068,
+            "name": "src/logs/taskServices-2024-07-31-14-23.error.log",
+            "hash": "9084798af3b82591ab0a995de8c8c219a0ee32d997f24070380342a383284707"
+        },
+        {
+            "date": 1722410788678,
+            "name": "src/logs/taskServices-2024-07-31-14-26.error.log",
+            "hash": "c8211f1076eafc154c02822d57270aaff6018c5aef56f66085ec5ad899d9c8de"
+        },
+        {
+            "date": 1722411040985,
+            "name": "src/logs/taskServices-2024-07-31-14-30.error.log",
+            "hash": "7babf10487b884b6a94f6b97dbad3b69340ddd1aff8cf24c00b6231263f08661"
+        },
+        {
+            "date": 1723086822621,
+            "name": "src/logs/taskServices-2024-08-08-10-13.error.log",
+            "hash": "758e5135c54af501b7d3d7a58132bb3838038bd1aed0d7be63edc60a81fe5b0a"
+        },
+        {
+            "date": 1723087273548,
+            "name": "src/logs/taskServices-2024-08-08-10-21.error.log",
+            "hash": "0b203b4c8a3f4bb3c64d75d250be8cc3533ccfc4a65fd102445883ff56872bb0"
+        }
+    ],
+    "hashType": "sha256"
+}

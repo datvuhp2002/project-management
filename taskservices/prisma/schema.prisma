@@ -15,7 +15,8 @@ datasource db {
 
 model Task {
   task_id      String        @id @default(auto()) @map("_id") @db.ObjectId
-  description  String?
+  name         String
+  description  String
   document     String[]
   createdBy    String?       @db.ObjectId
   modifiedBy   String?       @db.ObjectId

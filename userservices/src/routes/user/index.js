@@ -21,7 +21,7 @@ router.get(
   "/admin/getAllStaffInDepartment/:id",
   asyncHandler(UserController.getAllStaffInDepartmentForAdmin)
 );
-router.post(
+router.get(
   "/getAllStaffInDepartment",
   asyncHandler(UserController.getAllStaffInDepartment)
 );
@@ -33,22 +33,10 @@ router.get(
 router.get("/admin/trash", asyncHandler(UserController.trash));
 // Tạo ra một người dùng mới
 router.post("/create", asyncHandler(UserController.create));
-// Upload Avatar
 router.post(
-  "/uploadAvatarFromUrl",
-  asyncHandler(UserController.uploadImageFromUrl)
+  "/getAllStaffByUserIds",
+  asyncHandler(UserController.getAllStaffByUserIds)
 );
-router.post(
-  "/uploadAvatarFromLocal",
-  upload.single("file"),
-  asyncHandler(UserController.uploadAvartarFromLocal)
-);
-router.post("/getAvatar", asyncHandler(UserController.getAvatar));
-router.post(
-  "/deleteAvatarInCloud",
-  asyncHandler(UserController.deleteAvatarInCloud)
-);
-
 // update account information
 router.put("/update", asyncHandler(UserController.update));
 

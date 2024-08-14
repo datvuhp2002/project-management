@@ -1,2 +1,0 @@
-{"@timestamp":"2024-06-21T07:28:16.253Z","context":"/services/api/user/email/verify-token/","ecs.version":"8.10.0","log.level":"info","message":"input params:-:POST:-:","metadata":{"email":"detectiveduongz@gmail.com","token":"866559"},"requestId":"b65f8336-3e61-424c-a71a-abbcc59ac512"}
-{"@timestamp":"2024-06-21T07:28:22.361Z","context":"/services/api/user/email/verify-token/","ecs.version":"8.10.0","log.level":"info","message":"input params:-:POST:-:","metadata":{"email":"detectiveduongz@gmail.com","token":"866559"},"requestId":"b4e7c209-b4ba-4375-a5de-9732d9cfb594"}

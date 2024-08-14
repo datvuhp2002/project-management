@@ -32,7 +32,6 @@ class ActivityService {
     createdBy
   ) => {
     let query = [];
-    console.log(task_id);
     if (target && target == "user") {
       query.push({
         createdBy,
@@ -221,6 +220,15 @@ class ActivityService {
       currentPage,
       itemsPerPage,
     };
+  };
+  static totalActivity = async (task_id) => {
+    const total = await prisma.activity.count({
+      where: {
+        task_id,
+        deletedMark: false,
+      },
+    });
+    return total;
   };
 }
 module.exports = ActivityService;

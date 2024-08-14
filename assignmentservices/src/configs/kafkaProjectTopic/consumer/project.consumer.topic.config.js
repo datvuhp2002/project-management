@@ -1,8 +1,5 @@
 "use strict";
-const projectTopicsContinuous = {
-  getProjectInformationFromAssignment:
-    "get-project-information-from-assignment",
-};
+const projectTopicsContinuous = {};
 
 module.exports = {
   projectTopicsContinuous,

@@ -10,7 +10,7 @@ const getInfoData = ({ fields = [], object = {} }) => {
 const getAllUsersForActivity = async (user_ids) => {
   try {
     const response = await axios.post(
-      `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUserProperty?items_per_page=ALL`,
+      `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffByUserIds?items_per_page=ALL`,
       { user_ids }
     );
     return response.data.data.users;
@@ -36,7 +36,7 @@ const getAllActivitiesForTask = async (task_id) => {
       const user_ids = [
         ...new Set(
           Object.values(activities).flatMap((dateActivities) =>
-            dateActivities.map((activity) => activity.user_id)
+            dateActivities.map((activity) => activity.createdBy)
           )
         ),
       ];
@@ -48,7 +48,7 @@ const getAllActivitiesForTask = async (task_id) => {
       for (const dateActivities of Object.values(activities)) {
         for (const activity of dateActivities) {
           const correspondingUser = userInformation.find(
-            (user) => user.user_id === activity.user_id
+            (user) => user.user_id === activity.createdBy
           );
           activity.user_information = correspondingUser;
         }
@@ -170,6 +170,7 @@ const getUserByEmail = async (email) => {
       throw new BadRequestError("Người dùng không tồn tại");
     }
     const foundUser = response.data.data;
+    console.log(foundUser);
     const role = foundUser.role;
     return { user: foundUser, role };
   } catch (error) {

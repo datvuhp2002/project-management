@@ -127,8 +127,11 @@ class DepartmentService {
     }
     if (department.manager_id) {
       try {
-        const userResponse = await getUser(department.manager_id);
-        department.manager_info = userResponse;
+        const userResponse = await GetDetailManagerAndTotalStaffInDepartment(
+          department.department_id,
+          department.manager_id
+        );
+        department.information = userResponse;
       } catch (err) {}
     }
     return department;
@@ -187,7 +190,6 @@ class DepartmentService {
   };
 
   static deleteManagerId = async (department_id) => {
-    console.log("Department_id:::", department_id);
     const deleteManagerId = await prisma.department.update({
       where: { department_id },
       data: { manager_id: null },
@@ -327,10 +329,8 @@ class DepartmentService {
           department.department_id,
           department.manager_id
         );
-        console.log(result);
         department.information = result;
       });
-
       await Promise.all(departmentPromises);
     }
     return {

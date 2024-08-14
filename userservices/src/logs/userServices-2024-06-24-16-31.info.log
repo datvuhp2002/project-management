@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-24T09:31:58.649Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Expected data to have an avatar property"},"requestId":"dca7ef5c-944f-43ce-877c-23056077d4ac"}

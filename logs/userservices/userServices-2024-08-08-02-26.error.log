@@ -1,0 +1,1 @@
+{"@timestamp":"2024-08-08T02:26:48.948Z","context":"/services/api/user/create/","ecs.version":"8.10.0","log.level":"error","message":"400:-:2ms:-:Response:{\"status\":400,\"now\":1723084008932}","metadata":{"message":"Error: User Already registered"},"requestId":"dd8ebae6-21ee-448a-a134-24cf9250ed97"}

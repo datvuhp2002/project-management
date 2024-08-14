@@ -1,0 +1,60 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.6b371f63b3598cc97056c95609c1302510349b2f-audit.json",
+    "files": [
+        {
+            "date": 1723082116609,
+            "name": "src/logs/departmentServices-2024-08-08-01-55.info.log",
+            "hash": "beefd939d1b68b8cfad584d3c63ebaffb11d7e9fc6e850950e56e7a1b1639a1f"
+        },
+        {
+            "date": 1723082327048,
+            "name": "src/logs/departmentServices-2024-08-08-01-58.info.log",
+            "hash": "a136501ee2990146df526d22a84233a89445e983fdf2ca0ee0c566d774a14531"
+        },
+        {
+            "date": 1723082584918,
+            "name": "src/logs/departmentServices-2024-08-08-02-03.info.log",
+            "hash": "abd1c6c6ae0e21c42dedaf6a89bf522659852f751c1716b02fd59c2852ffb6f9"
+        },
+        {
+            "date": 1723082941876,
+            "name": "src/logs/departmentServices-2024-08-08-02-09.info.log",
+            "hash": "d241d51f65c70bb541617e81df92f5657f377dacc521e60137c09da9a87f61ad"
+        },
+        {
+            "date": 1723083038433,
+            "name": "src/logs/departmentServices-2024-08-08-02-10.info.log",
+            "hash": "b400e90b44bd1f06c5237790537d6b1b73d9f2550a0bcc2ad29b338bfe4d786f"
+        },
+        {
+            "date": 1723083279263,
+            "name": "src/logs/departmentServices-2024-08-08-02-14.info.log",
+            "hash": "cd12b0ee322d5389c759b52831f8c3849f4fecdccb1b7c931259e7997d7fd591"
+        },
+        {
+            "date": 1723083533017,
+            "name": "src/logs/departmentServices-2024-08-08-02-18.info.log",
+            "hash": "0906f06a324420d220510095832dd5811223c268d5bf56c4229da989ca8bef55"
+        },
+        {
+            "date": 1723084564945,
+            "name": "src/logs/departmentServices-2024-08-08-02-36.info.log",
+            "hash": "b2f6dea329ae35a0670183a55979357c39e05d1b7318ab2b24a5fc4b7e7a9ac6"
+        },
+        {
+            "date": 1723084800411,
+            "name": "src/logs/departmentServices-2024-08-08-02-40.info.log",
+            "hash": "be257407514fbf9a7d8ff0167a89d40bc266b1e1e5e5164c0ea2087ee4ce8d7b"
+        },
+        {
+            "date": 1723089005727,
+            "name": "src/logs/departmentServices-2024-08-08-03-50.info.log",
+            "hash": "746ec6a6add8b20255c72c1c7bd321b0168a9d99820f97e8a718ef676574d822"
+        }
+    ],
+    "hashType": "sha256"
+}

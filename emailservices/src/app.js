@@ -6,7 +6,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
 const { v4: uuidv4 } = require("uuid");
-const UserLogger = require("./loggers/user.log");
+const EmailLogger = require("./loggers/email.log");
 const initElasticsearch = require("./dbs/init.elasticsearch");
 
 const app = express();

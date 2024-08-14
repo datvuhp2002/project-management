@@ -26,10 +26,25 @@ const projectServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
+  "/get-all-user-project": {
+    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllUserProject`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/get-all-user-project-in-department": {
+    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllUserProjectInDepartment`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/get-all-info-project-in-department": {
+    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllInfoProjectInDepartment`,
+    authRequired: true,
+    permissions: null,
+  },
   "/get-all-project-in-department": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllProjectInDepartment`,
     authRequired: true,
-    permissions: null,
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/create": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/create`,

@@ -6,7 +6,6 @@ const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
 const app = express();
-const initElasticsearch = require("./dbs/init.elasticsearch");
 const { v4: uuidv4 } = require("uuid");
 const AssignmentLogger = require("./loggers/assignment.log");
 // init middleware
@@ -29,10 +28,6 @@ app.use((req, res, next) => {
   ]);
   next();
 });
-// init elasticsearch
-// initElasticsearch.init({
-//   ELASTICSEARCH_IS_ENABLED: true,
-// });
 // init routes
 app.use("", require("./routes"));
 // handle errors
@@ -56,6 +51,6 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
-continuousConsumer().catch(console.error);
+// continuousConsumer().catch(console.error);
 
 module.exports = app;

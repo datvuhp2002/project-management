@@ -7,15 +7,18 @@ const {
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const { runProducer } = require("../message_queue/producer");
 const {
   ActivityProducerTopic,
 } = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
-const { GetAllTaskFromProject } = require("./grpcClient.services");
+const {
+  GetAllTaskFromProject,
+  TotalActivity,
+} = require("./grpcClient.services");
 class TaskService {
   static select = {
     task_id: true,
+    name: true,
     description: true,
     document: true,
     createdBy: true,
@@ -30,7 +33,7 @@ class TaskService {
     if (newTask) {
       await runProducer(ActivityProducerTopic.taskCreated, {
         task_id: newTask.task_id,
-        description: newTask.description,
+        name: newTask.name,
         createdBy,
       });
       return newTask;
@@ -70,7 +73,6 @@ class TaskService {
   };
   static getAllTaskInProject = async (query, project_id) => {
     const task_ids = await GetAllTaskFromProject(project_id);
-    console.log("list task:", task_ids);
     return await this.getAllTaskByTaskIds(query, { task_ids });
   };
   // get all tasks
@@ -122,11 +124,12 @@ class TaskService {
       select: this.select,
     });
     if (!task) throw new BadRequestError("Task not found");
+    const total = await TotalActivity(task_id);
+    task.total_activities = total;
     return task;
   };
   // update task
   static update = async ({ task_id, data }, modifiedBy) => {
-    console.log(task_id);
     const existingTask = await prisma.task.findUnique({ where: { task_id } });
     if (!existingTask) throw new BadRequestError("Task not found");
     let updateTask;
@@ -147,7 +150,7 @@ class TaskService {
     if (updateTask) {
       await runProducer(ActivityProducerTopic.taskUpdated, {
         task_id: updateTask.task_id,
-        description: updateTask.description,
+        name: updateTask.name,
         modifiedBy,
       });
       return true;
@@ -185,53 +188,6 @@ class TaskService {
     }
     return true;
   };
-  // get Image File from cloudinary
-  // static getFileImage = async ({ filename }) => {
-  //   const options = {
-  //     height: 500,
-  //     width: 500,
-  //     format: "jpg",
-  //   };
-  //   try {
-  //     const result = await cloudinary.url(filename, options);
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   return await cloudinary.image(filename);
-  // };
-  // static getFile = async ({ filename }) => {
-  //   try {
-  //     const result = await cloudinary.url(filename, { resource_type: "raw" });
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // static deleteFile = async (task_id, { filename }) => {
-  //   const existingTask = await prisma.task.findUnique({
-  //     where: { task_id },
-  //   });
-  //   if (!existingTask) throw new BadRequestError("Nhiệm vụ không tồn tại");
-  //   try {
-  //     const updatedDocument = existingTask.document.filter(
-  //       (file) => file !== filename
-  //     );
-  //     const uploadFile = await prisma.task.update({
-  //       where: { task_id },
-  //       data: {
-  //         document: updatedDocument,
-  //       },
-  //     });
-  //     if (uploadFile) {
-  //       cloudinary.uploader.destroy(filename);
-  //       return true;
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
-  //   }
-  // };
   static queryTask = async ({
     query,
     items_per_page,
@@ -275,11 +231,14 @@ class TaskService {
         createdAt: "desc",
       },
     });
-
+    const taskPromises = tasks.map(async (task, index) => {
+      const result = await TotalActivity(task.task_id);
+      task.total_activities = result;
+    });
+    await Promise.all(taskPromises);
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
-
     return {
       data: tasks,
       total,

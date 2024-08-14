@@ -58,19 +58,18 @@ const userServicesRoutes = {
   "/get-all-staff-in-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffInDepartment`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
-    authRequired: null,
-    permissions: null,
+    authRequired: true,
+    permissions: ["ADMIN", "MANAGER"],
   },
   "/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
     permissions: null,
   },
-
   "/detail": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/detail`,
     authRequired: true,
@@ -81,7 +80,6 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
-
   "/add-user-into-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/addUserIntoDepartment`,
     authRequired: true,
@@ -102,20 +100,5 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["ADMIN", "MANAGER"],
   },
-  // "/upload-avatar-from-local": {
-  //   target: `${process.env.USER_SERVICES_REQUEST_URL}/uploadAvatarFromLocal`,
-  //   authRequired: true,
-  //   permissions: null,
-  // },
-  // "/get-avatar": {
-  //   target: `${process.env.USER_SERVICES_REQUEST_URL}/getAvatar`,
-  //   authRequired: true,
-  //   permissions: null,
-  // },
-  // "/delete-avatar-in-cloud": {
-  //   target: `${process.env.USER_SERVICES_REQUEST_URL}/deleteAvatarInCloud`,
-  //   authRequired: true,
-  //   permissions: null,
-  // },
 };
 module.exports = userServicesRoutes;

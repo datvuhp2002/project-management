@@ -1,0 +1,65 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "src/logs/.5186b69d7a48467b4c6cb65eb313fb7fae6b8bfc-audit.json",
+    "files": [
+        {
+            "date": 1723081031801,
+            "name": "src/logs/emailServices-2024-08-08-08-37.info.log",
+            "hash": "06e0988c24b2248ea96917aa7c700ab0e32e033f3e25d23d6fe69ee94250d17e"
+        },
+        {
+            "date": 1723081297040,
+            "name": "src/logs/emailServices-2024-08-08-08-41.info.log",
+            "hash": "cc1171b76ad7975cd57d3bbbda29d900137aae11ffd21cad83831ce681154a58"
+        },
+        {
+            "date": 1723081325550,
+            "name": "src/logs/emailServices-2024-08-08-08-42.info.log",
+            "hash": "27cfab08072282f2bdd3f7b278a5e38b3a64ad641395e1305033c2e3e312ea05"
+        },
+        {
+            "date": 1723081428244,
+            "name": "src/logs/emailServices-2024-08-08-08-43.info.log",
+            "hash": "a95bd68d859f1d853518f3634e5be9dc06202c364e72d6b7ed9ee38d645a5bf7"
+        },
+        {
+            "date": 1723081643795,
+            "name": "src/logs/emailServices-2024-08-08-08-47.info.log",
+            "hash": "87c9122a574bb561542a1cc66b429894a69277678edf97b369a710a0bacb162f"
+        },
+        {
+            "date": 1723081695093,
+            "name": "src/logs/emailServices-2024-08-08-08-48.info.log",
+            "hash": "881dc72fb505f895b73142c02211eced38eacd1ea84cd416d0abaf3cd7c42747"
+        },
+        {
+            "date": 1723081744443,
+            "name": "src/logs/emailServices-2024-08-08-08-49.info.log",
+            "hash": "1f73ec28cab64917528f9de34aae55b153721fe36dd36d725f357576f36030e3"
+        },
+        {
+            "date": 1723081827674,
+            "name": "src/logs/emailServices-2024-08-08-08-50.info.log",
+            "hash": "0dd19957d95f8ae1030472c350fd6ef577d51f48aacae8b462183f1cf0c8ec39"
+        },
+        {
+            "date": 1723081870199,
+            "name": "src/logs/emailServices-2024-08-08-08-51.info.log",
+            "hash": "801447c3e6659788fc5203759f18150ea91ae0d0ed21d9d614f4d4b731df3daa"
+        },
+        {
+            "date": 1723081927998,
+            "name": "src/logs/emailServices-2024-08-08-08-52.info.log",
+            "hash": "9db045caa9f6e22443e58a70a96b027c7754dd458e153d8c23e2cbbdd7d35ffc"
+        },
+        {
+            "date": 1723082010046,
+            "name": "src/logs/emailServices-2024-08-08-08-53.info.log",
+            "hash": "f659437534a8e8dbcadc782c2f2054082476a9fe9751411f258d8b7a79864515"
+        }
+    ],
+    "hashType": "sha256"
+}

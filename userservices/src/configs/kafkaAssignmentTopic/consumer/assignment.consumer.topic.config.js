@@ -1,7 +1,5 @@
 "use strict";
-const assignmentTopicsContinuous = {
-  getUserInformation: "get-user-information",
-};
+const assignmentTopicsContinuous = {};
 const assignmentTopicsOnDemand = {
   receivedListUserPropertyFromProject:
     "received-list-user-properties-from-project",

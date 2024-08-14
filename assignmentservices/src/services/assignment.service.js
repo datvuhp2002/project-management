@@ -1,11 +1,7 @@
 "use strict";
 
 const prisma = require("../prisma");
-const {
-  BadRequestError,
-  AuthFailureError,
-  ForbiddenError,
-} = require("../core/error.response");
+const { BadRequestError } = require("../core/error.response");
 const { getUser, getTask, getProject } = require("./grpcClient.services");
 class AssignmentService {
   static select = {
@@ -21,15 +17,47 @@ class AssignmentService {
   };
   // create new assignment
   static create = async (data, createdBy) => {
+    try {
+      const projectResponse = await getProject(data.project_id);
+    } catch (e) {
+      throw new BadRequestError("Project is not exist");
+    }
+    if (!data.task_id) {
+      const assignment = await prisma.assignment.create({
+        data: { ...data, createdBy },
+        select: this.select,
+      });
+      return assignment || { code: 200, metadata: null };
+    }
+    try {
+      const taskResponse = await getTask(data.task_id);
+    } catch (e) {
+      throw new BadRequestError("Task is not exist");
+    }
+    const findAssignment = await prisma.assignment.findFirst({
+      where: {
+        project_id: data.project_id,
+        task_id: data.task_id,
+        user_id: data.user_id,
+      },
+    });
+    if (findAssignment)
+      throw new BadRequestError("Assignment is already exist");
+    const startDateAssignment = new Date(data.startAt);
+    const endDateAssignment = new Date(data.endAt);
+    if (endDateAssignment <= startDateAssignment) {
+      throw new BadRequestError("End date cannot be equal start date");
+    }
     const assignment = await prisma.assignment.create({
-      data: { ...data, createdBy },
+      data: {
+        user_id: data.user_id,
+        project_id: data.project_id,
+        task_id: data.task_id,
+        createdBy,
+      },
       select: this.select,
     });
-    if (assignment) return assignment;
-    return {
-      code: 200,
-      metadata: null,
-    };
+    return assignment || { code: 200, metadata: null };
   };
   // get all assignment instances
   static getAll = async ({
@@ -42,10 +70,8 @@ class AssignmentService {
   }) => {
     let query = [];
     query.push({ deletedMark: false });
-    if (status && status === "true") {
-      query.push({ status: true });
-    } else if (status && status === "false") {
-      query.push({ status: false });
+    if (status) {
+      query.push({ status: Number(status) });
     }
     return await this.queryAssignment(
       {
@@ -78,10 +104,8 @@ class AssignmentService {
   ) => {
     let query = [];
     query.push({ deletedMark: false, user_id });
-    if (status && status === "true") {
-      query.push({ status: true });
-    } else if (status && status === "false") {
-      query.push({ status: false });
+    if (status) {
+      query.push({ status: Number(status) });
     }
     return await this.queryAssignment(
       {
@@ -109,10 +133,8 @@ class AssignmentService {
   ) => {
     let query = [];
     query.push({ deletedMark: false, task_id });
-    if (status && status === "true") {
-      query.push({ status: true });
-    } else if (status && status === "false") {
-      query.push({ status: false });
+    if (status) {
+      query.push({ status: Number(status) });
     }
     if (isAssigned && isAssigned === "true") {
       query.push(
@@ -178,10 +200,8 @@ class AssignmentService {
         }
       );
     }
-    if (status && status === "true") {
-      query.push({ status: true });
-    } else if (status && status === "false") {
-      query.push({ status: false });
+    if (status) {
+      query.push({ status: Number(status) });
     }
     return await this.queryAssignment(
       {
@@ -245,7 +265,7 @@ class AssignmentService {
       },
     ];
     if (status) {
-      query.push({ status });
+      query.push({ status: Number(status) });
     }
     return await this.queryAssignment(
       {
@@ -426,6 +446,18 @@ class AssignmentService {
       };
     }
     return null;
+  };
+  static getAllUserProject = async (user_id) => {
+    const list_project = await prisma.assignment.findMany({
+      where: { user_id },
+    });
+    if (list_project) {
+      const projectIds = list_project.map((item) => item.project_id);
+      const uniqueProjectIds = [...new Set(projectIds)];
+      return uniqueProjectIds;
+    } else {
+      return [];
+    }
   };
 }
 module.exports = AssignmentService;

@@ -4,15 +4,15 @@ sleep 5
 
 docker exec -it mongo1 bash -c "/scripts/rs-init.sh"
 
-docker stop kibana zookeeper kafkaMQ kafka-ui elasticsearch debezium 
-docker stop userservices gateway departmentservices assignmentservices activityservices projectservices taskservices emailservices
+docker stop zookeeper kafkaMQ kafka-ui debezium 
+docker stop userservices gateway departmentservices assignmentservices activityservices projectservices taskservices emailservices uploadservices
 
-docker start zookeeper elasticsearch
+docker start zookeeper
 
-sleep 5
+sleep 10
 
-docker start kibana kafkaMQ debezium kafka-ui
+docker start kafkaMQ debezium kafka-ui
 
 sleep 20
 
-docker start userservices departmentservices assignmentservices activityservices projectservices taskservices emailservices gateway
+docker start userservices departmentservices assignmentservices activityservices projectservices taskservices emailservices gateway uploadservices

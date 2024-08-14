@@ -1,1 +1,0 @@
-{"@timestamp":"2024-06-24T09:22:52.945Z","context":"/services/api/user/uploadAvatarFromLocal/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"data is not defined"},"requestId":"603784d1-300b-49dc-b427-98b4cf5f31dc"}
