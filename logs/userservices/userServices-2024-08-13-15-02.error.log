@@ -1,0 +1,1 @@
+{"@timestamp":"2024-08-13T15:02:34.375Z","context":"/services/api/user/create/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"genAvatarColor is not defined"},"requestId":"5621964b-cdfa-4f44-bfc5-f9ef706cef52"}

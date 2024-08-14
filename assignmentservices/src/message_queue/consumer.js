@@ -19,10 +19,11 @@ const kafka = new Kafka({
   clientId: "assignment-services",
   brokers: [process.env.KAFKA_BROKER],
 });
-
 const continuousConsumer = async () => {
   const consumer = kafka.consumer({ groupId: "assignment-continuous-group" });
   await consumer.connect();
+
+  // Subscribe to continuous topics
   await consumer.subscribe({
     topics: convertObjectToArray(projectTopicsContinuous),
     fromBeginning: false,
@@ -36,11 +37,20 @@ const continuousConsumer = async () => {
     fromBeginning: false,
   });
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      const parsedMessage = JSON.parse(message.value.toString());
-      switch (topic) {
-        default:
-          console.log("Topic không được xử lý:", topic);
+    eachMessage: async ({ topic, partition, message, heartbeat }) => {
+      try {
+        const parsedMessage = JSON.parse(message.value.toString());
+        console.log(
+          `Received message from topic: ${topic}, partition: ${partition}`
+        );
+        console.log("Message content:", parsedMessage);
+        switch (topic) {
+          default:
+            console.log("Unhandled topic:", topic);
+        }
+        await heartbeat(); // Ensure Kafka knows that the consumer is still alive
+      } catch (err) {
+        console.error("Error handling message:", err);
       }
     },
   });

@@ -248,9 +248,10 @@ class AssignmentService {
       null
     );
     if (listOfAssignment.assignments) {
-      const taskIds = listOfAssignment.assignments.map(
-        (assignment) => assignment.task_id
-      );
+      const taskIds = listOfAssignment.assignments
+        .filter((assignment) => assignment.task_id !== null)
+        .map((assignment) => assignment.task_id);
+
       const uniqueTaskIds = [...new Set(taskIds)];
       return uniqueTaskIds;
     }
@@ -264,7 +265,7 @@ class AssignmentService {
         project_id,
       },
     ];
-    if (status) {
+    if (status !== null) {
       query.push({ status: Number(status) });
     }
     return await this.queryAssignment(

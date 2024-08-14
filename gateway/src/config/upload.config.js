@@ -28,22 +28,22 @@ const uploadServicesRoutes = {
   "/upload-file-for-project": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-file-for-project`,
     authRequired: true,
-    permissions: [ADMIN, MANAGER, PROJECT_MANAGER],
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/delete-file-for-project": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/delete-file-for-project`,
     authRequired: true,
-    permissions: [ADMIN, MANAGER, PROJECT_MANAGER],
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/upload-file-for-task": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/upload-file-for-task`,
     authRequired: true,
-    permissions: [ADMIN, MANAGER, PROJECT_MANAGER],
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/delete-file-for-task": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/delete-file-for-task`,
     authRequired: true,
-    permissions: [ADMIN, MANAGER, PROJECT_MANAGER],
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/delete-avatar-in-cloud": {
     target: `${process.env.UPLOAD_SERVICES_REQUEST_URL}/delete-file`,

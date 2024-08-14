@@ -34,7 +34,7 @@ router.put(
 router.put(
   "/delete-file-for-task/:id",
   uploadProject.single("file"),
-  asyncHandler(UploadController.deleteFileForProject)
+  asyncHandler(UploadController.deleteFileForTask)
 );
 router.post("/getFileImage", asyncHandler(UploadController.getFileImage));
 module.exports = router;

@@ -35,12 +35,24 @@ class UserService {
     createdBy: true,
     deletedMark: true,
     department_id: true,
+    avatar_color: true,
     role: {
       select: {
         role_id: true,
         name: true,
       },
     },
+  };
+  static genAvatarColor = () => {
+    const result = Math.floor(Math.random() * 3);
+    switch (result) {
+      case 0:
+        return "#f56a00";
+      case 1:
+        return "#87d068";
+      case 2:
+        return "#1677ff";
+    }
   };
   // create new user
   static create = async ({ username, email, role, ...rest }, createdBy) => {
@@ -60,10 +72,12 @@ class UserService {
     // Convert the integer to a string and pad it with leading zeros if necessary
     const password = genPass.toString().padStart(6, "0");
     const passwordHash = await bcrypt.hash(password, 10);
+    const avatarColor = this.genAvatarColor();
     const newUser = await prisma.user.create({
       data: {
         username,
         email,
+        avatar_color: avatarColor,
         role_id: role_data.role_id,
         password: passwordHash,
         createdBy,
