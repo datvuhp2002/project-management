@@ -4,7 +4,6 @@ const grpc = require("@grpc/grpc-js");
 
 async function getAvatar(call, callback) {
   const { avatar } = call.request;
-  console.log(avatar);
   try {
     const avatarResponse = await uploadServices.getAvatar({ avatar });
     if (avatarResponse) {

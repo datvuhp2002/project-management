@@ -1,6 +1,5 @@
 const {
   projectTopicsContinuous,
-  projectTopicsOnDemand,
 } = require("./consumer/project.consumer.topic.config");
 const {
   projectProducerTopic,
@@ -8,6 +7,5 @@ const {
 
 module.exports = {
   projectTopicsContinuous,
-  projectTopicsOnDemand,
   projectProducerTopic,
 };

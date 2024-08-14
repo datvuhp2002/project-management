@@ -23,6 +23,7 @@ model User {
   avatar        String?
   name          String?
   birthday      DateTime?
+  avatar_color  String?
   createdBy     String?   @db.ObjectId
   modifiedBy    String?   @db.ObjectId
   createdAt     DateTime  @default(now())

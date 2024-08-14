@@ -6,7 +6,6 @@ const morgan = require("morgan");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 const UploadLog = require("./loggers/upload.log");
-const initElasticsearch = require("./dbs/init.elasticsearch");
 
 const app = express();
 
@@ -17,10 +16,6 @@ app.use(compression());
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-// init elasticsearch
-// initElasticsearch.init({
-//   ELASTICSEARCH_IS_ENABLED: true,
-// });
 // init routes
 app.use("", require("./routes"));
 // // init logger

@@ -247,6 +247,18 @@ class ProjectService {
     await this.restore(project_id);
     throw new BadRequestError("Xoá dự án không thành công");
   };
+  // delete file
+  static deleteFile = async ({ project_id, filename }) => {
+    const project = await prisma.project.findUnique({ where: { project_id } });
+    if (!project) throw new BadRequestError("Project not found");
+    const updatedDocuments = project.document.filter((doc) => doc !== filename);
+    const updateProject = await prisma.project.update({
+      where: { project_id },
+      data: { document: updatedDocuments },
+    });
+    if (!updateProject) throw new BadRequestError("Can not delete this file");
+    return true;
+  };
   // restore project
   static restore = async (project_id) => {
     const restoreProject = await prisma.project.update({

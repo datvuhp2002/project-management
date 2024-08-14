@@ -20,22 +20,38 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
+
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
-      const parsedMessage = JSON.parse(message.value.toString());
-      switch (topic) {
-        case uploadTopicsContinuous.uploadFileForTask:
-          console.log(parsedMessage);
-          await TaskService.update(
-            {
-              task_id: parsedMessage.task_id,
-              data: { document: parsedMessage.file },
-            },
-            parsedMessage.modifiedBy
-          );
-          break;
-        default:
-          console.log("Topic không được xử lý:", topic);
+      try {
+        const parsedMessage = JSON.parse(message.value.toString());
+        console.log("Before handle :::", parsedMessage);
+
+        switch (topic) {
+          case uploadTopicsContinuous.uploadFileForTask:
+            console.log(parsedMessage);
+            await TaskService.update(
+              {
+                task_id: parsedMessage.task_id,
+                data: { document: parsedMessage.file },
+              },
+              parsedMessage.modifiedBy
+            );
+            break;
+          case uploadTopicsContinuous.deleteTaskFileInCloud:
+            await TaskService.deleteFile(parsedMessage);
+            break;
+          default:
+            console.log("Topic không được xử lý:", topic);
+        }
+        // Gọi heartbeat để giữ kết nối sống nếu cần
+        await heartbeat();
+      } catch (error) {
+        console.error(
+          `[Kafka] Error processing message in topic ${topic}:`,
+          error.message
+        );
+        console.error(error.stack);
       }
     },
   });
