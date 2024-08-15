@@ -119,6 +119,51 @@
             "date": 1723561556601,
             "name": "src/logs/userServices-2024-08-13-15-05.info.log",
             "hash": "72a6ed7c21dd22cd87938b249e5cc799a8413dd769ebbe047067b075f827fe0a"
+        },
+        {
+            "date": 1723621480122,
+            "name": "src/logs/userServices-2024-08-14-07-44.info.log",
+            "hash": "c060c5dbb2f7e2fbf4494ef592754836024982eeadd51979597a031e29451893"
+        },
+        {
+            "date": 1723621985355,
+            "name": "src/logs/userServices-2024-08-14-07-53.info.log",
+            "hash": "c8855ec2d28e5cd434f23b11d757a1d4a62d05f6859c837ac3e2f4342f01deca"
+        },
+        {
+            "date": 1723689762220,
+            "name": "src/logs/userServices-2024-08-15-02-42.info.log",
+            "hash": "998cfcf54cbf01966e78a981953d4e53ad529b8018b824e5d6c7a063baa2d1f1"
+        },
+        {
+            "date": 1723691333352,
+            "name": "src/logs/userServices-2024-08-15-03-08.info.log",
+            "hash": "171cdbe6595d4ff46c20bef4419f9cf834fb04fe28beb9289d69b8f5cf1b2297"
+        },
+        {
+            "date": 1723692185553,
+            "name": "src/logs/userServices-2024-08-15-03-23.info.log",
+            "hash": "3cb17587e44094f7c67ed888925e717718f92250dc811f7dca04cecc0d0d59ed"
+        },
+        {
+            "date": 1723692745501,
+            "name": "src/logs/userServices-2024-08-15-03-32.info.log",
+            "hash": "493f95f71bb2b1c6c48d8b27b19b5da58478bc86371c0856f9e4eb55ed5a495a"
+        },
+        {
+            "date": 1723693102785,
+            "name": "src/logs/userServices-2024-08-15-03-38.info.log",
+            "hash": "f627d1c7c06cc634a6c487589dba556aa0ac7b96483c63890bd0aac97b7f1c30"
+        },
+        {
+            "date": 1723693674268,
+            "name": "src/logs/userServices-2024-08-15-03-47.info.log",
+            "hash": "c4edcedba9d3ecc4bc7bcc922f3149e44ddde35fb099c8c1c4611c820476bd64"
+        },
+        {
+            "date": 1723694857364,
+            "name": "src/logs/userServices-2024-08-15-04-07.info.log",
+            "hash": "59ff7adf8c79a4d898fa821bc15c3e8d433628b8366b5fa58d35dd46d6c43f54"
         }
     ],
     "hashType": "sha256"

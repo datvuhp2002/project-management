@@ -2,7 +2,12 @@
 
 const prisma = require("../prisma");
 const { BadRequestError } = require("../core/error.response");
-const { getUser, getTask, getProject } = require("./grpcClient.services");
+const {
+  getUser,
+  getTask,
+  getProject,
+  getListProjectInDepartment,
+} = require("./grpcClient.services");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -18,10 +23,18 @@ class AssignmentService {
   // create new assignment
   static create = async (data, createdBy) => {
     try {
-      const projectResponse = await getProject(data.project_id);
+      await getProject(data.project_id);
     } catch (e) {
       throw new BadRequestError("Project is not exist");
     }
+    const isAssignmentExist = await prisma.assignment.findFirst({
+      where: {
+        project_id: data.project_id,
+        user_id: data.user_id,
+      },
+    });
+    if (isAssignmentExist)
+      throw new BadRequestError("Assignment already exists");
     if (!data.task_id) {
       const assignment = await prisma.assignment.create({
         data: { ...data, createdBy },
@@ -30,7 +43,7 @@ class AssignmentService {
       return assignment || { code: 200, metadata: null };
     }
     try {
-      const taskResponse = await getTask(data.task_id);
+      await getTask(data.task_id);
     } catch (e) {
       throw new BadRequestError("Task is not exist");
     }
@@ -421,29 +434,39 @@ class AssignmentService {
   static getTotalTaskWithStatusFromProjectAndTotalStaff = async (
     project_id
   ) => {
-    const listOfAssignmentIsNotDone = await this.listOfAssignmentFromProject(
+    const listOfAssignmentIsTodo = await this.listOfAssignmentFromProject(
       project_id,
-      false
+      0
+    );
+    const listOfAssignmentIsOnProgress = await this.listOfAssignmentFromProject(
+      project_id,
+      1
     );
     const listOfAssignmentIsDone = await this.listOfAssignmentFromProject(
       project_id,
-      true
+      2
     );
     const totalStaff = await this.getAllUserFromProject(project_id);
     if (
-      listOfAssignmentIsNotDone.assignments &&
+      listOfAssignmentIsTodo.assignments &&
+      listOfAssignmentIsOnProgress.assignments &&
       listOfAssignmentIsDone.assignments
     ) {
       const taskIdsIsDone = listOfAssignmentIsDone.assignments.map(
         (assignment) => assignment.task_id
       );
-      const taskIdsIsNotDone = listOfAssignmentIsNotDone.assignments.map(
+      const taskIdsIsOnProgress = listOfAssignmentIsOnProgress.assignments.map(
         (assignment) => assignment.task_id
       );
+      const taskIdsIsTodo = listOfAssignmentIsTodo.assignments.map(
+        (assignment) => assignment.task_id
+      );
+      const taskIdsIsNotDone =
+        taskIdsIsOnProgress.length + taskIdsIsTodo.length;
       return {
         total_user: totalStaff.total,
         total_task_is_done: taskIdsIsDone.length,
-        total_task_is_not_done: taskIdsIsNotDone.length,
+        total_task_is_not_done: taskIdsIsNotDone,
       };
     }
     return null;
@@ -459,6 +482,20 @@ class AssignmentService {
     } else {
       return [];
     }
+  };
+  static getAllUserInDepartmentHaveProjects = async (department_id) => {
+    const projectIds = await getListProjectInDepartment(department_id);
+    let userIds = [];
+    for (const id of projectIds) {
+      const listProjectInfo = await prisma.assignment.findMany({
+        where: { project_id: id, user_id: { not: null } },
+      });
+      listProjectInfo.forEach((item) => {
+        if (item.user_id !== null) userIds.push(item.user_id);
+      });
+    }
+    const uniqueUserIds = [...new Set(userIds)];
+    return uniqueUserIds;
   };
 }
 module.exports = AssignmentService;

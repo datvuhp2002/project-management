@@ -51,6 +51,6 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
-// continuousConsumer().catch(console.error);
+continuousConsumer().catch(console.error);
 
 module.exports = app;

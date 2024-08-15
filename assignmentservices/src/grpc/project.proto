@@ -1,17 +1,24 @@
 syntax = "proto3";
 
 package project;
+
 service ProjectService {
-  rpc GetProject(ProjectRequest) returns (ProjectResponse);
+  rpc GetProject(ProjectRequeset) returns (ProjectResponse);
+  rpc GetListProjectInDepartment(GetListProjectInDepartmentRequest) returns (GetListProjectInDepartmentResponse);
 }
 
-message ProjectRequest {
+message ProjectRequeset {
   string project_id = 1;
 }
-
 message ProjectResponse {
   string project_id = 1;
   string projectCode = 2;
   string investor = 3;
   string createdBy = 4;
+}
+message GetListProjectInDepartmentRequest {
+  string department_id = 1;
+}
+message GetListProjectInDepartmentResponse {
+  repeated string ids = 1;
 }

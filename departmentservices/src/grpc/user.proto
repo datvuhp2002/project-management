@@ -18,7 +18,10 @@ message UserResponse {
   string phone = 4;
   string avatar = 5;
   string name = 6;
+  string avatar_color = 7;
+  string department_id = 8;
 }
+
 message DetailManagerAndTotalStaffInDepartmentRequest {
   string department_id = 1;
   string manager_id = 2;

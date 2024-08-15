@@ -40,7 +40,7 @@ const assignmentServicesRoutes = {
   "/update": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/detail": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/detail`,

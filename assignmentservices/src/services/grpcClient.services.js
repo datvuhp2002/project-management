@@ -83,5 +83,19 @@ async function getProject(project_id) {
     });
   });
 }
-
-module.exports = { getUser, getTask, getProject };
+async function getListProjectInDepartment(department_id) {
+  if (department_id == null) return null;
+  return new Promise((resolve, reject) => {
+    projectClient.getListProjectInDepartment(
+      { department_id },
+      (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response.ids);
+        }
+      }
+    );
+  });
+}
+module.exports = { getUser, getTask, getProject, getListProjectInDepartment };

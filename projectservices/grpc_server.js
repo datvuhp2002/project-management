@@ -1,7 +1,10 @@
 "use strict";
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
-const { GetProject } = require("./src/services/grpc.service");
+const {
+  GetProject,
+  GetListProjectInDepartment,
+} = require("./src/services/grpc.service");
 const path = require("path");
 
 const PROJECT_PROTO_PATH = path.join(__dirname, "src/grpc/project.proto");
@@ -20,6 +23,7 @@ function startGrpcServer() {
   const server = new grpc.Server();
   server.addService(projectProto.project.ProjectService.service, {
     GetProject,
+    GetListProjectInDepartment,
   });
   const host = "0.0.0.0";
   const port = process.env.GRPC_PORT;
