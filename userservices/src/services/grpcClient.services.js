@@ -33,6 +33,21 @@ async function GetAllUserFromProject(project_id) {
     });
   });
 }
+async function GetAllUserInDepartmentHaveProjects(department_id) {
+  if (department_id == null) return null;
+  return new Promise((resolve, reject) => {
+    assignmentClient.getAllUserInDepartmentHaveProjects(
+      { department_id },
+      (err, response) => {
+        if (err) {
+          reject(err.message);
+        } else {
+          resolve(response.ids);
+        }
+      }
+    );
+  });
+}
 const packageUploadDefinition = protoLoader.loadSync(UPLOAD_PROTO_PATH, {
   keepCase: true,
   longs: String,
@@ -58,4 +73,8 @@ async function GetAvatar(avatar) {
     });
   });
 }
-module.exports = { GetAllUserFromProject, GetAvatar };
+module.exports = {
+  GetAllUserFromProject,
+  GetAvatar,
+  GetAllUserInDepartmentHaveProjects,
+};

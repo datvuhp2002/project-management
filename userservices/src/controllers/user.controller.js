@@ -53,6 +53,15 @@ class UserController {
       data: await UserService.getListOfStaffDoNotHaveDepartment(req.query),
     }).send(res);
   };
+  getListUserDoNotHaveProject = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy ra danh nhân viên trong phòng ban chưa có dự án thành công",
+      data: await UserService.getListUserDoNotHaveProject(
+        req.query,
+        req.params.id
+      ),
+    }).send(res);
+  };
   getAllStaffInDepartment = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách người dùng thành công",

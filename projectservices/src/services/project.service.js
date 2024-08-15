@@ -133,6 +133,15 @@ class ProjectService {
       true
     );
   };
+  // get all projects ids in department
+  static getAllProjectIdsInDepartment = async (department_id) => {
+    const projects = await prisma.project.findMany({
+      where: { department_id },
+      select: { project_id: true },
+    });
+    const ids = projects.map((project) => project.project_id);
+    return ids;
+  };
   static getAllUserProjectInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage },
     department_id,
@@ -363,7 +372,6 @@ class ProjectService {
           const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
             project.project_id
           );
-          console.log(result);
           const projectManagerInformation = await getUser(
             project.project_manager_id
           );

@@ -16,6 +16,10 @@ router.get(
   "/getListOfStaffDoNotHaveDepartment",
   asyncHandler(UserController.getListOfStaffDoNotHaveDepartment)
 );
+router.get(
+  "/getListUserDoNotHaveProject/:id",
+  asyncHandler(UserController.getListUserDoNotHaveProject)
+);
 // get all user in department
 router.get(
   "/admin/getAllStaffInDepartment/:id",

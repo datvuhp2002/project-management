@@ -21,7 +21,11 @@ const {
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
 
-const { GetAllUserFromProject, GetAvatar } = require("./grpcClient.services");
+const {
+  GetAllUserFromProject,
+  GetAvatar,
+  GetAllUserInDepartmentHaveProjects,
+} = require("./grpcClient.services");
 class UserService {
   static select = {
     user_id: true,
@@ -365,17 +369,14 @@ class UserService {
     role = "STAFF",
   }) => {
     let query = [];
+    const userIds = await this.findUserByRole(role);
     query.push({
-      user_id: {
-        in: await this.findUserByRole(role),
-      },
-    });
-    query.push({
-      department_id: null || undefined,
+      user_id: { in: userIds },
+      department_id: null,
       deletedMark: false,
     });
     return await this.queryUser({
-      query: query,
+      query,
       items_per_page,
       page,
       search,
@@ -530,7 +531,31 @@ class UserService {
     await this.delete(user_id);
     return null;
   };
+  // get list user do not have project
+  static getListUserDoNotHaveProject = async (query, department_id) => {
+    const listUserInDepartmentHaveProjectsIds =
+      await GetAllUserInDepartmentHaveProjects(department_id);
+    const listAllStaffInDepartmentWithoutProjects = await prisma.user.findMany({
+      where: {
+        department_id: department_id,
+        user_id: {
+          notIn: listUserInDepartmentHaveProjectsIds,
+        },
+      },
+      select: {
+        user_id: true,
+      },
+    });
+    const listAllStaffInDepartmentWithoutProjectsIds =
+      listAllStaffInDepartmentWithoutProjects.map((id) => {
+        return id.user_id;
+      });
 
+    return await this.getAllStaffByUserIds(
+      query,
+      listAllStaffInDepartmentWithoutProjectsIds
+    );
+  };
   static queryUser = async ({
     query,
     items_per_page,
@@ -540,60 +565,51 @@ class UserService {
     previousPage,
   }) => {
     const searchKeyword = search || "";
+
     let whereClause = {
-      OR: [
+      AND: [
         {
-          username: {
-            contains: searchKeyword,
-          },
-        },
-        {
-          email: {
-            contains: searchKeyword,
-          },
+          OR: [
+            { username: { contains: searchKeyword } },
+            { email: { contains: searchKeyword } },
+          ],
         },
       ],
     };
     if (query && query.length > 0) {
-      whereClause.AND = query;
+      whereClause.AND.push(...query);
     }
     const total = await prisma.user.count({
       where: whereClause,
     });
-    let itemsPerPage;
-    if (items_per_page !== "ALL") {
-      itemsPerPage = Number(items_per_page) || 10;
-    } else {
-      itemsPerPage = total;
-    }
+
+    const itemsPerPage =
+      items_per_page === "ALL" ? total : Number(items_per_page) || 10;
     const currentPage = Number(page) || 1;
-    const skip = currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0;
+    const skip = (currentPage - 1) * itemsPerPage;
     const users = await prisma.user.findMany({
       take: itemsPerPage,
       skip,
       select: this.select,
       where: whereClause,
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
+
     const getUsersAvatar = users.map(async (user) => {
       if (user.avatar) {
-        console.log(user.avatar);
         const avatar = await GetAvatar(user.avatar);
-        console.log(avatar);
         user.avatar = avatar;
       }
     });
+
     await Promise.all(getUsersAvatar);
+
     const lastPage = Math.ceil(total / itemsPerPage);
-    const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
-    const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
     return {
-      users: users,
+      users,
       total,
-      nextPage: nextPageNumber,
-      previousPage: previousPageNumber,
+      nextPage: currentPage + 1 > lastPage ? null : currentPage + 1,
+      previousPage: currentPage - 1 < 1 ? null : currentPage - 1,
       currentPage,
       itemsPerPage,
     };

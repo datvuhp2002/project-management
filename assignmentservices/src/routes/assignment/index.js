@@ -28,7 +28,6 @@ router.delete(
 );
 // get all assignments has been deleted
 router.get("/admin/trash", asyncHandler(AssignmentController.trash));
-
 // create a new assignment
 router.post("/create", asyncHandler(AssignmentController.create));
 
