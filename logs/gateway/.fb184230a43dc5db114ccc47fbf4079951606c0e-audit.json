@@ -149,6 +149,16 @@
             "date": 1723694856088,
             "name": "src/logs/gateway-2024-08-15-04-07.error.log",
             "hash": "1bd74903350a66bad5b8cee73a21c049fd9d6a1f8ea6c1450cb0ea6e7e09d0f0"
+        },
+        {
+            "date": 1723737169399,
+            "name": "src/logs/gateway-2024-08-15-15-52.error.log",
+            "hash": "8b6041f7f27944d6c5981b36fb40b2d37e3a20b7ea1d0bef88e9e2c6b4e2fc05"
+        },
+        {
+            "date": 1723738711442,
+            "name": "src/logs/gateway-2024-08-15-16-18.error.log",
+            "hash": "6e9343284137af38395d8ade9c32e649aacfee66f8ccd032b0f5110fbbe866fb"
         }
     ],
     "hashType": "sha256"

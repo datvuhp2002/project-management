@@ -551,10 +551,9 @@ class UserService {
         return id.user_id;
       });
 
-    return await this.getAllStaffByUserIds(
-      query,
-      listAllStaffInDepartmentWithoutProjectsIds
-    );
+    return await this.getAllStaffByUserIds(query, {
+      user_ids: listAllStaffInDepartmentWithoutProjectsIds,
+    });
   };
   static queryUser = async ({
     query,
