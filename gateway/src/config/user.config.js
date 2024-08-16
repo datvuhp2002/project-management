@@ -60,10 +60,15 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: null,
   },
+  "/get-list-user-do-not-have-project": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/getListUserDoNotHaveProject`,
+    authRequired: true,
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
+  },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/update`,

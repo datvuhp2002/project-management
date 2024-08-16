@@ -26,6 +26,15 @@ router.post(
   uploadProject.single("file"),
   asyncHandler(UploadController.uploadFileForProject)
 );
-
+router.put(
+  "/delete-file-for-project/:id",
+  uploadProject.single("file"),
+  asyncHandler(UploadController.deleteFileForProject)
+);
+router.put(
+  "/delete-file-for-task/:id",
+  uploadProject.single("file"),
+  asyncHandler(UploadController.deleteFileForTask)
+);
 router.post("/getFileImage", asyncHandler(UploadController.getFileImage));
 module.exports = router;

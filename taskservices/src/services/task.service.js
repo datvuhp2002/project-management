@@ -15,6 +15,9 @@ const {
   GetAllTaskFromProject,
   TotalActivity,
 } = require("./grpcClient.services");
+const {
+  uploadProducerTopic,
+} = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
 class TaskService {
   static select = {
     task_id: true,
@@ -173,6 +176,17 @@ class TaskService {
     }
     this.restore(task_id);
     return false;
+  };
+  static deleteFile = async ({ task_id, filename }) => {
+    const task = await prisma.task.findUnique({ where: { task_id } });
+    if (!task) throw new BadRequestError("Task not found");
+    const updatedDocuments = task.document.filter((doc) => doc !== filename);
+    const updateTask = await prisma.task.update({
+      where: { task_id },
+      data: { document: updatedDocuments },
+    });
+    if (!updateTask) throw new BadRequestError("Can not delete this file");
+    return true;
   };
   // restore project
   static restore = async (task_id) => {

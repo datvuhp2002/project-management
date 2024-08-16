@@ -12,6 +12,5 @@ cloudinary.config({
   sign_url: true,
 });
 
-console.log(cloudinary.config());
 // Log the configuration
 module.exports = cloudinary;

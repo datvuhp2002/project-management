@@ -297,7 +297,6 @@ class DepartmentService {
     if (query && query.length > 0) {
       whereClause.AND = query;
     }
-
     const total = await prisma.department.count({
       where: whereClause,
     });

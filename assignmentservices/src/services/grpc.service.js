@@ -50,6 +50,30 @@ async function getAllUserFromProject(call, callback) {
     });
   }
 }
+async function getAllUserInDepartmentHaveProjects(call, callback) {
+  const { department_id } = call.request;
+  try {
+    const listIds = await AssignmentService.getAllUserInDepartmentHaveProjects(
+      department_id
+    );
+    const response = {
+      ids: listIds,
+    };
+    if (listIds) {
+      callback(null, response);
+    } else {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        details: "Assignment not found",
+      });
+    }
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      details: "Internal server error",
+    });
+  }
+}
 async function getTotalTaskWithStatusFromProjectAndTotalStaff(call, callback) {
   const { project_id } = call.request;
   try {
@@ -99,5 +123,6 @@ module.exports = {
   getAllTaskFromProject,
   getAllUserFromProject,
   getTotalTaskWithStatusFromProjectAndTotalStaff,
+  getAllUserInDepartmentHaveProjects,
   getAllUserProject,
 };

@@ -44,7 +44,7 @@ const projectServicesRoutes = {
   "/get-all-project-in-department": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllProjectInDepartment`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
+    permissions: null,
   },
   "/create": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/create`,

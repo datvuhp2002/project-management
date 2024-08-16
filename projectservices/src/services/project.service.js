@@ -133,6 +133,15 @@ class ProjectService {
       true
     );
   };
+  // get all projects ids in department
+  static getAllProjectIdsInDepartment = async (department_id) => {
+    const projects = await prisma.project.findMany({
+      where: { department_id },
+      select: { project_id: true },
+    });
+    const ids = projects.map((project) => project.project_id);
+    return ids;
+  };
   static getAllUserProjectInDepartment = async (
     { items_per_page, page, search, nextPage, previousPage },
     department_id,
@@ -247,6 +256,18 @@ class ProjectService {
     await this.restore(project_id);
     throw new BadRequestError("Xoá dự án không thành công");
   };
+  // delete file
+  static deleteFile = async ({ project_id, filename }) => {
+    const project = await prisma.project.findUnique({ where: { project_id } });
+    if (!project) throw new BadRequestError("Project not found");
+    const updatedDocuments = project.document.filter((doc) => doc !== filename);
+    const updateProject = await prisma.project.update({
+      where: { project_id },
+      data: { document: updatedDocuments },
+    });
+    if (!updateProject) throw new BadRequestError("Can not delete this file");
+    return true;
+  };
   // restore project
   static restore = async (project_id) => {
     const restoreProject = await prisma.project.update({
@@ -350,7 +371,6 @@ class ProjectService {
           const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
             project.project_id
           );
-          console.log(result);
           const projectManagerInformation = await getUser(
             project.project_manager_id
           );
