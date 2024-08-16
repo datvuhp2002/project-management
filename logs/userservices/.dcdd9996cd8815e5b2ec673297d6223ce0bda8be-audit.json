@@ -164,6 +164,16 @@
             "date": 1723694857386,
             "name": "src/logs/userServices-2024-08-15-04-07.error.log",
             "hash": "499c86362a058a0867b7a02228eb94a862ffb8f449233cf66570ff9a52103bae"
+        },
+        {
+            "date": 1723737169831,
+            "name": "src/logs/userServices-2024-08-15-15-52.error.log",
+            "hash": "01cc08419765c0e355327b5ef0a5c54ee77082ec2b2631346c2ef92e7267dd91"
+        },
+        {
+            "date": 1723738711513,
+            "name": "src/logs/userServices-2024-08-15-16-18.error.log",
+            "hash": "54ba5587f8d7a501ead412b4da7aef20178996e00462ff7641e8193ea29a218f"
         }
     ],
     "hashType": "sha256"

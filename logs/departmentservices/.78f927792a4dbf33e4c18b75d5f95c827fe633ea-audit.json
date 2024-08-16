@@ -109,6 +109,16 @@
             "date": 1723694855978,
             "name": "src/logs/departmentServices-2024-08-15-04-07.error.log",
             "hash": "a6e4c9417e29b1214d9908432c53e71520338266d92cdb0580df17887b026e20"
+        },
+        {
+            "date": 1723737169113,
+            "name": "src/logs/departmentServices-2024-08-15-15-52.error.log",
+            "hash": "3b8b8544451552e711f2d898a7a3f88ec7d575b4a62f823ee47f5494d0501f63"
+        },
+        {
+            "date": 1723738711007,
+            "name": "src/logs/departmentServices-2024-08-15-16-18.error.log",
+            "hash": "7e312476eccc171e19b7139c68ae34cff410306728565cb9a5a055622424401b"
         }
     ],
     "hashType": "sha256"
