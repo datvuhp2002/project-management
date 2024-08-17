@@ -32,6 +32,12 @@ class UserController {
       data: await UserService.findByEmail(req.params.email),
     }).send(res);
   };
+  findByUsername = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Tìm email thành công",
+      data: await UserService.findByUsername(req.params.username),
+    }).send(res);
+  };
 
   /**
    * @param {items_per_page}
@@ -53,13 +59,10 @@ class UserController {
       data: await UserService.getListOfStaffDoNotHaveDepartment(req.query),
     }).send(res);
   };
-  getListUserDoNotHaveProject = async (req, res, next) => {
+  getListUserDoNotInProject = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh nhân viên trong phòng ban chưa có dự án thành công",
-      data: await UserService.getListUserDoNotHaveProject(
-        req.query,
-        req.params.id
-      ),
+      data: await UserService.getListUserDoNotInProject(req.query, req.body),
     }).send(res);
   };
   getAllStaffInDepartment = async (req, res, next) => {
@@ -115,16 +118,22 @@ class UserController {
   update = async (req, res, next) => {
     new SuccessResponse({
       message: "Cập nhật nhân viên thành công",
-      data: await UserService.update({ id: req.headers.user, data: req.body }),
+      data: await UserService.update(
+        { id: req.headers.user, data: req.body },
+        req.headers.user
+      ),
     }).send(res);
   };
   updateStaff = async (req, res, next) => {
     new SuccessResponse({
       message: "Cập nhật nhân viên thành công",
-      data: await UserService.update({
-        id: req.params.id,
-        data: req.body,
-      }),
+      data: await UserService.update(
+        {
+          id: req.params.id,
+          data: req.body,
+        },
+        req.headers.user
+      ),
     }).send(res);
   };
   delete = async (req, res, next) => {
@@ -164,40 +173,6 @@ class UserController {
       data: await UserService.getAllStaffByUserIds(req.query, req.body),
     }).send(res);
   };
-  // uploadImageFromUrl = async (req, res, next) => {
-  //   new SuccessResponse({
-  //     message: "Tải avatar thành công",
-  //     data: await uploadImageFromUrl(req.body, req.headers.user),
-  //   }).send(res);
-  // };
-  // uploadAvartarFromLocal = async (req, res, next) => {
-  //   const { file } = req;
-  //   if (!file) {
-  //     throw new BadRequestError("File is missing");
-  //   }
-  //   new SuccessResponse({
-  //     message: "Tải ảnh đại diện lên thành công",
-  //     data: await UserService.uploadAvartarFromLocal({
-  //       id: req.headers.user,
-  //       data: { avatar: file.filename },
-  //     }),
-  //   }).send(res);
-  // };
-  // getAvatar = async (req, res, next) => {
-  //   new SuccessResponse({
-  //     message: "Lấy ảnh đại diện về thành công",
-  //     data: await UserService.getAvatar(req.body.avatar),
-  //   }).send(res);
-  // };
-  // deleteAvatarInCloud = async (req, res, next) => {
-  //   new SuccessResponse({
-  //     message: "Xóa ảnh đại diện thành công",
-  //     data: await UserService.deleteAvatarInCloud(
-  //       req.body.avatar,
-  //       req.headers.user
-  //     ),
-  //   }).send(res);
-  // };
 }
 
 module.exports = new UserController();

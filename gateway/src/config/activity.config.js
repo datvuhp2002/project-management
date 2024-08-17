@@ -9,12 +9,12 @@ const activityServicesRoutes = {
   "/admin/restore": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/restore`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/trash": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/get-all-activities": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/getAllActivities`,
@@ -24,7 +24,7 @@ const activityServicesRoutes = {
   "/admin/delete": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/admin/delete`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/create": {
     target: `${process.env.ACTIVITY_SERVICES_REQUEST_URL}/create`,

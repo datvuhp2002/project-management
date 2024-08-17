@@ -41,12 +41,4 @@ router.put("/update/:id", asyncHandler(ProjectController.update));
 // Lấy ra chi tiết project theo id
 router.get("/detail/:id", asyncHandler(ProjectController.detail));
 
-// router.post(
-//   "/uploadFileFromLocal/:id",
-//   uploadProject.single("file"),
-//   asyncHandler(ProjectController.uploadFileFromLocal)
-// );
-// router.post("/getFileImage", asyncHandler(ProjectController.getFileImage));
-// router.post("/getFile", asyncHandler(ProjectController.getFile));
-// router.post("/deleteFile/:id", asyncHandler(ProjectController.deleteFile));
 module.exports = router;

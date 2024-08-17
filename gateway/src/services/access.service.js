@@ -4,6 +4,7 @@ const crypto = require("node:crypto");
 const { generateAccessToken, createTokenPair } = require("../auth/authUtils");
 const {
   getUserByEmail,
+  getUserByUsername,
   getAllProjectInDepartment,
   addTasksToProjects,
   detailProject,
@@ -37,10 +38,19 @@ class AccessService {
     return listProjectWithTask;
   };
 
-  static login = async ({ email, password }) => {
-    const userData = await getUserByEmail(email);
-    if (!userData) {
-      throw new AuthFailureError("Error: User Is not exist");
+  static login = async ({ email, username, password }) => {
+    let userData;
+    if (email) {
+      userData = await getUserByEmail(email);
+      if (!userData) {
+        throw new AuthFailureError("Error: User Is not exist");
+      }
+    }
+    if (username) {
+      userData = await getUserByUsername(username);
+      if (!userData) {
+        throw new AuthFailureError("Error: User Is not exist");
+      }
     }
     const match = await bcrypt.compare(password, userData.user.password);
     if (!match) {

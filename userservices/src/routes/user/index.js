@@ -10,15 +10,19 @@ router.put("/change-password", asyncHandler(UserController.changePassword));
 
 // Tìm người dùng bằng email
 router.get("/findByEmail/:email", asyncHandler(UserController.findByEmail));
+router.get(
+  "/findByUsername/:username",
+  asyncHandler(UserController.findByUsername)
+);
 // Lấy ra hết tất cả user
 router.get("/admin/getAll", asyncHandler(UserController.getAll));
 router.get(
   "/getListOfStaffDoNotHaveDepartment",
   asyncHandler(UserController.getListOfStaffDoNotHaveDepartment)
 );
-router.get(
-  "/getListUserDoNotHaveProject/:id",
-  asyncHandler(UserController.getListUserDoNotHaveProject)
+router.post(
+  "/getListUserDoNotInProject",
+  asyncHandler(UserController.getListUserDoNotInProject)
 );
 // get all user in department
 router.get(
