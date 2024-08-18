@@ -9,7 +9,7 @@ const roleRoutes = {
   "/get-all": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/role/getAll`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
 };
 

@@ -44,7 +44,6 @@ registerRouterServices("/roles", roleRoutes, app);
 registerRouterServices("/users", userServicesRoutes, app);
 registerRouterServices("/assignments", assignmentServicesRoutes, app);
 registerRouterServices("/projects", projectServicesRoutes, app);
-registerRouterServices("/clients", clientRoutes, app);
 registerRouterServices("/tasks", taskServicesRoutes, app);
 registerRouterServices("/activities", activityServicesRoutes, app);
 registerRouterServices("/upload", uploadServicesRoutes, app);

@@ -6,7 +6,6 @@ async function GetTask(call, callback) {
   const { task_id } = call.request;
   try {
     const task = await TaskServices.detail(task_id);
-    console.log("Result:::", task);
     if (task) {
       callback(null, task);
     } else {

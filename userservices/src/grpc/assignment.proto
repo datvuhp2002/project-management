@@ -4,7 +4,7 @@ package assignment;
 
 service AssignmentService {
   rpc getAllUserFromProject(getAllUserFromProjectRequest) returns (getAllUserFromProjectResponse);
-  rpc getAllUserInDepartmentHaveProjects(getAllUserInDepartmentHaveProjectsRequest) returns (getAllUserInDepartmentHaveProjectsResponse);
+  rpc GetAllUserInProjects(getAllUserInProjectsRequest) returns (getAllUserInProjectsResponse);
 }
 
 message getAllUserFromProjectRequest{
@@ -16,10 +16,10 @@ message getAllUserFromProjectResponse{
 
 }
 
-message getAllUserInDepartmentHaveProjectsRequest {
-  string department_id = 1;
+message getAllUserInProjectsRequest {
+  string project_id = 1;
 }
 
-message getAllUserInDepartmentHaveProjectsResponse {
+message getAllUserInProjectsResponse {
   repeated string ids = 1;
 }

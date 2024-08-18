@@ -4,16 +4,9 @@ const {
   projectProducerTopic,
 } = require("../configs/kafkaProjectTopic");
 const AssignmentServices = require("../services/assignment.service");
-const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
-const {
-  userTopicsContinuous,
-  userProducerTopic,
-} = require("../configs/kafkaUserTopic");
-const {
-  taskTopicsContinuous,
-  taskProducerTopic,
-} = require("../configs/kafkaTaskTopic");
+const { userTopicsContinuous } = require("../configs/kafkaUserTopic");
+const { taskTopicsContinuous } = require("../configs/kafkaTaskTopic");
 
 const kafka = new Kafka({
   clientId: "assignment-services",
@@ -45,6 +38,20 @@ const continuousConsumer = async () => {
         );
         console.log("Message content:", parsedMessage);
         switch (topic) {
+          case projectTopicsContinuous.forceDeleteProjectAssignment: {
+            await AssignmentServices.forceDeleteProjectAssignment(
+              parsedMessage
+            );
+            break;
+          }
+          case userTopicsContinuous.deletedUser: {
+            await AssignmentServices.forceDeleteUserAssignment(parsedMessage);
+            break;
+          }
+          case taskTopicsContinuous.taskDeleted: {
+            await AssignmentServices.forceDeleteTaskAssignment(parsedMessage);
+            break;
+          }
           default:
             console.log("Unhandled topic:", topic);
         }

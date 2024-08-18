@@ -28,6 +28,10 @@ router.put("/admin/restore/:id", asyncHandler(ProjectController.restore));
 
 // Xoá một project theo id
 router.delete("/delete/:id", asyncHandler(ProjectController.delete));
+router.delete(
+  "/admin/forceDelete/:id",
+  asyncHandler(ProjectController.forceDelete)
+);
 
 // Lấy ra hết tất cả project đã bị xoá
 router.get("/admin/trash", asyncHandler(ProjectController.trash));
@@ -41,12 +45,4 @@ router.put("/update/:id", asyncHandler(ProjectController.update));
 // Lấy ra chi tiết project theo id
 router.get("/detail/:id", asyncHandler(ProjectController.detail));
 
-// router.post(
-//   "/uploadFileFromLocal/:id",
-//   uploadProject.single("file"),
-//   asyncHandler(ProjectController.uploadFileFromLocal)
-// );
-// router.post("/getFileImage", asyncHandler(ProjectController.getFileImage));
-// router.post("/getFile", asyncHandler(ProjectController.getFile));
-// router.post("/deleteFile/:id", asyncHandler(ProjectController.deleteFile));
 module.exports = router;

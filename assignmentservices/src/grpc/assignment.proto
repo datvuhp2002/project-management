@@ -8,16 +8,9 @@ service AssignmentService {
   rpc getAllUserFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
   rpc getTotalTaskWithStatusFromProjectAndTotalStaff(getTotalTaskWithStatusFromProjectAndTotalStaffRequest) returns (getTotalTaskWithStatusFromProjectAndTotalStaffResponse);
   rpc getAllUserProject(getAllUserProjectRequest) returns (getAllUserProjectResponse); 
-  rpc getAllUserInDepartmentHaveProjects(getAllUserInDepartmentHaveProjectsRequest) returns (getAllUserInDepartmentHaveProjectsResponse);
+
 }
 
-message getAllUserInDepartmentHaveProjectsRequest {
-  string department_id = 1;
-}
-
-message getAllUserInDepartmentHaveProjectsResponse {
-  repeated string ids = 1;
-}
 
 message AssignmentRequest {
   string assignment_id = 1;

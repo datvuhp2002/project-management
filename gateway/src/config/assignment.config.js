@@ -10,17 +10,17 @@ const assignmentServicesRoutes = {
   "/admin/get-all": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/trash": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/restore": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/admin/restore`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/get-all-assignment": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/getAllAssignment`,
@@ -30,12 +30,12 @@ const assignmentServicesRoutes = {
   "/remove-staff-from-project": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/removeStaffFromProject`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/create": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/update": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/update`,
@@ -50,7 +50,7 @@ const assignmentServicesRoutes = {
   "/delete": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/delete`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
 };
 module.exports = assignmentServicesRoutes;

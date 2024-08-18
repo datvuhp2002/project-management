@@ -1,0 +1,1 @@
+{"@timestamp":"2024-08-17T03:44:11.104Z","context":"/services/api/user/getListOfStaffDoNotHaveDepartment/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"getUsersAvatar is not defined"},"requestId":"e1ec9cff-90ce-4595-943d-90ffa05a803f"}

@@ -1,12 +1,11 @@
 "use strict";
 const { Kafka } = require("kafkajs");
 const { convertObjectToArray } = require("../utils");
-const {
-  uploadTopicsContinuous,
-  uploadProducerTopic,
-} = require("../configs/kafkaUploadTopic");
+const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
 const TaskService = require("../services/task.service");
-const { runProducer } = require("./producer");
+const {
+  assignmentTopicsContinuous,
+} = require("../configs/kafkaAssignmentTopic/consumer/assignment.consumer.topic.config");
 const kafka = new Kafka({
   clientId: "task-services",
   brokers: [process.env.KAFKA_BROKER],
@@ -20,6 +19,10 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
+  await consumer.subscribe({
+    topics: convertObjectToArray(assignmentTopicsContinuous),
+    fromBeginning: false,
+  });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
@@ -28,8 +31,7 @@ const continuousConsumer = async () => {
         console.log("Before handle :::", parsedMessage);
 
         switch (topic) {
-          case uploadTopicsContinuous.uploadFileForTask:
-            console.log(parsedMessage);
+          case uploadTopicsContinuous.uploadFileForTask: {
             await TaskService.update(
               {
                 task_id: parsedMessage.task_id,
@@ -38,9 +40,14 @@ const continuousConsumer = async () => {
               parsedMessage.modifiedBy
             );
             break;
-          case uploadTopicsContinuous.deleteTaskFileInCloud:
+          }
+          case uploadTopicsContinuous.deleteTaskFileInCloud: {
             await TaskService.deleteFile(parsedMessage);
             break;
+          }
+          case assignmentTopicsContinuous.forceDeleteProject: {
+            await TaskService.deleteMultiple(parsedMessage);
+          }
           default:
             console.log("Topic không được xử lý:", topic);
         }

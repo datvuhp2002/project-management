@@ -9,27 +9,27 @@ const taskServicesRoutes = {
   "/admin/get-all": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/trash": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/restore": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/restore`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/create": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/update": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/detail": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/detail`,
@@ -39,7 +39,7 @@ const taskServicesRoutes = {
   "/admin/delete": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/delete`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/get-file-image": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getFileImage`,

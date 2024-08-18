@@ -9,22 +9,27 @@ const projectServicesRoutes = {
   "/admin/get-all": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/trash": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/restore": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/restore`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/delete": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/delete`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
+  },
+  "/admin/force-delete": {
+    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/forceDelete`,
+    authRequired: true,
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/get-all-user-project": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllUserProject`,
@@ -49,37 +54,17 @@ const projectServicesRoutes = {
   "/create": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/update": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/detail": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/detail`,
     authRequired: true,
     permissions: null,
-  },
-  "/upload-file-from-local": {
-    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/uploadFileFromLocal`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
-  },
-  "/get-file-image": {
-    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getFileImage`,
-    authRequired: true,
-    permissions: null,
-  },
-  "/get-file": {
-    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getFile`,
-    authRequired: true,
-    permissions: null,
-  },
-  "/delete-file": {
-    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/deleteFile`,
-    authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
   },
 };
 module.exports = projectServicesRoutes;

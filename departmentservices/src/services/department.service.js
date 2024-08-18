@@ -230,6 +230,16 @@ class DepartmentService {
     }
     throw new BadRequestError("Xoá phòng ban không thành công");
   };
+  static forceDelete = async (department_id) => {
+    const forceDeleteDepartment = await prisma.department.delete({
+      where: { department_id },
+    });
+    if (!forceDeleteDepartment) {
+      await this.restore(department_id);
+      throw new BadRequestError("Xóa phòng ban không thành công");
+    }
+    return true;
+  };
   // restore department
   static restore = async (department_id) => {
     const restoreDepartment = await prisma.department.update({

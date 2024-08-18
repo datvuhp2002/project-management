@@ -1,7 +1,7 @@
 "use strict";
-const taskTopicsOnDemand = {};
-const taskTopicsContinuous = {};
+const taskTopicsContinuous = {
+  taskDeleted: "task-deleted",
+};
 module.exports = {
-  taskTopicsOnDemand,
   taskTopicsContinuous,
 };

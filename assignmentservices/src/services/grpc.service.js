@@ -50,30 +50,7 @@ async function getAllUserFromProject(call, callback) {
     });
   }
 }
-async function getAllUserInDepartmentHaveProjects(call, callback) {
-  const { department_id } = call.request;
-  try {
-    const listIds = await AssignmentService.getAllUserInDepartmentHaveProjects(
-      department_id
-    );
-    const response = {
-      ids: listIds,
-    };
-    if (listIds) {
-      callback(null, response);
-    } else {
-      callback({
-        code: grpc.status.NOT_FOUND,
-        details: "Assignment not found",
-      });
-    }
-  } catch (error) {
-    callback({
-      code: grpc.status.INTERNAL,
-      details: "Internal server error",
-    });
-  }
-}
+
 async function getTotalTaskWithStatusFromProjectAndTotalStaff(call, callback) {
   const { project_id } = call.request;
   try {
@@ -98,7 +75,6 @@ async function getTotalTaskWithStatusFromProjectAndTotalStaff(call, callback) {
 }
 async function getAllUserProject(call, callback) {
   const { user_id } = call.request;
-  console.log(user_id);
   try {
     const result = await AssignmentService.getAllUserProject(user_id);
     const response = {
@@ -123,6 +99,5 @@ module.exports = {
   getAllTaskFromProject,
   getAllUserFromProject,
   getTotalTaskWithStatusFromProjectAndTotalStaff,
-  getAllUserInDepartmentHaveProjects,
   getAllUserProject,
 };

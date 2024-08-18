@@ -10,15 +10,19 @@ router.put("/change-password", asyncHandler(UserController.changePassword));
 
 // Tìm người dùng bằng email
 router.get("/findByEmail/:email", asyncHandler(UserController.findByEmail));
+router.get(
+  "/findByUsername/:username",
+  asyncHandler(UserController.findByUsername)
+);
 // Lấy ra hết tất cả user
 router.get("/admin/getAll", asyncHandler(UserController.getAll));
 router.get(
   "/getListOfStaffDoNotHaveDepartment",
   asyncHandler(UserController.getListOfStaffDoNotHaveDepartment)
 );
-router.get(
-  "/getListUserDoNotHaveProject/:id",
-  asyncHandler(UserController.getListUserDoNotHaveProject)
+router.post(
+  "/getListUserDoNotInProject",
+  asyncHandler(UserController.getListUserDoNotInProject)
 );
 // get all user in department
 router.get(
@@ -53,6 +57,11 @@ router.get("/detail", asyncHandler(UserController.detail));
 router.get("/information/:id", asyncHandler(UserController.information));
 // Xoá một người dùng theo id
 router.delete("/admin/delete/:id", asyncHandler(UserController.delete));
+// Force Deleted User Account
+router.delete(
+  "/admin/forceDelete/:id",
+  asyncHandler(UserController.forceDelete)
+);
 // Khôi phục một người dùng đã bị xoá
 router.put("/admin/restore/:id", asyncHandler(UserController.restore));
 

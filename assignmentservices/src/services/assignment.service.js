@@ -8,6 +8,8 @@ const {
   getProject,
   getListProjectInDepartment,
 } = require("./grpcClient.services");
+const { runProducer } = require("../message_queue/producer");
+const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -20,57 +22,132 @@ class AssignmentService {
     createdBy: true,
     createdAt: true,
   };
-  // create new assignment
+  // Create new assignment
   static create = async (data, createdBy) => {
+    const { project_id, task_id, user_id, startAt, endAt } = data;
+
+    // 1. Kiểm tra dự án tồn tại
     try {
-      await getProject(data.project_id);
+      await getProject(project_id);
     } catch (e) {
-      throw new BadRequestError("Project is not exist");
+      throw new BadRequestError("Project does not exist");
     }
-    const isAssignmentExist = await prisma.assignment.findFirst({
-      where: {
-        project_id: data.project_id,
-        user_id: data.user_id,
-      },
-    });
-    if (isAssignmentExist)
-      throw new BadRequestError("Assignment already exists");
-    if (!data.task_id) {
+
+    // Kiểm tra nếu có task_id
+    if (task_id) {
+      try {
+        await getTask(task_id);
+      } catch (e) {
+        throw new BadRequestError("Task does not exist");
+      }
+    }
+
+    // Kiểm tra tính hợp lệ của thời gian
+    if (startAt && endAt) {
+      const startDateAssignment = new Date(startAt);
+      const endDateAssignment = new Date(endAt);
+      if (endDateAssignment <= startDateAssignment) {
+        throw new BadRequestError(
+          "End date cannot be equal or earlier than start date"
+        );
+      }
+    }
+
+    // 2. Xử lý các trường hợp tạo assignment
+
+    // Trường hợp 1: Chỉ có project_id và task_id
+    if (project_id && task_id && !user_id) {
+      const existingTaskAssignment = await prisma.assignment.findFirst({
+        where: {
+          project_id,
+          task_id,
+          deletedMark: false,
+        },
+      });
+
+      if (existingTaskAssignment) {
+        throw new BadRequestError(
+          "Task is already assigned within the project"
+        );
+      }
+
       const assignment = await prisma.assignment.create({
-        data: { ...data, createdBy },
+        data: {
+          project_id,
+          task_id,
+          startAt,
+          endAt,
+          createdBy,
+        },
         select: this.select,
       });
-      return assignment || { code: 200, metadata: null };
+      return assignment;
     }
-    try {
-      await getTask(data.task_id);
-    } catch (e) {
-      throw new BadRequestError("Task is not exist");
+
+    // Trường hợp 2: Chỉ có project_id và user_id
+    if (project_id && user_id && !task_id) {
+      const existingUserAssignment = await prisma.assignment.findFirst({
+        where: {
+          project_id,
+          user_id,
+          deletedMark: false,
+        },
+      });
+
+      if (existingUserAssignment) {
+        throw new BadRequestError("User is already assigned to the project");
+      }
+
+      const assignment = await prisma.assignment.create({
+        data: {
+          project_id,
+          user_id,
+          startAt,
+          endAt,
+          createdBy,
+        },
+        select: this.select,
+      });
+      return assignment;
     }
-    const findAssignment = await prisma.assignment.findFirst({
-      where: {
-        project_id: data.project_id,
-        task_id: data.task_id,
-        user_id: data.user_id,
-      },
-    });
-    if (findAssignment)
-      throw new BadRequestError("Assignment is already exist");
-    const startDateAssignment = new Date(data.startAt);
-    const endDateAssignment = new Date(data.endAt);
-    if (endDateAssignment <= startDateAssignment) {
-      throw new BadRequestError("End date cannot be equal start date");
+
+    // Trường hợp 3: Có cả project_id, task_id và user_id
+    if (project_id && task_id && user_id) {
+      const existingAssignment = await prisma.assignment.findFirst({
+        where: {
+          project_id,
+          task_id,
+          deletedMark: false,
+        },
+      });
+
+      if (existingAssignment) {
+        // Nếu assignment đã tồn tại, chỉ cần cập nhật user_id
+        const updatedAssignment = await prisma.assignment.update({
+          where: { assignment_id: existingAssignment.assignment_id },
+          data: { user_id, modifiedBy: createdBy },
+          select: this.select,
+        });
+        return updatedAssignment;
+      }
+
+      // Nếu chưa tồn tại assignment, tạo mới
+      const newAssignment = await prisma.assignment.create({
+        data: {
+          project_id,
+          task_id,
+          user_id,
+          startAt,
+          endAt,
+          createdBy,
+        },
+        select: this.select,
+      });
+      return newAssignment;
     }
-    const assignment = await prisma.assignment.create({
-      data: {
-        user_id: data.user_id,
-        project_id: data.project_id,
-        task_id: data.task_id,
-        createdBy,
-      },
-      select: this.select,
-    });
-    return assignment || { code: 200, metadata: null };
+
+    // Nếu không khớp trường hợp nào, trả về lỗi
+    throw new BadRequestError("Invalid assignment data");
   };
   // get all assignment instances
   static getAll = async ({
@@ -255,10 +332,10 @@ class AssignmentService {
     return null;
   };
   // list of task from project
-  static getAllTaskFromProject = async (project_id) => {
+  static getAllTaskFromProject = async (project_id, status = null) => {
     const listOfAssignment = await this.listOfAssignmentFromProject(
       project_id,
-      null
+      status
     );
     if (listOfAssignment.assignments) {
       const taskIds = listOfAssignment.assignments
@@ -269,6 +346,21 @@ class AssignmentService {
       return uniqueTaskIds;
     }
     return null;
+  };
+  // consumer handle request
+  static getTotalTaskWithStatusFromProjectAndTotalStaff = async (
+    project_id
+  ) => {
+    const taskIdsIsTodo = await this.getAllTaskFromProject(project_id, 0);
+    const taskIdsIsOnProgress = await this.getAllTaskFromProject(project_id, 1);
+    const taskIdsIsDone = await this.getAllTaskFromProject(project_id, 2);
+    // calculator
+    const totalStaff = await this.getAllUserFromProject(project_id);
+    return {
+      total_user: totalStaff.total,
+      total_task_is_done: taskIdsIsDone.length,
+      total_task_is_not_done: taskIdsIsOnProgress.length + taskIdsIsTodo.length,
+    };
   };
   // list of task from project
   static listOfAssignmentFromProject = async (project_id, status) => {
@@ -351,6 +443,29 @@ class AssignmentService {
       select: this.select,
     });
   };
+  static forceDeleteProjectAssignment = async (project_id) => {
+    const listDataByProject = await this.getAllTaskFromProject(
+      project_id,
+      null
+    );
+    const forceDeleteAssignment = await prisma.assignment.deleteMany({
+      where: { project_id },
+    });
+    if (!forceDeleteAssignment) {
+      throw new BadRequestError("Can't delete project assignment");
+    }
+    await runProducer(taskProducerTopic.forceDeleteProject, listDataByProject);
+  };
+  static forceDeleteTaskAssignment = async (task_id) => {
+    return await prisma.assignment.deleteMany({
+      where: { task_id },
+    });
+  };
+  static forceDeleteUserAssignment = async (user_id) => {
+    return await prisma.assignment.deleteMany({
+      where: { user_id },
+    });
+  };
   // restore assignment
   static restore = async (assignment_id) => {
     return await prisma.assignment.update({
@@ -430,47 +545,6 @@ class AssignmentService {
       itemsPerPage,
     };
   };
-  // consumer handle request
-  static getTotalTaskWithStatusFromProjectAndTotalStaff = async (
-    project_id
-  ) => {
-    const listOfAssignmentIsTodo = await this.listOfAssignmentFromProject(
-      project_id,
-      0
-    );
-    const listOfAssignmentIsOnProgress = await this.listOfAssignmentFromProject(
-      project_id,
-      1
-    );
-    const listOfAssignmentIsDone = await this.listOfAssignmentFromProject(
-      project_id,
-      2
-    );
-    const totalStaff = await this.getAllUserFromProject(project_id);
-    if (
-      listOfAssignmentIsTodo.assignments &&
-      listOfAssignmentIsOnProgress.assignments &&
-      listOfAssignmentIsDone.assignments
-    ) {
-      const taskIdsIsDone = listOfAssignmentIsDone.assignments.map(
-        (assignment) => assignment.task_id
-      );
-      const taskIdsIsOnProgress = listOfAssignmentIsOnProgress.assignments.map(
-        (assignment) => assignment.task_id
-      );
-      const taskIdsIsTodo = listOfAssignmentIsTodo.assignments.map(
-        (assignment) => assignment.task_id
-      );
-      const taskIdsIsNotDone =
-        taskIdsIsOnProgress.length + taskIdsIsTodo.length;
-      return {
-        total_user: totalStaff.total,
-        total_task_is_done: taskIdsIsDone.length,
-        total_task_is_not_done: taskIdsIsNotDone,
-      };
-    }
-    return null;
-  };
   static getAllUserProject = async (user_id) => {
     const list_project = await prisma.assignment.findMany({
       where: { user_id },
@@ -482,20 +556,6 @@ class AssignmentService {
     } else {
       return [];
     }
-  };
-  static getAllUserInDepartmentHaveProjects = async (department_id) => {
-    const projectIds = await getListProjectInDepartment(department_id);
-    let userIds = [];
-    for (const id of projectIds) {
-      const listProjectInfo = await prisma.assignment.findMany({
-        where: { project_id: id, user_id: { not: null } },
-      });
-      listProjectInfo.forEach((item) => {
-        if (item.user_id !== null) userIds.push(item.user_id);
-      });
-    }
-    const uniqueUserIds = [...new Set(userIds)];
-    return uniqueUserIds;
   };
 }
 module.exports = AssignmentService;

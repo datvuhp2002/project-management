@@ -170,7 +170,6 @@ const getUserByEmail = async (email) => {
       throw new BadRequestError("Người dùng không tồn tại");
     }
     const foundUser = response.data.data;
-    console.log(foundUser);
     const role = foundUser.role;
     return { user: foundUser, role };
   } catch (error) {
@@ -178,10 +177,28 @@ const getUserByEmail = async (email) => {
     throw new BadRequestError("Failed to fetch user by email");
   }
 };
+const getUserByUsername = async (username) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REQUEST_URL}/users/find-by-username/${username}`,
+      { responseType: "json" }
+    );
+    if (!response.data) {
+      throw new BadRequestError("Người dùng không tồn tại");
+    }
+    const foundUser = response.data.data;
+    const role = foundUser.role;
+    return { user: foundUser, role };
+  } catch (error) {
+    console.error("Error fetching user by username:", error);
+    throw new BadRequestError("Failed to fetch user by username");
+  }
+};
 
 module.exports = {
   getInfoData,
   getUserByEmail,
+  getUserByUsername,
   getAllProjectInDepartment,
   getAllTasksForProject,
   addTasksToProjects,

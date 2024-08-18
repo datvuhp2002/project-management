@@ -8,32 +8,37 @@ const userServicesRoutes = {
   "/admin/get-all": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAll`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/delete": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/delete`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
+  },
+  "/admin/force-delete": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/forceDelete`,
+    authRequired: true,
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/get-all-staff-in-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAllStaffInDepartment`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/trash": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/update`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/admin/restore": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/restore`,
     authRequired: true,
-    permissions: ["ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN"],
   },
   "/forget-password": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/forget-password`,
@@ -50,20 +55,25 @@ const userServicesRoutes = {
     authRequired: false,
     permissions: null,
   },
+  "/find-by-username": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/findByUsername`,
+    authRequired: false,
+    permissions: null,
+  },
   "/get-all-staff-in-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffInDepartment`,
     authRequired: true,
     permissions: null,
   },
-  "/get-list-user-do-not-have-project": {
-    target: `${process.env.USER_SERVICES_REQUEST_URL}/getListUserDoNotHaveProject`,
+  "/get-list-user-do-not-in-project": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/getListUserDoNotInProject`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER", "PROJECT_MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
   "/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/update`,
@@ -83,12 +93,12 @@ const userServicesRoutes = {
   "/add-user-into-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/addUserIntoDepartment`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/get-a-list-of-staff-do-not-have-departments": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getListOfStaffDoNotHaveDepartment`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/get-all-staff-in-project": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffInProject`,
@@ -98,7 +108,7 @@ const userServicesRoutes = {
   "/remove-staff-from-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/removeStaffFromDepartment`,
     authRequired: true,
-    permissions: ["ADMIN", "MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
 };
 module.exports = userServicesRoutes;

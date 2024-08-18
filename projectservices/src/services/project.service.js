@@ -10,6 +10,7 @@ const {
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const { uploadProducerTopic } = require("../configs/kafkaUploadTopic");
+const { runProducer } = require("../message_queue/producer");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
   getUser,
@@ -38,25 +39,29 @@ class ProjectService {
     const currentDate = new Date();
     const startDate = new Date(data.startAt);
     const endDate = new Date(data.endAt);
+    // Validate the dates
+    if (isNaN(startDate) || isNaN(endDate)) {
+      throw new BadRequestException("Invalid start or end date provided.");
+    }
     if (startDate < currentDate) {
       throw new BadRequestException(
-        "Start date cannot be less than current date"
+        "Start date cannot be earlier than the current date."
       );
     }
     if (endDate <= startDate) {
       throw new BadRequestException(
-        "End date cannot be equal or less than start date"
+        "End date must be later than the start date."
       );
     }
-    const newProject = await prisma.project.create({ data });
-
-    if (!newProject) {
+    // Create the project
+    try {
+      const newProject = await prisma.project.create({ data });
+      return newProject;
+    } catch (error) {
       throw new BadRequestException(
-        "Failed to create a new project, please try again"
+        "Failed to create the project, please try again."
       );
     }
-
-    return newProject;
   };
   // get all projects
   static getAll = async ({
@@ -255,6 +260,23 @@ class ProjectService {
     }
     await this.restore(project_id);
     throw new BadRequestError("Xoá dự án không thành công");
+  };
+  static forceDelete = async (project_id) => {
+    const deleteProject = await prisma.project.delete({
+      where: { project_id },
+    });
+    if (!deleteProject) {
+      throw new BadRequestError("Xoá dự án không thành công");
+    }
+    try {
+      await runProducer(
+        assignmentProducerTopic.forceDeleteProjectAssignment,
+        project_id
+      );
+    } catch (err) {
+      throw new BadRequestError(err);
+    }
+    return true;
   };
   // delete file
   static deleteFile = async ({ project_id, filename }) => {

@@ -143,7 +143,6 @@ services:
       - DEPARTMENT_SERVICES_REQUEST_URL=http://departmentservices:3057/services/api/department
       - ASSIGNMENT_SERVICES_REQUEST_URL=http://assignmentservices:3058/services/api/assignment
       - PROJECT_SERVICES_REQUEST_URL=http://projectservices:3059/services/api/project
-      - CLIENT_REQUEST_URL=http://projectservices:3059/services/api/project/client
       - TASK_SERVICES_REQUEST_URL=http://taskservices:3060/services/api/task
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - EMAIL_SERVICES_REQUEST_URL=http://emailservices:3069/services/api/email

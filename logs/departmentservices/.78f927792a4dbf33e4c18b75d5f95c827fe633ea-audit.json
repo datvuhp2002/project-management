@@ -119,6 +119,56 @@
             "date": 1723738711007,
             "name": "src/logs/departmentServices-2024-08-15-16-18.error.log",
             "hash": "7e312476eccc171e19b7139c68ae34cff410306728565cb9a5a055622424401b"
+        },
+        {
+            "date": 1723774785279,
+            "name": "src/logs/departmentServices-2024-08-16-02-19.error.log",
+            "hash": "695da77b108e03bd18f20de1100c175447c658a461def585664d3de58d947115"
+        },
+        {
+            "date": 1723776254371,
+            "name": "src/logs/departmentServices-2024-08-16-02-44.error.log",
+            "hash": "655eda09bf49ebbc914aa0095b3111a4b98d0c51d12892e0bbf665bd067df32f"
+        },
+        {
+            "date": 1723778510444,
+            "name": "src/logs/departmentServices-2024-08-16-03-21.error.log",
+            "hash": "402266aa6854e406c3bcf7b28e09e3383271310a4f9f5594da2e5d7dfd96d05a"
+        },
+        {
+            "date": 1723780216498,
+            "name": "src/logs/departmentServices-2024-08-16-03-50.error.log",
+            "hash": "1d107f9456192d317f827339821b84d61515a9c1ea43a83c45896ef4d458c2b2"
+        },
+        {
+            "date": 1723785265758,
+            "name": "src/logs/departmentServices-2024-08-16-05-14.error.log",
+            "hash": "ab254c099ea0e882799cd1147b3f1e5784d114dc188c69dcf2ab65fc1ceff3d4"
+        },
+        {
+            "date": 1723872607662,
+            "name": "src/logs/departmentServices-2024-08-17-05-30.error.log",
+            "hash": "147f866f333e76c942371bcd9d543d0254978d89c78309c2319aa372a14bc01e"
+        },
+        {
+            "date": 1723911159570,
+            "name": "src/logs/departmentServices-2024-08-17-16-12.error.log",
+            "hash": "e48d009068f163a7022e29ae91bd5375d22d1d2886933ba93aa710db944c35a7"
+        },
+        {
+            "date": 1723911810968,
+            "name": "src/logs/departmentServices-2024-08-17-16-23.error.log",
+            "hash": "b7e42094e70d0f8119945efffa8fc2c9aca3e28d10890fd53c689426762ddb5d"
+        },
+        {
+            "date": 1723917431284,
+            "name": "src/logs/departmentServices-2024-08-17-17-57.error.log",
+            "hash": "33930845e7861e37c52d5d5333d703c6e2270e00f52af844b9dc6b81d976a5fa"
+        },
+        {
+            "date": 1723964637627,
+            "name": "src/logs/departmentServices-2024-08-18-07-03.error.log",
+            "hash": "a7732486a72205a0d5e6d95bd96f5efd61a44298c43a9a10385f0688d8efadee"
         }
     ],
     "hashType": "sha256"
