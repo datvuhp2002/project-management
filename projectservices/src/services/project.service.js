@@ -10,6 +10,7 @@ const {
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const { uploadProducerTopic } = require("../configs/kafkaUploadTopic");
+const { runProducer } = require("../message_queue/producer");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
   getUser,
@@ -259,6 +260,23 @@ class ProjectService {
     }
     await this.restore(project_id);
     throw new BadRequestError("Xoá dự án không thành công");
+  };
+  static forceDelete = async (project_id) => {
+    const deleteProject = await prisma.project.delete({
+      where: { project_id },
+    });
+    if (!deleteProject) {
+      throw new BadRequestError("Xoá dự án không thành công");
+    }
+    try {
+      await runProducer(
+        assignmentProducerTopic.forceDeleteProjectAssignment,
+        project_id
+      );
+    } catch (err) {
+      throw new BadRequestError(err);
+    }
+    return true;
   };
   // delete file
   static deleteFile = async ({ project_id, filename }) => {

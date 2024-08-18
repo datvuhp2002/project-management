@@ -40,6 +40,14 @@ const continuousConsumer = async () => {
             await ActivityServices.create(data, modifiedBy);
             break;
           }
+          case taskTopicsContinuous.taskDeleted: {
+            await ActivityServices.deleteByTaskId(parsedMessage);
+            break;
+          }
+          case taskTopicsContinuous.taskDeletedMultiple: {
+            await ActivityServices.deleteByTaskIds(parsedMessage);
+            break;
+          }
           default:
             console.log("Unhandled topic:", topic);
         }

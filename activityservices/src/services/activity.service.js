@@ -108,6 +108,30 @@ class ActivityService {
     }
     return true;
   };
+  // delete activity when task is deleted
+  static deleteByTaskId = async (task_id) => {
+    const deleteByTaskId = await prisma.activity.deleteMany({
+      where: { task_id },
+    });
+    if (!deleteByTaskId) {
+      throw new BadRequestError(`Can not delete activities by task_id`);
+    }
+    return true;
+  };
+  // delete activity when delete multiple task
+  static deleteByTaskIds = async (task_ids) => {
+    const deleteByTaskIds = await prisma.activity.deleteMany({
+      where: {
+        task_id: {
+          in: task_ids,
+        },
+      },
+    });
+    if (!deleteByTaskIds) {
+      throw new BadRequestError(`Can not delete activities by task_ids`);
+    }
+    return true;
+  };
   // restore project
   static restore = async (activity_id) => {
     const restoreActivity = await prisma.activity.update({

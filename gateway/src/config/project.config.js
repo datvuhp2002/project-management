@@ -26,6 +26,11 @@ const projectServicesRoutes = {
     authRequired: true,
     permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
   },
+  "/admin/force-delete": {
+    target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/admin/forceDelete`,
+    authRequired: true,
+    permissions: ["SUPER_ADMIN", "ADMIN"],
+  },
   "/get-all-user-project": {
     target: `${process.env.PROJECT_SERVICES_REQUEST_URL}/getAllUserProject`,
     authRequired: true,

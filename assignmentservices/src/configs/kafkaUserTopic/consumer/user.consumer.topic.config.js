@@ -1,8 +1,8 @@
 "use strict";
-const userTopicsContinuous = {};
+const userTopicsContinuous = {
+  deletedUser: "deleted-user",
+};
 
-const userTopicsOnDemand = {};
 module.exports = {
   userTopicsContinuous,
-  userTopicsOnDemand,
 };

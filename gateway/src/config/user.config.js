@@ -15,6 +15,11 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["SUPER_ADMIN", "ADMIN"],
   },
+  "/admin/force-delete": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/forceDelete`,
+    authRequired: true,
+    permissions: ["SUPER_ADMIN", "ADMIN"],
+  },
   "/admin/get-all-staff-in-department": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/getAllStaffInDepartment`,
     authRequired: true,

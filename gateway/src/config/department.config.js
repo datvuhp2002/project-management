@@ -20,6 +20,11 @@ const departmentServicesRoutes = {
     authRequired: true,
     permissions: ["SUPER_ADMIN", "ADMIN"],
   },
+  "/admin/force-delete": {
+    target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/admin/force-delete`,
+    authRequired: true,
+    permissions: ["SUPER_ADMIN", "ADMIN"],
+  },
   "/admin/update": {
     target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/admin/update`,
     authRequired: true,

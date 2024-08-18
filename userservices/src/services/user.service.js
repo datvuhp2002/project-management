@@ -554,7 +554,11 @@ class UserService {
       },
     });
     if (deleteUser) {
-      const roleUser = await RoleService.findById(deleteUser);
+      const roleUser = deleteUser.role.name;
+      if (roleUser === "SUPER_ADMIN") {
+        await this.restore(user_id);
+        throw new BadRequestError("Can't delete this account");
+      }
       if (roleUser.name === "ADMIN" || roleUser.name === "MANAGER") {
         await runProducer(
           departmentProducerTopic.deleteUser,
@@ -566,6 +570,22 @@ class UserService {
     }
     await this.restore(user_id);
     return null;
+  };
+  static forceDelete = async (user_id) => {
+    const findDeletedUser = await prisma.user.findUnique({
+      where: { user_id },
+      select: this.select,
+    });
+    if (!findDeletedUser) {
+      throw new NotFoundError("User not found");
+    }
+    if (findDeletedUser.role.name === "SUPER_ADMIN") {
+      throw new BadRequestError("Can't force delete this account");
+    }
+    const forceDeleteUser = await prisma.user.delete({ where: { user_id } });
+    if (!forceDeleteUser) throw new BadRequestError("Delete user failed");
+    await runProducer(assignmentProducerTopic.deletedUser, user_id);
+    return true;
   };
   // restore user account
   static restore = async (user_id) => {

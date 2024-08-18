@@ -13,6 +13,15 @@ router.get("/admin/trash", asyncHandler(DepartmentController.trash));
 // Tạo ra một department mới
 router.post("/admin/create", asyncHandler(DepartmentController.create));
 
+// Xoá một department theo id
+router.delete("/admin/delete/:id", asyncHandler(DepartmentController.delete));
+
+// force delete
+router.delete(
+  "/admin/force-delete/:id",
+  asyncHandler(DepartmentController.forceDelete)
+);
+
 // Cập nhật một department theo id
 router.put("/update/:id", asyncHandler(DepartmentController.updateForManager));
 // Cập nhật một department theo id
@@ -20,9 +29,6 @@ router.put("/admin/update/:id", asyncHandler(DepartmentController.update));
 
 // Lấy ra chi tiết department theo id
 router.get("/detail/:id", asyncHandler(DepartmentController.detail));
-
-// Xoá một department theo id
-router.delete("/admin/delete/:id", asyncHandler(DepartmentController.delete));
 
 // Khôi phục một department đã bị xoá
 router.put("/admin/restore/:id", asyncHandler(DepartmentController.restore));

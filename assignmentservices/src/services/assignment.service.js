@@ -8,6 +8,8 @@ const {
   getProject,
   getListProjectInDepartment,
 } = require("./grpcClient.services");
+const { runProducer } = require("../message_queue/producer");
+const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -439,6 +441,29 @@ class AssignmentService {
         deletedAt: new Date(),
       },
       select: this.select,
+    });
+  };
+  static forceDeleteProjectAssignment = async (project_id) => {
+    const listDataByProject = await this.getAllTaskFromProject(
+      project_id,
+      null
+    );
+    const forceDeleteAssignment = await prisma.assignment.deleteMany({
+      where: { project_id },
+    });
+    if (!forceDeleteAssignment) {
+      throw new BadRequestError("Can't delete project assignment");
+    }
+    await runProducer(taskProducerTopic.forceDeleteProject, listDataByProject);
+  };
+  static forceDeleteTaskAssignment = async (task_id) => {
+    return await prisma.assignment.deleteMany({
+      where: { task_id },
+    });
+  };
+  static forceDeleteUserAssignment = async (user_id) => {
+    return await prisma.assignment.deleteMany({
+      where: { user_id },
     });
   };
   // restore assignment

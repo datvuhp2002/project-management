@@ -18,6 +18,9 @@ const {
 const {
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
+const {
+  assignmentProducerTopic,
+} = require("../../../projectservices/src/configs/kafkaAssignmentTopic");
 class TaskService {
   static select = {
     task_id: true,
@@ -161,19 +164,25 @@ class TaskService {
   };
   // delete task
   static delete = async (task_id) => {
-    const deleteTask = await prisma.task.update({
+    const deleteTask = await prisma.task.delete({
       where: { task_id },
-      select: this.select,
-      data: {
-        deletedMark: true,
-        deletedAt: new Date(),
-      },
     });
     if (deleteTask) {
+      await runProducer(ActivityProducerTopic.taskDeleted, task_id);
+      await runProducer(assignmentProducerTopic.taskDeleted, task_id);
       return true;
     }
-    this.restore(task_id);
-    return false;
+    throw new BadRequestError("Delete task failed");
+  };
+  static deleteMultiple = async (taskIds) => {
+    const multipleDeleteTask = await prisma.task.deleteMany({
+      where: { task_id: { in: taskIds } },
+    });
+    if (multipleDeleteTask) {
+      await runProducer(ActivityProducerTopic.taskDeletedMultiple, taskIds);
+      return true;
+    }
+    throw new BadRequestError("Delete multiple tasks failed");
   };
   static deleteFile = async ({ task_id, filename }) => {
     const task = await prisma.task.findUnique({ where: { task_id } });
@@ -184,20 +193,6 @@ class TaskService {
       data: { document: updatedDocuments },
     });
     if (!updateTask) throw new BadRequestError("Can not delete this file");
-    return true;
-  };
-  // restore project
-  static restore = async (task_id) => {
-    const restoreTask = await prisma.task.update({
-      where: { task_id },
-      data: {
-        deletedMark: false,
-      },
-    });
-    if (!restoreTask) {
-      await this.delete(task_id);
-      throw new BadRequestError("Can't restore task");
-    }
     return true;
   };
   static queryTask = async ({

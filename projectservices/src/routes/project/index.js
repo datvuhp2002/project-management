@@ -28,6 +28,10 @@ router.put("/admin/restore/:id", asyncHandler(ProjectController.restore));
 
 // Xoá một project theo id
 router.delete("/delete/:id", asyncHandler(ProjectController.delete));
+router.delete(
+  "/admin/forceDelete/:id",
+  asyncHandler(ProjectController.forceDelete)
+);
 
 // Lấy ra hết tất cả project đã bị xoá
 router.get("/admin/trash", asyncHandler(ProjectController.trash));

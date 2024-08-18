@@ -239,6 +239,11 @@
             "date": 1723919945132,
             "name": "src/logs/userServices-2024-08-17-18-39.error.log",
             "hash": "ef94baa4f4480787cd6560f61b99223ce4389047e480af924701188e5c6e576b"
+        },
+        {
+            "date": 1723964636314,
+            "name": "src/logs/userServices-2024-08-18-07-03.error.log",
+            "hash": "c285d1bb24ccc562b632837e8b3a8bd3276c4babfc06e14d3a7eaddeea07613f"
         }
     ],
     "hashType": "sha256"

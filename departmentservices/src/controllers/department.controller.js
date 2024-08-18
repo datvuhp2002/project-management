@@ -68,6 +68,12 @@ class DepartmentController {
       data: await DepartmentService.delete(req.params.id),
     }).send(res);
   };
+  forceDelete = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Xoá thành công phòng ban",
+      data: await DepartmentService.forceDelete(req.params.id),
+    }).send(res);
+  };
   restore = async (req, res, next) => {
     new SuccessResponse({
       message: "Khôi phục thànœh công phòng ban",

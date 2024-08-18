@@ -1,5 +1,7 @@
 "use strict";
-const projectTopicsContinuous = {};
+const projectTopicsContinuous = {
+  forceDeleteProjectAssignment: "force-delete-project-assignment",
+};
 
 module.exports = {
   projectTopicsContinuous,
