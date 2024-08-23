@@ -74,6 +74,15 @@ class UserController {
       ),
     }).send(res);
   };
+  getAllStaffInDepartments = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Lấy ra danh sách người dùng thành công",
+      data: await UserService.getAllStaffInDepartments(
+        req.query,
+        req.body.department_ids
+      ),
+    }).send(res);
+  };
   getAllStaffInProject = async (req, res, next) => {
     new SuccessResponse({
       message: "Lấy ra danh sách người dùng thành công",

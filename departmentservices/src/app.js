@@ -5,7 +5,6 @@ const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const { continuousConsumer } = require("./message_queue/consumer");
-const initElasticsearch = require("./dbs/init.elasticsearch");
 const { v4: uuidv4 } = require("uuid");
 const DepartmentLogger = require("./loggers/department.log");
 const app = express();
@@ -27,15 +26,10 @@ app.use((req, res, next) => {
   ]);
   next();
 });
-// init elasticsearch
-// initElasticsearch.init({
-//   ELASTICSEARCH_IS_ENABLED: true,
-// });
 // init db
 require(`./dbs/init.dbs`);
 // init routes
 app.use("", require("./routes"));
-
 // handle errors
 app.use((err, req, res, next) => {
   const status = err.status || 500;

@@ -1,5 +1,8 @@
 const { Kafka } = require("kafkajs");
 const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
+const {
+  departmentTopicsContinuous,
+} = require("../configs/kafkaDepartmentTopic");
 const { convertObjectToArray } = require("../utils");
 const ProjectService = require("../services/project.service");
 
@@ -17,6 +20,10 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: true,
   });
+  await consumer.subscribe({
+    topics: convertObjectToArray(departmentTopicsContinuous),
+    fromBeginning: true,
+  });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
@@ -27,6 +34,10 @@ const continuousConsumer = async () => {
         );
         console.log("Message content:", parsedMessage);
         switch (topic) {
+          case departmentTopicsContinuous.removeProjectFromDepartment: {
+            await ProjectService.removeProjectsFromDepartment(parsedMessage);
+            break;
+          }
           case uploadTopicsContinuous.uploadFileForProject: {
             if (parsedMessage.project_id && parsedMessage.file) {
               await ProjectService.uploadFile(

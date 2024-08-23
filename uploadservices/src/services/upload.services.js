@@ -6,8 +6,11 @@ const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
 const { projectProducerTopic } = require("../configs/kafkaProjectTopic");
 const getFile = async (filename) => {
   try {
-    const result = await cloudinary.url(filename, { resource_type: "raw" });
-    return result;
+    const getAccessId = await cloudinary.api.resource(filename);
+    const result = await cloudinary.api.resource_by_asset_id(
+      getAccessId.asset_id
+    );
+    return result.url;
   } catch (error) {
     console.error(error);
   }
@@ -30,6 +33,7 @@ const getFileImage = async ({ filename }) => {
   };
   try {
     const result = await cloudinary.url(filename, options);
+    console.log(filename);
     return result;
   } catch (error) {
     console.error(error);

@@ -1,1 +1,0 @@
-{"@timestamp":"2024-08-08T02:49:36.034Z","context":"/gateway/api/access/login","ecs.version":"8.10.0","log.level":"error","message":"401:-:12ms:-:Response:{\"status\":401,\"now\":1723085376004}","metadata":{"message":"Error: Mật khẩu không đúng, hãy thử lại"},"requestId":"7f11d36e-909a-4e07-b26d-e88e6078c5f3","timestamp":"2024-08-08 02:49:034 AM"}

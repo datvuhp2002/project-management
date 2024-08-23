@@ -21,7 +21,11 @@ const {
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
 
-const { GetAllUserFromProject, GetAvatar } = require("./grpcClient.services");
+const {
+  GetAllUserFromProject,
+  GetAvatar,
+  GetDepartment,
+} = require("./grpcClient.services");
 class UserService {
   static select = {
     user_id: true,
@@ -81,7 +85,6 @@ class UserService {
     if (/\s/.test(username)) {
       throw new BadRequestError("Username should not contain spaces.");
     }
-
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -104,7 +107,6 @@ class UserService {
     await runProducer(emailProducerTopic.createUser, message);
     return newUser;
   };
-
   static async forgetPassword({ email = null, captcha = null }) {
     const holderUser = await prisma.user.findFirst({ where: { email } });
     // return holderUser;
@@ -161,7 +163,6 @@ class UserService {
       },
     });
   };
-
   // DEPARTMENT
   // add user into department
   static addUserIntoDepartment = async ({ list_user_ids }, department_id) => {
@@ -179,15 +180,37 @@ class UserService {
     { list_user_ids },
     department_id
   ) => {
-    return await prisma.user.updateMany({
-      where: {
-        department_id,
-        OR: list_user_ids.map((user_id) => ({ user_id: user_id })),
-      },
-      data: {
-        department_id: null,
-      },
+    const operations = list_user_ids.map(async (item) => {
+      const user = await prisma.user.findUnique({
+        where: { user_id: item },
+        select: { role: { select: { name: true } } },
+      });
+      if (!user) {
+        console.warn(`User with ID ${item} not found.`);
+        return;
+      }
+      if (user.role.name === "MANAGER") {
+        await runProducer(departmentProducerTopic.removeManager, department_id);
+      }
+      await prisma.user.updateMany({
+        where: {
+          department_id,
+          user_id: item,
+        },
+        data: {
+          department_id: null,
+        },
+      });
     });
+    try {
+      await Promise.all(operations);
+    } catch (error) {
+      throw new BadRequestError(
+        `Failed to remove staff from department: ${error.message}`
+      );
+    }
+
+    return true; // Hoặc giá trị phù hợp với yêu cầu của bạn
   };
   static removeStaffFromDepartmentHasBeenDeleted = async ({
     department_id,
@@ -250,6 +273,8 @@ class UserService {
       previousPage,
     });
   };
+  // Có thể gộp làm 1
+  // {
   // get All Staff in department for ADMIN
   static getAllStaffInDepartmentForAdmin = async (
     { items_per_page, page, search, nextPage, previousPage, role = null },
@@ -284,6 +309,43 @@ class UserService {
       previousPage,
     });
   };
+  // get All Staff in departments for PM
+  static getAllStaffInDepartments = async (
+    { items_per_page, page, search, nextPage, previousPage, role = null },
+    department_ids
+  ) => {
+    let query = [];
+    let ListUser;
+    if (role) {
+      const role_data = await RoleService.findByName(role);
+      ListUser = await prisma.user.findMany({
+        where: {
+          department_id: { in: department_ids },
+          role_id: role_data.role_id,
+        },
+      });
+    } else {
+      ListUser = await prisma.user.findMany({
+        where: { department_id: { in: department_ids } },
+      });
+    }
+    query.push({
+      user_id: {
+        in: ListUser.map((user) => user.user_id),
+      },
+      deletedMark: false,
+    });
+    return await this.queryUser({
+      query: query,
+      items_per_page,
+      page,
+      search,
+      nextPage,
+      previousPage,
+    });
+  };
+  // }
+  //
   // do not have department
   static getListOfStaffDoNotHaveDepartment = async ({
     items_per_page,
@@ -321,6 +383,7 @@ class UserService {
     items_per_page,
     page,
     haveDepartment,
+    department_id,
     search,
     nextPage,
     previousPage,
@@ -352,13 +415,31 @@ class UserService {
         deletedMark: false,
       });
     }
-    if (role) {
+    // If department_id is provided, prioritize filtering by it
+    if (department_id) {
+      if (role) {
+        // Filter by both department_id and role
+        const roleData = await RoleService.findByName(role);
+        query.push({
+          department_id,
+          role_id: roleData.role_id,
+        });
+      } else {
+        // Filter only by department_id
+        query.push({ department_id });
+      }
+    } else if (role) {
+      const roleData = await RoleService.findByName(role);
+      const usersByRole = await prisma.user.findMany({
+        where: { role_id: roleData.role_id },
+        select: { user_id: true },
+      });
+
       query.push({
-        user_id: {
-          in: await this.findUserByRole(role),
-        },
+        user_id: { in: usersByRole.map((user) => user.user_id) },
       });
     }
+
     query.push({
       deletedMark: false,
     });
@@ -385,9 +466,13 @@ class UserService {
       managerInformation = await this.detailManager(manager_id);
       if (managerInformation) {
         if (managerInformation.avatar) {
-          managerInformation.avatar = await GetAvatar(
-            managerInformation.avatar
-          );
+          try {
+            managerInformation.avatar = await GetAvatar(
+              managerInformation.avatar
+            );
+          } catch (e) {
+            console.log("Upload services maybe close:::", e);
+          }
         }
       }
     } else {
@@ -399,8 +484,12 @@ class UserService {
     };
   };
   static getAllStaffInProject = async (query, project_id) => {
-    const user_ids = await GetAllUserFromProject(project_id);
-    return await this.getAllStaffByUserIds(query, { user_ids });
+    try {
+      const user_ids = await GetAllUserFromProject(project_id);
+      return await this.getAllStaffByUserIds(query, { user_ids });
+    } catch (e) {
+      console.log("Assignment service maybe close:::", e);
+    }
   };
   // get all staff by user properties
   static getAllStaffByUserIds = async (
@@ -437,7 +526,6 @@ class UserService {
       previousPage,
     });
   };
-
   // get all staffs has been delete
   static trash = async ({
     items_per_page,
@@ -474,9 +562,22 @@ class UserService {
       where: { user_id: id },
       select: this.select,
     });
+    console.log(detailUser);
     if (detailUser.avatar) {
-      const avatar = await GetAvatar(detailUser.avatar);
-      detailUser.avatar = avatar;
+      try {
+        const avatar = await GetAvatar(detailUser.avatar);
+        detailUser.avatar = avatar;
+      } catch (e) {
+        console.log("Upload services maybe close:::", e);
+      }
+    }
+    if (detailUser.department_id) {
+      try {
+        const department_info = await GetDepartment(detailUser.department_id);
+        detailUser.department_info = department_info;
+      } catch (e) {
+        console.log("Upload services maybe close:::", e);
+      }
     }
     if (!detailUser) throw new NotFoundError("User not found");
     return detailUser;
@@ -492,19 +593,19 @@ class UserService {
   //update user information
   static update = async ({ id, data }, modifiedBy) => {
     data.modifiedBy = modifiedBy;
+    const findUpdatedUser = await prisma.user.findUnique({
+      where: { user_id: id },
+      select: this.select,
+    });
     if (id !== modifiedBy) {
       const findUserToUpdate = await prisma.user.findUnique({
         where: { user_id: modifiedBy },
         select: this.select,
       });
-      const findUpdatedUser = await prisma.user.findUnique({
-        where: { user_id: id },
-        select: this.select,
-      });
       if (findUpdatedUser.role.name === "SUPER_ADMIN")
         throw new BadRequestError("Can't update this account");
       if (
-        findUserToUpdate.role_id.name !== "SUPER_ADMIN" &&
+        findUserToUpdate.role.name !== "SUPER_ADMIN" &&
         findUpdatedUser.role.name === "ADMIN"
       ) {
         throw new BadRequestError("Can't update ADMIN ACCOUNT");
@@ -532,6 +633,17 @@ class UserService {
     if (role) {
       const role_data = await RoleService.findByName(role);
       if (!role_data) throw new BadRequestError("Role not found");
+      if (
+        findUpdatedUser.role.name === "MANAGER" &&
+        findUpdatedUser.role.name !== role &&
+        findUpdatedUser.department_id !== null
+      ) {
+        await runProducer(
+          departmentProducerTopic.removeManager,
+          findUpdatedUser.department_id
+        );
+        await this.updateWithoutModified({ id, data: { department_id: null } });
+      }
       updateUserData.role_id = role_data.role_id;
     }
     const updatedUser = await prisma.user.update({
@@ -541,6 +653,23 @@ class UserService {
     });
     if (updatedUser) return updatedUser;
     throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
+  };
+  //update user information [for consumer]
+  static updateWithoutModified = async ({ id, data }) => {
+    try {
+      const { role, ...updateUserData } = data;
+      if (role) {
+        const role_data = await RoleService.findByName(role);
+        if (!role_data) throw new BadRequestError("Role not found");
+        updateUserData.role_id = role_data.role_id;
+      }
+      await prisma.user.update({
+        where: { user_id: id },
+        data: updateUserData,
+      });
+    } catch (err) {
+      throw new BadRequestError(err);
+    }
   };
   // delete user account
   static delete = async (user_id) => {
@@ -553,23 +682,24 @@ class UserService {
         deletedAt: new Date(),
       },
     });
-    if (deleteUser) {
-      const roleUser = deleteUser.role.name;
-      if (roleUser === "SUPER_ADMIN") {
-        await this.restore(user_id);
-        throw new BadRequestError("Can't delete this account");
-      }
-      if (roleUser.name === "ADMIN" || roleUser.name === "MANAGER") {
-        await runProducer(
-          departmentProducerTopic.deleteUser,
-          deleteUser.department_id
-        );
-        return true;
-      }
-      await this.restore(user_id);
+    if (!deleteUser) {
+      throw new BadRequestError("User not found or update failed");
     }
-    await this.restore(user_id);
-    return null;
+    const roleUser = deleteUser.role.name;
+
+    if (roleUser === "SUPER_ADMIN") {
+      await this.restore(user_id);
+      throw new BadRequestError("Can't delete this account");
+    }
+    if (roleUser === "ADMIN" || roleUser === "MANAGER") {
+      await runProducer(
+        departmentProducerTopic.deleteUser,
+        deleteUser.department_id
+      );
+      return true;
+    }
+    // Xử lý các vai trò khác hoặc không có vai trò cụ thể
+    throw new BadRequestError("Delete user failed");
   };
   static forceDelete = async (user_id) => {
     const findDeletedUser = await prisma.user.findUnique({
@@ -607,26 +737,31 @@ class UserService {
     query,
     { project_id, department_id }
   ) => {
-    const listUserInProjectsIds = await GetAllUserFromProject(project_id);
-    const listAllStaffInDepartmentWithoutProjects = await prisma.user.findMany({
-      where: {
-        department_id: department_id,
-        user_id: {
-          notIn: listUserInProjectsIds,
-        },
-      },
-      select: {
-        user_id: true,
-      },
-    });
-    const listAllStaffInDepartmentWithoutProjectsIds =
-      listAllStaffInDepartmentWithoutProjects.map((id) => {
-        return id.user_id;
-      });
+    try {
+      const listUserInProjectsIds = await GetAllUserFromProject(project_id);
+      const listAllStaffInDepartmentWithoutProjects =
+        await prisma.user.findMany({
+          where: {
+            department_id: department_id,
+            user_id: {
+              notIn: listUserInProjectsIds,
+            },
+          },
+          select: {
+            user_id: true,
+          },
+        });
+      const listAllStaffInDepartmentWithoutProjectsIds =
+        listAllStaffInDepartmentWithoutProjects.map((id) => {
+          return id.user_id;
+        });
 
-    return await this.getAllStaffByUserIds(query, {
-      user_ids: listAllStaffInDepartmentWithoutProjectsIds,
-    });
+      return await this.getAllStaffByUserIds(query, {
+        user_ids: listAllStaffInDepartmentWithoutProjectsIds,
+      });
+    } catch (e) {
+      console.log("Assignment service maybe close:::", e);
+    }
   };
   static queryUser = async ({
     query,
@@ -650,6 +785,7 @@ class UserService {
     if (query && query.length > 0) {
       whereClause.AND.push(...query);
     }
+
     const total = await prisma.user.count({
       where: whereClause,
     });
@@ -664,15 +800,25 @@ class UserService {
       where: whereClause,
       orderBy: { createdAt: "desc" },
     });
+    await Promise.all(
+      users.map(async (user) => {
+        try {
+          const avatar = await GetAvatar(user.avatar);
+          user.avatar = avatar;
+        } catch (e) {
+          console.log("Error fetching avatar:", e);
+          user.avatar = null; // Set avatar to null in case of an error
+        }
 
-    const getUsersAvatar = users.map(async (user) => {
-      if (user.avatar) {
-        const avatar = await GetAvatar(user.avatar);
-        user.avatar = avatar;
-      }
-    });
-
-    await Promise.all(getUsersAvatar);
+        try {
+          const department_info = await GetDepartment(user.department_id);
+          user.department_info = department_info;
+        } catch (e) {
+          console.log("Error fetching department name:", e);
+          user.department_info = null; // Set department_name to null in case of an error
+        }
+      })
+    );
 
     const lastPage = Math.ceil(total / itemsPerPage);
     return {

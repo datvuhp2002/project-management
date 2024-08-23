@@ -52,7 +52,6 @@ class UserController {
         throw new BadRequestError("Path và filename không được để trống");
       }
       const { path, filename } = file;
-      console.log(req.params.id);
       await runProducer(taskProducerTopic.uploadFileForTask, {
         file: file.filename,
         task_id: req.params.id,

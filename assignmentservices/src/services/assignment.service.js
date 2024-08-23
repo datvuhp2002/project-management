@@ -10,6 +10,9 @@ const {
 } = require("./grpcClient.services");
 const { runProducer } = require("../message_queue/producer");
 const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
+const {
+  activityProducerTopic,
+} = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -102,6 +105,7 @@ class AssignmentService {
         data: {
           project_id,
           user_id,
+          task_id: null,
           startAt,
           endAt,
           createdBy,
@@ -179,13 +183,12 @@ class AssignmentService {
     switch (query.target) {
       case "project":
         return await this.getAllAssignmentForProject(query, id);
-        break;
+
       case "task":
         return await this.getAllAssignmentForTask(query, id);
-        break;
+
       default:
         return await this.getAllAssignmentForUser(query, id);
-        break;
     }
   };
   static getAllAssignmentForUser = async (
@@ -306,15 +309,64 @@ class AssignmentService {
     );
   };
   // remove staff from project
-  static removeStaffFromProject = async (project_id, user_ids) => {
-    const removeStaff = await prisma.assignment.deleteMany({
-      where: {
-        project_id,
-        user_id: { in: user_ids },
-      },
-    });
-    if (removeStaff.count > 0) return true;
-    return false;
+  static removeStaffFromProject = async (project_id, user_ids, modifiedBy) => {
+    try {
+      const manager_info = await getUser(modifiedBy);
+      let filterUser_ids = user_ids;
+      if (
+        manager_info.role_name !== "ADMIN" &&
+        manager_info.role_name !== "SUPER_ADMIN" &&
+        manager_info.role_name !== "PROJECT_MANAGER"
+      ) {
+        const managerDepartmentId = manager_info.department_id;
+
+        filterUser_ids = await Promise.all(
+          user_ids.map(async (user_id) => {
+            try {
+              const userInfo = await getUser(user_id);
+              if (userInfo.department_id === managerDepartmentId) {
+                return user_id;
+              }
+              return null;
+            } catch (error) {
+              console.error(
+                `Error fetching information for user ${user_id}:`,
+                error
+              );
+              return null;
+            }
+          })
+        );
+        filterUser_ids = filterUser_ids.filter((id) => id !== null);
+      }
+      const removeStaff = await prisma.assignment.deleteMany({
+        where: {
+          project_id,
+          user_id: { in: filterUser_ids },
+          task_id: null,
+        },
+      });
+
+      const updateAssignment = await prisma.assignment.updateMany({
+        where: {
+          project_id,
+          user_id: { in: filterUser_ids },
+        },
+        data: {
+          user_id: null,
+        },
+      });
+
+      // Kiểm tra nếu có bản ghi bị xóa hoặc cập nhật
+      if (removeStaff.count > 0 || updateAssignment.count > 0) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error removing staff from project:", error);
+      return false;
+    }
   };
   // get all assignment instances
   static getAllUserFromProject = async (project_id) => {
@@ -396,32 +448,43 @@ class AssignmentService {
   };
   // assignment information
   static detail = async (id) => {
-    const assignment = await prisma.assignment.findUnique({
-      where: { assignment_id: id },
-      select: this.select,
-    });
-    const userResponse = await getUser(assignment.user_id);
-    const taskResponse = await getTask(assignment.task_id);
-    const projectResponse = await getProject(assignment.project_id);
-    if (userResponse) {
-      assignment.user = userResponse;
-    } else {
-      assignment.user = null;
+    try {
+      const assignment = await prisma.assignment.findUnique({
+        where: { assignment_id: id },
+        select: this.select,
+      });
+      const userResponse = await getUser(assignment.user_id);
+      const taskResponse = await getTask(assignment.task_id);
+      const projectResponse = await getProject(assignment.project_id);
+      if (userResponse) {
+        assignment.user = userResponse;
+      } else {
+        assignment.user = null;
+      }
+      if (taskResponse) {
+        assignment.task = taskResponse;
+      } else {
+        assignment.task = null;
+      }
+      if (projectResponse) {
+        assignment.project = projectResponse;
+      } else {
+        assignment.project = null;
+      }
+      return assignment;
+    } catch (e) {
+      console.log("Something was wrong:::", e);
     }
-    if (taskResponse) {
-      assignment.task = taskResponse;
-    } else {
-      assignment.task = null;
-    }
-    if (projectResponse) {
-      assignment.project = projectResponse;
-    } else {
-      assignment.project = null;
-    }
-    return assignment;
   };
   // update assignment
-  static update = async ({ id, data }) => {
+  static update = async ({ id, data }, modifiedBy) => {
+    data.modifiedBy = modifiedBy;
+    // Check if the assignment exists
+    const findAssignment = await prisma.assignment.findUnique({
+      where: { assignment_id: id },
+    });
+    if (!findAssignment) throw new BadRequestError("Can't find assignment");
+    // Update the assignment
     const updateAssignment = await prisma.assignment.update({
       where: { assignment_id: id },
       data,
@@ -429,6 +492,32 @@ class AssignmentService {
     });
     if (!updateAssignment) {
       throw new BadRequestError("Can't update assignment");
+    }
+    // Check and handle status updates
+    if (findAssignment.task_id !== null) {
+      const task = await getTask(findAssignment.task_id);
+      let status;
+      switch (data.status) {
+        case 0:
+          status = "to do";
+          break;
+        case 1:
+          status = "on progress";
+          break;
+        case 2:
+          status = "done";
+          break;
+        default:
+          status = "unknown";
+          break;
+      }
+      const message = {
+        createdBy: modifiedBy,
+        task: task.name,
+        task_id: findAssignment.task_id,
+        status: status,
+      };
+      await runProducer(activityProducerTopic.updatedStatusAssignment, message);
     }
     return updateAssignment;
   };

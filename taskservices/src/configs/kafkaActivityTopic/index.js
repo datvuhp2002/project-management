@@ -1,6 +1,5 @@
 const {
   activityTopicsContinuous,
-  activityTopicsOnDemand,
 } = require("./consumer/activity.consumer.topic.config");
 const {
   activityProducerTopic,
@@ -8,6 +7,5 @@ const {
 
 module.exports = {
   activityTopicsContinuous,
-  activityTopicsOnDemand,
   activityProducerTopic,
 };

@@ -9,12 +9,13 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
-const { uploadProducerTopic } = require("../configs/kafkaUploadTopic");
+const { userProducerTopic } = require("../configs/kafkaUserTopic");
 const { runProducer } = require("../message_queue/producer");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
   getUser,
   getAllUserProject,
+  GetDepartment,
 } = require("./grpcClient.services");
 class ProjectService {
   static select = {
@@ -31,34 +32,34 @@ class ProjectService {
     modifiedBy: true,
     createdAt: true,
     project_manager_id: true,
-    department_id: true,
+    department_ids: true,
   };
   // create a new project
   static create = async (data, createdBy) => {
     data.createdBy = createdBy;
+    data.department_ids = data.department_ids || [];
+    data.project_manager_id = data.project_manager_id || null;
     const currentDate = new Date();
-    const startDate = new Date(data.startAt);
+    const startDate = new Date(data.startAt) || currentDate;
     const endDate = new Date(data.endAt);
-    // Validate the dates
+    // Validate the datesget
     if (isNaN(startDate) || isNaN(endDate)) {
-      throw new BadRequestException("Invalid start or end date provided.");
+      throw new BadRequestError("Invalid start or end date provided.");
     }
     if (startDate < currentDate) {
-      throw new BadRequestException(
+      throw new BadRequestError(
         "Start date cannot be earlier than the current date."
       );
     }
     if (endDate <= startDate) {
-      throw new BadRequestException(
-        "End date must be later than the start date."
-      );
+      throw new BadRequestError("End date must be later than the start date.");
     }
     // Create the project
     try {
       const newProject = await prisma.project.create({ data });
       return newProject;
     } catch (error) {
-      throw new BadRequestException(
+      throw new BadRequestError(
         "Failed to create the project, please try again."
       );
     }
@@ -93,7 +94,7 @@ class ProjectService {
   ) => {
     let query = [];
     query.push({
-      department_id: id,
+      department_ids: { has: id },
       deletedMark: false,
     });
     const select = {
@@ -123,7 +124,7 @@ class ProjectService {
   ) => {
     let query = [];
     query.push({
-      department_id: id,
+      department_ids: { has: id },
       deletedMark: false,
     });
     return await this.queryProject(
@@ -141,7 +142,7 @@ class ProjectService {
   // get all projects ids in department
   static getAllProjectIdsInDepartment = async (department_id) => {
     const projects = await prisma.project.findMany({
-      where: { department_id },
+      where: { department_ids: { has: department_id } },
       select: { project_id: true },
     });
     const ids = projects.map((project) => project.project_id);
@@ -154,14 +155,18 @@ class ProjectService {
   ) => {
     let query = [];
     query.push({
-      department_id,
+      department_ids: { has: department_id },
       deletedMark: false,
     });
-    const data = await getAllUserProject(user_id);
-    if (data.length === 0) return "Bạn chưa có dự án";
-    query.push({
-      project_id: { in: data },
-    });
+    try {
+      const data = await getAllUserProject(user_id);
+      if (data.length === 0) return "Bạn chưa có dự án";
+      query.push({
+        project_id: { in: data },
+      });
+    } catch (e) {
+      console.log("Assignment service maybe close:::", e);
+    }
     return await this.queryProject(
       {
         query: query,
@@ -182,12 +187,16 @@ class ProjectService {
     query.push({
       deletedMark: false,
     });
-    const data = await getAllUserProject(user_id);
-    console.log(data);
-    if (data.length === 0) return "Bạn chưa có dự án";
-    query.push({
-      project_id: { in: data },
-    });
+    try {
+      const data = await getAllUserProject(user_id);
+      console.log(data);
+      if (data.length === 0) return "Bạn chưa có dự án";
+      query.push({
+        project_id: { in: data },
+      });
+    } catch (e) {
+      console.log("Assignment service maybe close:::", e);
+    }
     return await this.queryProject(
       {
         query: query,
@@ -231,10 +240,85 @@ class ProjectService {
       select: this.select,
     });
     if (!project) throw new NotFoundError("No project found");
+    try {
+      const projectManagerInformation = await getUser(
+        project.project_manager_id
+      );
+      project.project_manager = projectManagerInformation;
+      // Fetch department details for each department ID in the project
+      // Fetch department details for all department IDs in the project
+      const departmentPromises = project.department_ids.map((id) =>
+        GetDepartment(id)
+      );
+      const departments = await Promise.all(departmentPromises);
+      // Attach department info directly to the project
+      project.department_info = departments;
+    } catch (e) {
+      console.error(e);
+    }
     return project;
+  };
+  static removeProjectsFromDepartment = async (department_id) => {
+    if (!department_id) {
+      throw new BadRequestError("department_id is required");
+    }
+    // Lấy danh sách tất cả các dự án có department_ids chứa department_id này
+    const projects = await prisma.project.findMany({
+      where: {
+        department_ids: {
+          has: department_id,
+        },
+      },
+      select: {
+        project_id: true,
+        department_ids: true,
+      },
+    });
+    // Cập nhật các dự án với danh sách department_ids mới
+    const updatePromises = projects.map((project) => {
+      const filteredDepartmentIds = project.department_ids.filter(
+        (id) => id !== department_id
+      );
+      return prisma.project.update({
+        where: { project_id: project.project_id },
+        data: { department_ids: { set: filteredDepartmentIds } },
+      });
+    });
+    // Thực hiện tất cả các cập nhật
+    await Promise.all(updatePromises);
+    return { message: "Projects updated successfully" };
   };
   // update project
   static update = async ({ id, data }, modifiedBy) => {
+    const findProjects = await prisma.project.findUnique({
+      where: { project_id: id },
+      select: { department_ids: true, project_manager_id: true },
+    });
+    data.department_ids = data.department_ids || findProjects.department_ids;
+    if (
+      data.project_manager_id &&
+      data.project_manager_id !== findProjects.project_manager_id
+    ) {
+      if (!findProjects.project_manager_id) {
+        await runProducer(
+          userProducerTopic.addProjectManagerForProject,
+          data.project_manager_id
+        );
+      } else {
+        await runProducer(userProducerTopic.changeProjectManager, {
+          old_project_manager_id: findProjects.project_manager_id,
+          new_project_manager_id: data.project_manager_id,
+        });
+      }
+    } else if (
+      !data.project_manager_id &&
+      data.project_manager_id !== findProjects.project_manager_id
+    ) {
+      await runProducer(
+        userProducerTopic.removeProjectManagerForProject,
+        findProjects.project_manager_id
+      );
+    }
     const updateProject = await prisma.project.update({
       where: { project_id: id },
       data: { ...data, modifiedBy },
@@ -261,6 +345,26 @@ class ProjectService {
     await this.restore(project_id);
     throw new BadRequestError("Xoá dự án không thành công");
   };
+  static softDeleteMultipleProjects = async (projectIds) => {
+    try {
+      await Promise.all(
+        projectIds.map((project_id) => this.delete(project_id))
+      );
+      return true;
+    } catch (e) {
+      throw new BadRequestError(e);
+    }
+  };
+  static forceDeleteMultipleProjects = async (projectIds) => {
+    try {
+      await Promise.all(
+        projectIds.map((project_id) => this.forceDelete(project_id))
+      );
+      return true;
+    } catch (e) {
+      throw new BadRequestError(e);
+    }
+  };
   static forceDelete = async (project_id) => {
     const deleteProject = await prisma.project.delete({
       where: { project_id },
@@ -278,18 +382,6 @@ class ProjectService {
     }
     return true;
   };
-  // delete file
-  static deleteFile = async ({ project_id, filename }) => {
-    const project = await prisma.project.findUnique({ where: { project_id } });
-    if (!project) throw new BadRequestError("Project not found");
-    const updatedDocuments = project.document.filter((doc) => doc !== filename);
-    const updateProject = await prisma.project.update({
-      where: { project_id },
-      data: { document: updatedDocuments },
-    });
-    if (!updateProject) throw new BadRequestError("Can not delete this file");
-    return true;
-  };
   // restore project
   static restore = async (project_id) => {
     const restoreProject = await prisma.project.update({
@@ -305,8 +397,29 @@ class ProjectService {
     await this.delete(project_id);
     throw new BadRequestError("Khôi phục dự án không thành công");
   };
+  static multipleRestoreProject = async (projectIds) => {
+    try {
+      await Promise.all(
+        projectIds.map((project_id) => this.restore(project_id))
+      );
+      return true;
+    } catch (e) {
+      throw new BadRequestError(e);
+    }
+  };
+  // delete file
+  static deleteFile = async ({ project_id, filename }) => {
+    const project = await prisma.project.findUnique({ where: { project_id } });
+    if (!project) throw new BadRequestError("Project not found");
+    const updatedDocuments = project.document.filter((doc) => doc !== filename);
+    const updateProject = await prisma.project.update({
+      where: { project_id },
+      data: { document: updatedDocuments },
+    });
+    if (!updateProject) throw new BadRequestError("Can not delete this file");
+    return true;
+  };
   // upload file to cloud and store it in db
-
   static uploadFile = async (project_id, filename) => {
     const existingProject = await prisma.project.findUnique({
       where: { project_id },
@@ -325,28 +438,16 @@ class ProjectService {
       throw new BadRequestError(`Đã sảy ra lỗi: ${e.message}`);
     }
   };
-  static async update({ project_id, data, modifiedBy }) {
-    if (data.document) {
-      try {
-        return await prisma.project.update({
-          where: { project_id },
-          data: { ...data, modifiedBy },
-        });
-      } catch (error) {
-        console.error("Failed to update project:", error);
-        throw new BadRequestError(
-          "Cập nhật không thành công, vui lòng thử lại."
-        );
-      }
-    }
-    return await prisma.project.update({
-      where: { project_id },
-      data: { ...data, modifiedBy },
-      select: this.select,
-    });
-  }
   static queryProject = async (
-    { query, items_per_page, page, search, nextPage, previousPage },
+    {
+      query,
+      items_per_page,
+      page,
+      search,
+      hasDepartment = "true",
+      nextPage,
+      previousPage,
+    },
     isNotTrash = true,
     anotherSelected
   ) => {
@@ -366,19 +467,35 @@ class ProjectService {
         },
       ],
     };
+
     if (query && query.length > 0) {
       whereClause.AND = query;
     }
+
+    if (hasDepartment === "false") {
+      whereClause.AND = [
+        ...(whereClause.AND || []),
+        {
+          department_ids: {
+            hasSome: [],
+          },
+        },
+      ];
+    }
+
     const total = await prisma.project.count({
       where: whereClause,
     });
+
     if (items_per_page !== "ALL") {
       itemsPerPage = Number(items_per_page) || 10;
     } else {
       itemsPerPage = total;
     }
+
     const currentPage = Number(page) || 1;
     const skip = currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0;
+
     const projects = await prisma.project.findMany({
       take: itemsPerPage,
       skip,
@@ -388,8 +505,9 @@ class ProjectService {
         createdAt: "desc",
       },
     });
+
     if (isNotTrash) {
-      const projectPromise = projects.map(async (project, index) => {
+      const projectPromises = projects.map(async (project) => {
         try {
           const result = await getTotalTaskWithStatusFromProjectAndTotalStaff(
             project.project_id
@@ -397,6 +515,15 @@ class ProjectService {
           const projectManagerInformation = await getUser(
             project.project_manager_id
           );
+          // Fetch department details for all department IDs in the project
+          const departmentPromises = project.department_ids.map((id) =>
+            GetDepartment(id)
+          );
+          const departments = await Promise.all(departmentPromises);
+
+          // Attach department info directly to the project
+          project.department_info = departments;
+          // another info
           project.project_manager = projectManagerInformation;
           project.total_staff = result.total_staff;
           project.total_task = {
@@ -415,12 +542,14 @@ class ProjectService {
           };
         }
       });
-      await Promise.all(projectPromise);
+
+      await Promise.all(projectPromises);
     }
 
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
+
     return {
       data: projects,
       total,

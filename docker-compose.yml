@@ -188,6 +188,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - DEPARTMENT_GRPC_PORT=departmentservices:50059
       - UPLOAD_GRPC_PORT=uploadservices:50057
       - LOKI_HOST=http://loki:3100
     volumes:
@@ -216,6 +217,7 @@ services:
     container_name: departmentservices
     environment:
       - PORT=3057
+      - GRPC_PORT=50059
       - KAFKA_BROKER=kafkaMQ:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/departmentService?replicaSet=dbrs
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
@@ -292,6 +294,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50055
       - USER_GRPC_PORT=userservices:50053
+      - DEPARTMENT_GRPC_PORT=departmentservices:50059
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
       - LOKI_HOST=http://loki:3100
     volumes:

@@ -4,7 +4,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../configs/cloudinary.config");
 const storageClient = new CloudinaryStorage({
   cloudinary: cloudinary,
-  allowedFormat: ["jpg", "png", "jpeg"],
+  // allowedFormat: ["jpg", "png", "jpeg"],
+  allowedFormat: "image",
   params: {
     folder: (req, file) => `avatar/client/${req.params.id}`,
     format: async (req, file) => {
@@ -17,7 +18,7 @@ const storageProjectFile = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: `project/${req.params.id}`,
-      resource_type: "raw",
+      resource_type: "auto",
       raw_convert: "aspose",
       public_id: file.originalname,
     };
@@ -28,7 +29,8 @@ const storageTaskFile = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: `task/${req.params.id}`,
-      resource_type: "raw",
+      // resource_type: "raw",
+      resource_type: "auto",
       raw_convert: "aspose",
       public_id: file.originalname,
     };
