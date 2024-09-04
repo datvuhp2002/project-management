@@ -5,6 +5,7 @@ const {
 } = require("../configs/kafkaDepartmentTopic");
 const { convertObjectToArray } = require("../utils");
 const ProjectService = require("../services/project.service");
+const { userTopicsContinuous } = require("../configs/kafkaUserTopic");
 
 const kafka = new Kafka({
   clientId: "project-services",
@@ -22,6 +23,10 @@ const continuousConsumer = async () => {
   });
   await consumer.subscribe({
     topics: convertObjectToArray(departmentTopicsContinuous),
+    fromBeginning: true,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(userTopicsContinuous),
     fromBeginning: true,
   });
 
@@ -56,9 +61,8 @@ const continuousConsumer = async () => {
             break;
           }
           case uploadTopicsContinuous.deleteProjectFileInCloud: {
-            if (parsedMessage.filePath) {
-              await ProjectService.deleteFile(parsedMessage.filePath);
-              console.log(`File deleted: ${parsedMessage.filePath}`);
+            if (parsedMessage.filename) {
+              await ProjectService.deleteFile(parsedMessage);
             } else {
               console.warn(
                 "Invalid data for deleteProjectFileInCloud:",
@@ -67,6 +71,7 @@ const continuousConsumer = async () => {
             }
             break;
           }
+
           default:
             console.log("Unhandled topic:", topic);
         }

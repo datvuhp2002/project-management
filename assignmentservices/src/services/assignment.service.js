@@ -28,7 +28,16 @@ class AssignmentService {
   // Create new assignment
   static create = async (data, createdBy) => {
     const { project_id, task_id, user_id, startAt, endAt } = data;
-
+    const projectInfo = await getProject(project_id);
+    const userInfo = await getUser(createdBy);
+    if (
+      userInfo.role_name === "STAFF" &&
+      createdBy !== projectInfo.project_manager_id
+    ) {
+      throw new BadRequestError(
+        "You do not have permission to create assignment for this project"
+      );
+    }
     // 1. Kiểm tra dự án tồn tại
     try {
       await getProject(project_id);
@@ -312,14 +321,20 @@ class AssignmentService {
   static removeStaffFromProject = async (project_id, user_ids, modifiedBy) => {
     try {
       const manager_info = await getUser(modifiedBy);
+      const projectInfo = await getProject(project_id);
       let filterUser_ids = user_ids;
+      if (
+        manager_info.role_name === "STAFF" &&
+        modifiedBy !== projectInfo.project_manager_id
+      ) {
+        throw new BadRequestError("You do not have permission to remove staff");
+      }
       if (
         manager_info.role_name !== "ADMIN" &&
         manager_info.role_name !== "SUPER_ADMIN" &&
-        manager_info.role_name !== "PROJECT_MANAGER"
+        modifiedBy !== projectInfo.project_manager_id
       ) {
         const managerDepartmentId = manager_info.department_id;
-
         filterUser_ids = await Promise.all(
           user_ids.map(async (user_id) => {
             try {
@@ -346,7 +361,6 @@ class AssignmentService {
           task_id: null,
         },
       });
-
       const updateAssignment = await prisma.assignment.updateMany({
         where: {
           project_id,

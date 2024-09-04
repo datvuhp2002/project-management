@@ -29,7 +29,6 @@ const storageTaskFile = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: `task/${req.params.id}`,
-      // resource_type: "raw",
       resource_type: "auto",
       raw_convert: "aspose",
       public_id: file.originalname,

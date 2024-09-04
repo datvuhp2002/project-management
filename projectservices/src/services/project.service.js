@@ -71,6 +71,7 @@ class ProjectService {
     search,
     nextPage,
     previousPage,
+    department_id,
   }) => {
     let query = [];
     query.push({
@@ -84,12 +85,13 @@ class ProjectService {
         search,
         nextPage,
         previousPage,
+        department_id,
       },
       true
     );
   };
   static getAllInfoProjectInDepartment = async (
-    { items_per_page, page, search, nextPage, previousPage },
+    { items_per_page, page, search, nextPage, previousPage, department_id },
     { id }
   ) => {
     let query = [];
@@ -112,6 +114,7 @@ class ProjectService {
         search,
         nextPage,
         previousPage,
+        department_id,
       },
       false,
       select
@@ -119,7 +122,7 @@ class ProjectService {
   };
   // get all projects in department
   static getAllProjectInDepartment = async (
-    { items_per_page, page, search, nextPage, previousPage },
+    { items_per_page, page, search, nextPage, previousPage, department_id },
     { id }
   ) => {
     let query = [];
@@ -135,6 +138,7 @@ class ProjectService {
         search,
         nextPage,
         previousPage,
+        department_id,
       },
       true
     );
@@ -180,7 +184,7 @@ class ProjectService {
     );
   };
   static getUserProject = async (
-    { items_per_page, page, search, nextPage, previousPage },
+    { items_per_page, page, search, nextPage, previousPage, department_id },
     user_id
   ) => {
     let query = [];
@@ -205,6 +209,7 @@ class ProjectService {
         search,
         nextPage,
         previousPage,
+        department_id,
       },
       true
     );
@@ -216,6 +221,7 @@ class ProjectService {
     search,
     nextPage,
     previousPage,
+    department_id,
   }) => {
     let query = [];
     query.push({
@@ -229,6 +235,7 @@ class ProjectService {
         search,
         nextPage,
         previousPage,
+        department_id,
       },
       false
     );
@@ -294,31 +301,15 @@ class ProjectService {
       where: { project_id: id },
       select: { department_ids: true, project_manager_id: true },
     });
-    data.department_ids = data.department_ids || findProjects.department_ids;
+    const userInfo = await getUser(modifiedBy);
     if (
-      data.project_manager_id &&
-      data.project_manager_id !== findProjects.project_manager_id
-    ) {
-      if (!findProjects.project_manager_id) {
-        await runProducer(
-          userProducerTopic.addProjectManagerForProject,
-          data.project_manager_id
-        );
-      } else {
-        await runProducer(userProducerTopic.changeProjectManager, {
-          old_project_manager_id: findProjects.project_manager_id,
-          new_project_manager_id: data.project_manager_id,
-        });
-      }
-    } else if (
-      !data.project_manager_id &&
-      data.project_manager_id !== findProjects.project_manager_id
-    ) {
-      await runProducer(
-        userProducerTopic.removeProjectManagerForProject,
-        findProjects.project_manager_id
+      userInfo.role_name === "STAFF" &&
+      modifiedBy !== findProjects.project_manager_id
+    )
+      throw new BadRequestError(
+        "You do not have permission to update this project"
       );
-    }
+    data.department_ids = data.department_ids || findProjects.department_ids;
     const updateProject = await prisma.project.update({
       where: { project_id: id },
       data: { ...data, modifiedBy },
@@ -329,8 +320,24 @@ class ProjectService {
     }
     throw new BadRequestError("Update project failed");
   };
+
   // delete project
-  static delete = async (project_id) => {
+  static delete = async (project_id, modifiedBy = null) => {
+    const findProject = await prisma.project.findUnique({
+      where: { project_id },
+      select: { project_manager_id: true },
+    });
+    if (modifiedBy) {
+      const userInfo = await getUser(modifiedBy);
+      if (
+        userInfo.role_name === "STAFF" &&
+        modifiedBy === findProject.project_manager_id
+      ) {
+        throw new BadRequestError(
+          "You do not have permission to delete this project"
+        );
+      }
+    }
     const deleteProject = await prisma.project.update({
       where: { project_id },
       select: this.select,
@@ -348,7 +355,7 @@ class ProjectService {
   static softDeleteMultipleProjects = async (projectIds) => {
     try {
       await Promise.all(
-        projectIds.map((project_id) => this.delete(project_id))
+        projectIds.map((project_id) => this.delete(project_id, null))
       );
       return true;
     } catch (e) {
@@ -394,7 +401,7 @@ class ProjectService {
     if (restoreProject) {
       return true;
     }
-    await this.delete(project_id);
+    await this.delete(project_id, null);
     throw new BadRequestError("Khôi phục dự án không thành công");
   };
   static multipleRestoreProject = async (projectIds) => {
@@ -424,7 +431,7 @@ class ProjectService {
     const existingProject = await prisma.project.findUnique({
       where: { project_id },
     });
-    if (!existingProject) throw new BadRequestError("Dự án không tồn tại");
+    if (!existingProject) throw new BadRequestError("Project not found");
     try {
       const uploadFile = await prisma.project.update({
         where: { project_id },
@@ -447,6 +454,7 @@ class ProjectService {
       hasDepartment = "true",
       nextPage,
       previousPage,
+      department_id = null,
     },
     isNotTrash = true,
     anotherSelected
@@ -482,7 +490,16 @@ class ProjectService {
         },
       ];
     }
-
+    if (department_id) {
+      whereClause.AND = [
+        ...(whereClause.AND || []),
+        {
+          department_ids: {
+            has: department_id,
+          },
+        },
+      ];
+    }
     const total = await prisma.project.count({
       where: whereClause,
     });
@@ -555,6 +572,7 @@ class ProjectService {
       total,
       nextPage: nextPageNumber,
       previousPage: previousPageNumber,
+      lastPage,
       currentPage,
       itemsPerPage,
     };

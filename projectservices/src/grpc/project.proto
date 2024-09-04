@@ -15,6 +15,7 @@ message ProjectResponse {
   string projectCode = 2;
   string investor = 3;
   string createdBy = 4;
+  string project_manager_id = 5;
 }
 message GetListProjectInDepartmentRequest {
   string department_id = 1;

@@ -54,5 +54,4 @@ app.use((err, req, res, next) => {
   });
 });
 continuousConsumer().catch(console.error());
-
 module.exports = app;

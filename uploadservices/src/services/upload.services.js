@@ -4,13 +4,44 @@ const cloudinary = require("../configs/cloudinary.config");
 const { runProducer } = require("../message_queue/producer");
 const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
 const { projectProducerTopic } = require("../configs/kafkaProjectTopic");
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbiddenError,
+} = require("../core/error.response");
 const getFile = async (filename) => {
   try {
-    const getAccessId = await cloudinary.api.resource(filename);
-    const result = await cloudinary.api.resource_by_asset_id(
-      getAccessId.asset_id
-    );
-    return result.url;
+    const extension = filename.split(".").pop().toLowerCase();
+
+    if (extension === "pdf") {
+      return await getFileImage({ filename });
+    }
+
+    const resource_type = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(
+      extension
+    )
+      ? "image"
+      : "raw";
+
+    const result = await cloudinary.api.resource(filename, {
+      resource_type,
+    });
+
+    if (result) return result.url;
+    throw new BadRequestError("File not found");
+  } catch (error) {
+    console.error(error);
+  }
+};
+const getFileImage = async ({ filename }) => {
+  const options = {
+    format: "jpg",
+    quality: "auto",
+  };
+  try {
+    const result = await cloudinary.url(filename, options);
+    if (result) return result;
+    throw new BadRequestError("File not found");
   } catch (error) {
     console.error(error);
   }
@@ -26,20 +57,9 @@ const getAvatar = async ({ avatar }) => {
     console.error(error);
   }
 };
-const getFileImage = async ({ filename }) => {
-  const options = {
-    format: "jpg",
-    quality: "auto",
-  };
-  try {
-    const result = await cloudinary.url(filename, options);
-    console.log(filename);
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-};
+
 const deleteFileForTask = async (task_id, filename) => {
+  if (!filename) throw new BadRequestError("Invalid filename");
   await deleteFile(filename);
   await runProducer(taskProducerTopic.deleteTaskFileInCloud, {
     task_id: task_id,
@@ -48,6 +68,7 @@ const deleteFileForTask = async (task_id, filename) => {
   return true;
 };
 const deleteFileForProject = async (project_id, filename) => {
+  if (!filename) throw new BadRequestError("Invalid filename");
   await deleteFile(filename);
   await runProducer(projectProducerTopic.deleteProjectFileInCloud, {
     project_id: project_id,

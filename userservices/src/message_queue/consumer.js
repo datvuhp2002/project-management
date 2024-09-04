@@ -81,36 +81,6 @@ const continuousConsumer = async () => {
             );
             break;
           }
-          case projectTopicsContinuous.addProjectManagerForProject: {
-            await UserService.updateWithoutModified({
-              id: parsedMessage,
-              data: {
-                role: "PROJECT_MANAGER",
-              },
-            });
-          }
-          case projectTopicsContinuous.changeProjectManager: {
-            const { new_project_manager_id, old_project_manager_id } =
-              parsedMessage;
-            // Update the roles concurrently
-            await Promise.all([
-              UserService.updateWithoutModified({
-                id: old_project_manager_id,
-                data: { role: "STAFF" },
-              }),
-              UserService.updateWithoutModified({
-                id: new_project_manager_id,
-                data: { role: "PROJECT_MANAGER" },
-              }),
-            ]);
-          }
-          case projectTopicsContinuous.removeProjectManagerForProject: {
-            await UserService.updateWithoutModified({
-              id: parsedMessage,
-              data: { role: "STAFF" },
-            });
-            break;
-          }
           default:
             console.log("Unhandled topic:", topic);
         }

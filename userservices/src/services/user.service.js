@@ -21,6 +21,7 @@ const {
   uploadProducerTopic,
 } = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
 
+const { genAvatarColor, removeAccents } = require("../utils");
 const {
   GetAllUserFromProject,
   GetAvatar,
@@ -47,17 +48,7 @@ class UserService {
       },
     },
   };
-  static genAvatarColor = () => {
-    const result = Math.floor(Math.random() * 3);
-    switch (result) {
-      case 0:
-        return "#f56a00";
-      case 1:
-        return "#87d068";
-      case 2:
-        return "#1677ff";
-    }
-  };
+
   // create new user
   static create = async (
     { username, email, role, department_id, ...rest },
@@ -81,10 +72,14 @@ class UserService {
     // Convert the integer to a string and pad it with leading zeros if necessary
     const password = genPass.toString().padStart(6, "0");
     const passwordHash = await bcrypt.hash(password, 10);
-    const avatarColor = this.genAvatarColor();
+    const avatarColor = genAvatarColor();
+
+    // Chuyển username thành chữ thường và kiểm tra khoảng trắng
+    username = removeAccents(username.toLowerCase());
     if (/\s/.test(username)) {
       throw new BadRequestError("Username should not contain spaces.");
     }
+
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -612,6 +607,8 @@ class UserService {
       }
     }
     if (data.username) {
+      // Chuyển username thành chữ thường và kiểm tra khoảng trắng
+      data.username = removeAccents(data.username.toLowerCase());
       if (/\s/.test(data.username)) {
         throw new BadRequestException("Username should not contain spaces.");
       }
@@ -624,9 +621,7 @@ class UserService {
         });
         return updatedUser;
       } catch (err) {
-        throw new BadRequestError(
-          "Cập nhật không thành công, vui lòng thử lại."
-        );
+        throw new BadRequestError("Update failed");
       }
     }
     const { role, ...updateUserData } = data;
@@ -652,7 +647,7 @@ class UserService {
       select: this.select,
     });
     if (updatedUser) return updatedUser;
-    throw new BadRequestError("Cập nhật không thành công, vui lòng thử lại");
+    throw new BadRequestError("Update failed");
   };
   //update user information [for consumer]
   static updateWithoutModified = async ({ id, data }) => {
@@ -755,7 +750,6 @@ class UserService {
         listAllStaffInDepartmentWithoutProjects.map((id) => {
           return id.user_id;
         });
-
       return await this.getAllStaffByUserIds(query, {
         user_ids: listAllStaffInDepartmentWithoutProjectsIds,
       });
@@ -785,7 +779,6 @@ class UserService {
     if (query && query.length > 0) {
       whereClause.AND.push(...query);
     }
-
     const total = await prisma.user.count({
       where: whereClause,
     });
@@ -826,6 +819,7 @@ class UserService {
       total,
       nextPage: currentPage + 1 > lastPage ? null : currentPage + 1,
       previousPage: currentPage - 1 < 1 ? null : currentPage - 1,
+      lastPage,
       currentPage,
       itemsPerPage,
     };
