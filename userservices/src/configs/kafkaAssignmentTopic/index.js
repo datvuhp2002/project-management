@@ -1,6 +1,5 @@
 const {
   assignmentTopicsContinuous,
-  assignmentTopicsOnDemand,
 } = require("./consumer/assignment.consumer.topic.config");
 const {
   assignmentProducerTopic,
@@ -8,6 +7,5 @@ const {
 
 module.exports = {
   assignmentTopicsContinuous,
-  assignmentTopicsOnDemand,
   assignmentProducerTopic,
 };

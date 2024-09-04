@@ -19,6 +19,7 @@ message UserResponse {
   string name = 6;
   string avatar_color = 7;
   string department_id = 8;
+  string role_name = 9;
 }
 
 message detailManagerAndTotalStaffInDepartmentRequest{

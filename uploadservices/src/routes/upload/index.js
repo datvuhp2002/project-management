@@ -33,7 +33,7 @@ router.put(
 );
 router.put(
   "/delete-file-for-task/:id",
-  uploadProject.single("file"),
+  uploadTask.single("file"),
   asyncHandler(UploadController.deleteFileForTask)
 );
 router.post("/getFileImage", asyncHandler(UploadController.getFileImage));

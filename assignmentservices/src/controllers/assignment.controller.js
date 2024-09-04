@@ -101,7 +101,8 @@ class AssignmentController {
       message: "Xoá nhân viên trong dự án thành công",
       data: await AssignmentService.removeStaffFromProject(
         req.params.id,
-        req.body.ids
+        req.body.ids,
+        req.headers.user
       ),
     }).send(res);
   };
@@ -126,10 +127,13 @@ class AssignmentController {
   update = async (req, res, next) => {
     new SuccessResponse({
       message: "Cập nhật phân công thành công",
-      data: await AssignmentService.update({
-        id: req.params.id,
-        data: req.body,
-      }),
+      data: await AssignmentService.update(
+        {
+          id: req.params.id,
+          data: req.body,
+        },
+        req.headers.user
+      ),
     }).send(res);
   };
   delete = async (req, res, next) => {

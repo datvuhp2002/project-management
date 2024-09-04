@@ -2,6 +2,9 @@
 const { Kafka } = require("kafkajs");
 const { convertObjectToArray } = require("../utils/index");
 const { taskTopicsContinuous } = require("../configs/kafkaTaskTopic");
+const {
+  assignmentTopicsContinuous,
+} = require("../configs/kafkaAssignmentTopic");
 const ActivityServices = require("../services/activity.service");
 
 const kafka = new Kafka({
@@ -15,6 +18,10 @@ const continuousConsumer = async () => {
   await consumer.connect();
   await consumer.subscribe({
     topics: convertObjectToArray(taskTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(assignmentTopicsContinuous),
     fromBeginning: false,
   });
 
@@ -47,6 +54,12 @@ const continuousConsumer = async () => {
           case taskTopicsContinuous.taskDeletedMultiple: {
             await ActivityServices.deleteByTaskIds(parsedMessage);
             break;
+          }
+          case assignmentTopicsContinuous.updatedStatusAssignment: {
+            const { createdBy, task, task_id, status } = parsedMessage;
+            const message = `${task} has been updated to ${status}`;
+            const data = { description: message, task_id };
+            await ActivityServices.create(data, createdBy);
           }
           default:
             console.log("Unhandled topic:", topic);

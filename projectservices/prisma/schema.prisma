@@ -23,15 +23,15 @@ model Project {
   turnover            String?
   document            String[]
   investor            String?
-  createdBy            String?          @db.ObjectId
+  createdBy           String?          @db.ObjectId
   modifiedBy          String?          @db.ObjectId
   createdAt           DateTime         @default(now())
   updatedAt           DateTime?        @updatedAt
   status              Boolean?         @default(true)
   deletedAt           DateTime?
   deletedMark         Boolean          @default(false)
-  department_id       String?   @db.ObjectId
-  project_manager_id String? @db.ObjectId
+  department_ids      String[]   @db.ObjectId
+  project_manager_id  String? @db.ObjectId
 }
 
 

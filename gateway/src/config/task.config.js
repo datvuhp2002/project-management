@@ -24,22 +24,22 @@ const taskServicesRoutes = {
   "/create": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/update": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/detail": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/detail`,
     authRequired: true,
     permissions: null,
   },
-  "/admin/delete": {
-    target: `${process.env.TASK_SERVICES_REQUEST_URL}/admin/delete`,
+  "/delete": {
+    target: `${process.env.TASK_SERVICES_REQUEST_URL}/delete`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN"],
+    permissions: null,
   },
   "/get-file-image": {
     target: `${process.env.TASK_SERVICES_REQUEST_URL}/getFileImage`,

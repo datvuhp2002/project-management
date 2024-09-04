@@ -1,18 +1,11 @@
 const { Kafka } = require("kafkajs");
-const gatewayTopics = require("../configs/gateway.topic.config");
 const {
   departmentTopicsContinuous,
-  departmentProducerTopic,
 } = require("../configs/kafkaDepartmentTopic");
 const UserService = require("../services/user.service");
-const { runProducer } = require("./producer");
 const { convertObjectToArray } = require("../utils");
-const {
-  assignmentTopicsContinuous,
-  assignmentProducerTopic,
-} = require("../configs/kafkaAssignmentTopic");
 const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
-
+const { projectTopicsContinuous } = require("../configs/kafkaProjectTopic");
 const kafka = new Kafka({
   clientId: "user-services",
   brokers: [process.env.KAFKA_BROKER],
@@ -31,6 +24,10 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: false,
   });
+  await consumer.subscribe({
+    topics: convertObjectToArray(projectTopicsContinuous),
+    fromBeginning: false,
+  });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
@@ -40,27 +37,23 @@ const continuousConsumer = async () => {
 
         switch (topic) {
           case departmentTopicsContinuous.selectManagerToDepartment:
-            console.log(
-              `${departmentTopicsContinuous.selectManagerToDepartment}`,
-              parsedMessage
-            );
             const { old_manager_id, id, data } = parsedMessage;
-
             if (old_manager_id !== null) {
-              await UserService.update({
+              await UserService.updateWithoutModified({
                 id: old_manager_id,
                 data: { department_id: null },
               });
             }
 
             if (id !== null) {
-              await UserService.update({ id, data });
+              await UserService.updateWithoutModified({ id, data });
             }
+
             break;
 
           case uploadTopicsContinuous.uploadAvatarFromLocal: {
             try {
-              await UserService.update({
+              await UserService.updateWithoutModified({
                 id: parsedMessage.user_id,
                 data: { avatar: parsedMessage.file },
               });
@@ -82,20 +75,18 @@ const continuousConsumer = async () => {
             );
             break;
 
-          case departmentTopicsContinuous.removeStaffOutOfDepartment:
+          case departmentTopicsContinuous.removeStaffOutOfDepartment: {
             await UserService.removeStaffFromDepartmentHasBeenDeleted(
               parsedMessage
             );
             break;
-
+          }
           default:
             console.log("Unhandled topic:", topic);
         }
 
-        // Call heartbeat to ensure Kafka knows the consumer is still processing
         await heartbeat();
       } catch (error) {
-        // Log error details and prevent the consumer from stopping
         console.error(
           `[Kafka] Error processing message from topic ${topic}:`,
           error.message

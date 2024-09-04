@@ -41,6 +41,10 @@ const continuousConsumer = async () => {
             }
             break;
           }
+          case userTopicsContinuous.removeManager: {
+            await DepartmentService.deleteManagerId(parsedMessage);
+            break;
+          }
           default:
             console.log("Unhandled topic:", topic);
         }

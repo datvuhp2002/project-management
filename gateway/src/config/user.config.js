@@ -25,6 +25,11 @@ const userServicesRoutes = {
     authRequired: true,
     permissions: ["SUPER_ADMIN", "ADMIN"],
   },
+  "/get-all-staff-in-departments": {
+    target: `${process.env.USER_SERVICES_REQUEST_URL}/getAllStaffInDepartments`,
+    authRequired: true,
+    permissions: null,
+  },
   "/admin/trash": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/admin/trash`,
     authRequired: true,
@@ -68,12 +73,12 @@ const userServicesRoutes = {
   "/get-list-user-do-not-in-project": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/getListUserDoNotInProject`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
+    permissions: null,
   },
   "/create": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER", "PROJECT_MANAGER"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/update": {
     target: `${process.env.USER_SERVICES_REQUEST_URL}/update`,

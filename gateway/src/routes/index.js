@@ -26,7 +26,7 @@ const registerRouterServices = (basePath, routes, app) => {
       middlewareChain.push(permissionsAuthentication(permissions));
     }
     middlewareChain.push((req, res, next) => {
-      console.log(`Proxying request for ${basePath}${route} to ${target}`);
+      console.log(`Proxy request for ${basePath}${route} to ${target}`);
       next();
     });
     middlewareChain.push(

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package department;
+
+service DepartmentService {
+  rpc GetDepartment (DepartmentRequest) returns (DepartmentResponse) {}
+}
+
+message DepartmentRequest {
+  string department_id = 1;
+}
+
+message DepartmentResponse {
+  string name = 1;
+  string description = 2;
+}

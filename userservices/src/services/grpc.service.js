@@ -4,11 +4,21 @@ const grpc = require("@grpc/grpc-js");
 
 async function GetUser(call, callback) {
   const { user_id } = call.request;
-  console.log("User ID:::", user_id);
   try {
     const user = await UserServices.detail(user_id);
-    if (user) {
-      callback(null, user);
+    const responseData = {
+      user_id: user.user_id,
+      username: user.username,
+      email: user.email,
+      phone: user.phone,
+      avatar: user.avatar,
+      name: user.name,
+      avatar_color: user.avatar_color,
+      department_id: user.department_id,
+      role_name: user.role.name,
+    };
+    if (responseData) {
+      callback(null, responseData);
     } else {
       callback({
         code: grpc.status.NOT_FOUND,
@@ -24,7 +34,6 @@ async function GetUser(call, callback) {
 }
 async function GetDetailManagerAndTotalStaffInDepartment(call, callback) {
   const { department_id, manager_id } = call.request;
-  console.log(department_id);
   try {
     const result = await UserServices.getDetailManagerAndTotalStaffInDepartment(
       {
@@ -32,7 +41,6 @@ async function GetDetailManagerAndTotalStaffInDepartment(call, callback) {
         manager_id,
       }
     );
-    console.log("Result:::", result);
     if (result) {
       callback(null, result);
     } else {

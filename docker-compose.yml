@@ -3,10 +3,9 @@ version: "3.8"
 services:
   # MongoDB Replica Set
   mongo1:
-    container_name: mongo1
     image: mongo:4.4
     volumes:
-      - ~/mongors/data1:/data/db
+      - mongo-data1:/data/db
       - ./rs-init.sh:/scripts/rs-init.sh
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -16,36 +15,47 @@ services:
       - kafka-network
     ports:
       - "27021:27017"
-    links:
-      - mongo2
-      - mongo3
-    restart: always
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+    restart: always
+
   mongo2:
-    container_name: mongo2
     image: mongo:4.4
     volumes:
-      - ~/mongors/data2:/data/db
+      - mongo-data2:/data/db
     networks:
       - kafka-network
     ports:
-      - 27022:27017
-    restart: always
+      - "27022:27017"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+    restart: always
 
   mongo3:
-    container_name: mongo3
     image: mongo:4.4
     volumes:
-      - ~/mongors/data3:/data/db
+      - mongo-data3:/data/db
     networks:
       - kafka-network
     ports:
-      - 27023:27017
-    restart: always
+      - "27023:27017"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
+    restart: always
+
   grafana:
-    container_name: grafana
     image: grafana/grafana:latest
     ports:
       - "5600:3000"
@@ -55,8 +65,11 @@ services:
       - loki
     networks:
       - kafka-network
+    deploy:
+      replicas: 1
+    restart: always
+
   loki:
-    container_name: loki
     image: grafana/loki:latest
     ports:
       - "3100:3100"
@@ -64,10 +77,12 @@ services:
       - loki-data:/data
     networks:
       - kafka-network
-  # Zookeeper
+    deploy:
+      replicas: 1
+    restart: always
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
-    container_name: zookeeper
     ports:
       - "22181:2181"
     environment:
@@ -75,11 +90,12 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     networks:
       - kafka-network
+    deploy:
+      replicas: 1
+    restart: always
 
-  # Kafka
   kafka:
     image: confluentinc/cp-kafka:7.4.4
-    container_name: kafkaMQ
     depends_on:
       - zookeeper
     ports:
@@ -87,21 +103,22 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkaMQ:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - kafka-network
+    deploy:
+      replicas: 1
+    restart: always
 
-  # Debezium
-  connect:
+  debezium:
     image: quay.io/debezium/connect:2.0
-    container_name: debezium
     ports:
       - "8083:8083"
     environment:
-      BOOTSTRAP_SERVERS: kafkaMQ:9092
+      BOOTSTRAP_SERVERS: kafka:9092
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
@@ -110,30 +127,28 @@ services:
       - kafka
     networks:
       - kafka-network
+    deploy:
+      replicas: 1
 
-  # Kafka UI
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
     ports:
       - "8085:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafkaMQ:9092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
     networks:
       - kafka-network
+    deploy:
+      replicas: 1
+    restart: always
 
-  # Gateway Service
   gateway:
     build:
       context: ./gateway
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/gateway
-    container_name: gateway
     ports:
       - "3050:3050"
     environment:
@@ -147,16 +162,10 @@ services:
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - EMAIL_SERVICES_REQUEST_URL=http://emailservices:3069/services/api/email
       - UPLOAD_SERVICES_REQUEST_URL=http://uploadservices:3068/services/api/upload
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - PUBLIC_KEY=abcdefgh123
       - PRIVATE_KEY=12345678abc
       - LOKI_HOST=http://loki:3100
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
     volumes:
       - ./logs/gateway:/app/src/logs
     depends_on:
@@ -168,297 +177,231 @@ services:
       - taskservices
     networks:
       - kafka-network
-  # User Services
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.env == production
+      restart_policy:
+        condition: on-failure
+
   userservices:
     build:
       context: ./userservices
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/userservices
-    container_name: userservices
     environment:
       - PORT=3056
       - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
+      - KAFKA_BROKER=kafka:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/userService?replicaSet=dbrs
-      # - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/userService?retryWrites=true&w=majority&appName=Cluster0
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50053
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - DEPARTMENT_GRPC_PORT=departmentservices:50059
       - UPLOAD_GRPC_PORT=uploadservices:50057
       - LOKI_HOST=http://loki:3100
     volumes:
       - ./logs/userservices:/app/src/logs
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
     ports:
       - "3056:3056"
     depends_on:
-      - kafka
-
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - kafka-network
-  # Department Services
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
   departmentservices:
     build:
       context: ./departmentservices
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/departmentservices
-    container_name: departmentservices
     environment:
       - PORT=3057
-      - KAFKA_BROKER=kafkaMQ:9092
+      - GRPC_PORT=50059
+      - KAFKA_BROKER=kafka:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/departmentService?replicaSet=dbrs
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - USER_GRPC_PORT=userservices:50053
       - LOKI_HOST=http://loki:3100
     volumes:
       - ./logs/departmentservices:/app/src/logs
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
     ports:
       - "3057:3057"
     depends_on:
-      - kafka
-
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
 
-  # Assignment Services
   assignmentservices:
     build:
       context: ./assignmentservices
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/assignmentservices
-    container_name: assignmentservices
     environment:
       - PORT=3058
-      - KAFKA_BROKER=kafkaMQ:9092
-      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/assignmentService?replicaSet=dbrs
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50056
+      - KAFKA_BROKER=kafka:9092
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/assignmentService?replicaSet=dbrs
       - USER_GRPC_PORT=userservices:50053
-      - TASK_GRPC_PORT=taskservices:50054
-      - PROJECT_GRPC_PORT=projectservices:50055
       - LOKI_HOST=http://loki:3100
     volumes:
-      - ./logs/assignmentservices:/app/src/log
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
+      - ./logs/assignmentservices:/app/src/logs
     ports:
       - "3058:3058"
     depends_on:
-      - kafka
-
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
 
-  # Project Services
   projectservices:
     build:
       context: ./projectservices
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/projectservices
-    container_name: projectservices
     environment:
       - PORT=3059
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
+      - GRPC_PORT=50054
+      - KAFKA_BROKER=kafka:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/projectService?replicaSet=dbrs
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - GRPC_PORT=50055
       - USER_GRPC_PORT=userservices:50053
-      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
       - LOKI_HOST=http://loki:3100
     volumes:
-      - ./logs/projectservices:/app/src/log
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
+      - ./logs/projectservices:/app/src/logs
     ports:
       - "3059:3059"
     depends_on:
-      - kafka
-
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
 
-  # Email Services
-  emailservices:
-    build:
-      context: ./emailservices
-      dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
-    image: datvudinhtrong/emailservices
-    container_name: emailservices
-    environment:
-      - PORT=3069
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
-      # - DATABASE_URL=mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/emailService?retryWrites=true&w=majority&appName=Cluster0
-      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/emailService?replicaSet=dbrs
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - EMAIL_PASS=bwwk zwuo qfqw ciyf
-      - LOKI_HOST=http://loki:3100
-    volumes:
-      - ./logs/emailservices:/app/src/log
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
-    ports:
-      - "3069:3069"
-    depends_on:
-      - kafka
-
-    networks:
-      - kafka-network
-
-  #Upload servicse
-  uploadservices:
-    build:
-      context: ./uploadservices
-      dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
-    image: datvudinhtrong/uploadservices
-    container_name: uploadservices
-    environment:
-      - PORT=3068
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - GRPC_PORT=50057
-      - LOKI_HOST=http://loki:3100
-    volumes:
-      - ./logs/uploadservices:/app/src/log
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
-    ports:
-      - "3068:3068"
-    depends_on:
-      - kafka
-
-    networks:
-      - kafka-network
-
-  # Task Services
   taskservices:
     build:
       context: ./taskservices
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/taskservices
-    container_name: taskservices
     environment:
       - PORT=3060
-      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
-      - KAFKA_BROKER=kafkaMQ:9092
+      - GRPC_PORT=50055
+      - KAFKA_BROKER=kafka:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/taskService?replicaSet=dbrs
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - GRPC_PORT=50054
-      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
-      - ACTIVITY_GRPC_PORT=activityservices:50058
+      - USER_GRPC_PORT=userservices:50053
+      - PROJECT_GRPC_PORT=projectservices:50054
       - LOKI_HOST=http://loki:3100
     volumes:
-      - ./logs/taskservices:/app/src/log
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
+      - ./logs/taskservices:/app/src/logs
     ports:
       - "3060:3060"
     depends_on:
-      - kafka
-
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
 
-  # Activity Services
   activityservices:
     build:
       context: ./activityservices
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
-    platform: linux/amd64
     image: datvudinhtrong/activityservices
-    container_name: activityservices
     environment:
       - PORT=3061
-      - KAFKA_BROKER=kafkaMQ:9092
+      - GRPC_PORT=50061
+      - KAFKA_BROKER=kafka:9092
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/activityService?replicaSet=dbrs
-      - DOCKER_DEFAULT_PLATFORM=linux/amd64
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - USER_GRPC_PORT=userservices:50053
+      - PROJECT_GRPC_PORT=projectservices:50054
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - TASK_GRPC_PORT=taskservices:50055
       - LOKI_HOST=http://loki:3100
-      - GRPC_PORT=50058
     volumes:
-      - ./logs/activityservices:/app/src/log
-    labels:
-      co.elastic.logs/module: filebeat
-      co.elastic.logs/json.keys_under_root: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
+      - ./logs/activityservices:/app/src/logs
     ports:
       - "3061:3061"
     depends_on:
-      - kafka
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
       - kafka-network
-  # projectmanagementwebui:
-  #   platform: linux/amd64
-  #   image: chicong42/projectmanagementwebui
-  #   environment:
-  #     - VITE_REQUEST_API_URL=http://10.100.1.153:3050/
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
+  emailservices:
+    build:
+      context: ./emailservices
+      dockerfile: Dockerfile
+    image: datvudinhtrong/emailservices
+    environment:
+      - PORT=3069
+      - KAFKA_BROKER=kafka:9092
+      - LOKI_HOST=http://loki:3100
+    volumes:
+      - ./logs/emailservices:/app/src/logs
+    ports:
+      - "3069:3069"
+    networks:
+      - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
+  uploadservices:
+    build:
+      context: ./uploadservices
+      dockerfile: Dockerfile
+    image: datvudinhtrong/uploadservices
+    environment:
+      - PORT=3068
+      - KAFKA_BROKER=kafka:9092
+      - CLOUDINARY_API_SECRET=Ec2Fdj1v2voufkhhkX-CkhOZnj8
+      - LOKI_HOST=http://loki:3100
+    volumes:
+      - ./logs/uploadservices:/app/src/logs
+    ports:
+      - "3068:3068"
+    networks:
+      - kafka-network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
 volumes:
+  mongo-data1:
+  mongo-data2:
+  mongo-data3:
   grafana-data:
   loki-data:
-  esdata:
-    driver: local
+
 networks:
   kafka-network:
-    driver: bridge
+    driver: overlay

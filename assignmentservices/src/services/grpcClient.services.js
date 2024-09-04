@@ -77,7 +77,6 @@ async function getProject(project_id) {
         console.log(err.message);
         reject(err.message);
       } else {
-        console.log(response);
         resolve(response);
       }
     });

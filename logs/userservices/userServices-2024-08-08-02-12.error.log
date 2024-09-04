@@ -1,1 +1,0 @@
-{"@timestamp":"2024-08-08T02:12:34.844Z","context":"/services/api/user/create/","ecs.version":"8.10.0","log.level":"error","message":"undefined:-:NaNms:-:Response:{}","metadata":{"message":"Cannot read properties of null (reading 'role_id')"},"requestId":"cf3e2af8-5ca6-4c4b-aa10-1476b7225ca5"}

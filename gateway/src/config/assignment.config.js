@@ -30,12 +30,12 @@ const assignmentServicesRoutes = {
   "/remove-staff-from-project": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/removeStaffFromProject`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/create": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/create`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+    permissions: null,
   },
   "/update": {
     target: `${process.env.ASSIGNMENT_SERVICES_REQUEST_URL}/update`,

@@ -12,6 +12,7 @@ const {
   getUser,
   GetDetailManagerAndTotalStaffInDepartment,
 } = require("./grpcClient.services");
+const { projectProducerTopic } = require("../configs/kafkaProjectTopic");
 class DepartmentService {
   static select = {
     department_id: true,
@@ -23,7 +24,7 @@ class DepartmentService {
   };
   // create new department
   static create = async (
-    { name, description, manager_id, list_user_ids },
+    { name, description, manager_id = null, list_user_ids },
     createdBy
   ) => {
     const department = await prisma.department.create({
@@ -31,7 +32,7 @@ class DepartmentService {
       select: this.select,
     });
     if (department) {
-      if (manager_id) {
+      if (manager_id !== null) {
         await runProducer(userProducerTopic.selectManagerToDepartment, {
           old_manager_id: null,
           id: manager_id,
@@ -56,7 +57,6 @@ class DepartmentService {
         }
       }
       if (list_user_ids) {
-        console.log(list_user_ids);
         await runProducer(userProducerTopic.addStaffIntoDepartment, {
           list_user_ids: list_user_ids,
           department_id: department.department_id,
@@ -116,6 +116,16 @@ class DepartmentService {
       false
     );
   };
+  static infoDepartment = async (id) => {
+    const department = await prisma.department.findUnique({
+      where: { department_id: id },
+      select: this.select,
+    });
+    if (!department) {
+      throw new BadRequestError("Department not found");
+    }
+    return department;
+  };
   // department information
   static detail = async (id) => {
     const department = await prisma.department.findUnique({
@@ -132,7 +142,9 @@ class DepartmentService {
           department.manager_id
         );
         department.information = userResponse;
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     }
     return department;
   };
@@ -188,7 +200,6 @@ class DepartmentService {
     // Trả về true nếu cập nhật thành công, false nếu không
     return !!result;
   };
-
   static deleteManagerId = async (department_id) => {
     const deleteManagerId = await prisma.department.update({
       where: { department_id },
@@ -207,6 +218,7 @@ class DepartmentService {
     const delete_department = await prisma.department.update({
       where: { department_id },
       data: {
+        manager_id: null,
         deletedMark: true,
         deletedAt: new Date(),
       },
@@ -216,6 +228,10 @@ class DepartmentService {
       await this.restore(department_id);
       throw new BadRequestError("Xóa phòng ban không thành công");
     } else {
+      await runProducer(
+        projectProducerTopic.removeProjectFromDepartment,
+        department_id
+      );
       if (get_department.manager_id) {
         await runProducer(userProducerTopic.selectManagerToDepartment, {
           old_manager_id: get_department.manager_id,
@@ -228,16 +244,18 @@ class DepartmentService {
       });
       return true;
     }
-    throw new BadRequestError("Xoá phòng ban không thành công");
   };
   static forceDelete = async (department_id) => {
     const forceDeleteDepartment = await prisma.department.delete({
       where: { department_id },
     });
     if (!forceDeleteDepartment) {
-      await this.restore(department_id);
       throw new BadRequestError("Xóa phòng ban không thành công");
     }
+    await runProducer(
+      projectProducerTopic.removeProjectFromDepartment,
+      department_id
+    );
     return true;
   };
   // restore department
@@ -306,11 +324,15 @@ class DepartmentService {
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
     if (isNotTrash) {
       const departmentPromises = departments.map(async (department, index) => {
-        const result = await GetDetailManagerAndTotalStaffInDepartment(
-          department.department_id,
-          department.manager_id
-        );
-        department.information = result;
+        try {
+          const result = await GetDetailManagerAndTotalStaffInDepartment(
+            department.department_id,
+            department.manager_id
+          );
+          department.information = result;
+        } catch (e) {
+          console.log(e);
+        }
       });
       await Promise.all(departmentPromises);
     }

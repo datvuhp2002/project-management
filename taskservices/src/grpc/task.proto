@@ -12,8 +12,9 @@ message TaskRequest {
 
 message TaskReponse {
   string task_id = 1;
-  string description = 2;
-  string document = 3;
-  string createdBy = 4;
-  string createdAt = 5;
+  string name = 2;
+  string description = 3;
+  string document = 4;
+  string createdBy = 5;
+  string createdAt = 6;
 }

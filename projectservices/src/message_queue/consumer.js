@@ -1,7 +1,11 @@
 const { Kafka } = require("kafkajs");
 const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
+const {
+  departmentTopicsContinuous,
+} = require("../configs/kafkaDepartmentTopic");
 const { convertObjectToArray } = require("../utils");
 const ProjectService = require("../services/project.service");
+const { userTopicsContinuous } = require("../configs/kafkaUserTopic");
 
 const kafka = new Kafka({
   clientId: "project-services",
@@ -17,6 +21,14 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(uploadTopicsContinuous),
     fromBeginning: true,
   });
+  await consumer.subscribe({
+    topics: convertObjectToArray(departmentTopicsContinuous),
+    fromBeginning: true,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(userTopicsContinuous),
+    fromBeginning: true,
+  });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
@@ -27,6 +39,10 @@ const continuousConsumer = async () => {
         );
         console.log("Message content:", parsedMessage);
         switch (topic) {
+          case departmentTopicsContinuous.removeProjectFromDepartment: {
+            await ProjectService.removeProjectsFromDepartment(parsedMessage);
+            break;
+          }
           case uploadTopicsContinuous.uploadFileForProject: {
             if (parsedMessage.project_id && parsedMessage.file) {
               await ProjectService.uploadFile(
@@ -45,9 +61,8 @@ const continuousConsumer = async () => {
             break;
           }
           case uploadTopicsContinuous.deleteProjectFileInCloud: {
-            if (parsedMessage.filePath) {
-              await ProjectService.deleteFile(parsedMessage.filePath);
-              console.log(`File deleted: ${parsedMessage.filePath}`);
+            if (parsedMessage.filename) {
+              await ProjectService.deleteFile(parsedMessage);
             } else {
               console.warn(
                 "Invalid data for deleteProjectFileInCloud:",
@@ -56,6 +71,7 @@ const continuousConsumer = async () => {
             }
             break;
           }
+
           default:
             console.log("Unhandled topic:", topic);
         }

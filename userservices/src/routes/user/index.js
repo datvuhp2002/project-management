@@ -29,6 +29,10 @@ router.get(
   "/admin/getAllStaffInDepartment/:id",
   asyncHandler(UserController.getAllStaffInDepartmentForAdmin)
 );
+router.post(
+  "/getAllStaffInDepartments",
+  asyncHandler(UserController.getAllStaffInDepartments)
+);
 router.get(
   "/getAllStaffInDepartment",
   asyncHandler(UserController.getAllStaffInDepartment)

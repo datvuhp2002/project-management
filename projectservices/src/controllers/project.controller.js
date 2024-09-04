@@ -74,7 +74,7 @@ class ProjectController {
   delete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công dự án",
-      data: await ProjectService.delete(req.params.id),
+      data: await ProjectService.delete(req.params.id, req.headers.user),
     }).send(res);
   };
   forceDelete = async (req, res, next) => {

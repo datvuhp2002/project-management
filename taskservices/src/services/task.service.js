@@ -8,19 +8,12 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const { runProducer } = require("../message_queue/producer");
-const {
-  ActivityProducerTopic,
-} = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
+const { activityProducerTopic } = require("../configs/kafkaActivityTopic");
 const {
   GetAllTaskFromProject,
   TotalActivity,
 } = require("./grpcClient.services");
-const {
-  uploadProducerTopic,
-} = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
-const {
-  assignmentProducerTopic,
-} = require("../../../projectservices/src/configs/kafkaAssignmentTopic");
+const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 class TaskService {
   static select = {
     task_id: true,
@@ -37,7 +30,7 @@ class TaskService {
       data: { ...data, createdBy },
     });
     if (newTask) {
-      await runProducer(ActivityProducerTopic.taskCreated, {
+      await runProducer(activityProducerTopic.taskCreated, {
         task_id: newTask.task_id,
         name: newTask.name,
         createdBy,
@@ -78,8 +71,12 @@ class TaskService {
     return task;
   };
   static getAllTaskInProject = async (query, project_id) => {
-    const task_ids = await GetAllTaskFromProject(project_id);
-    return await this.getAllTaskByTaskIds(query, { task_ids });
+    try {
+      const task_ids = await GetAllTaskFromProject(project_id);
+      return await this.getAllTaskByTaskIds(query, { task_ids });
+    } catch (e) {
+      console.log("Assignment service maybe close", e);
+    }
   };
   // get all tasks
   static getAll = async ({
@@ -130,8 +127,12 @@ class TaskService {
       select: this.select,
     });
     if (!task) throw new BadRequestError("Task not found");
-    const total = await TotalActivity(task_id);
-    task.total_activities = total;
+    try {
+      const total = await TotalActivity(task_id);
+      task.total_activities = total;
+    } catch (e) {
+      console.log("Activity service maybe close:::", e);
+    }
     return task;
   };
   // update task
@@ -153,7 +154,7 @@ class TaskService {
       });
     }
     if (updateTask) {
-      await runProducer(ActivityProducerTopic.taskUpdated, {
+      await runProducer(activityProducerTopic.taskUpdated, {
         task_id: updateTask.task_id,
         name: updateTask.name,
         modifiedBy,
@@ -168,7 +169,7 @@ class TaskService {
       where: { task_id },
     });
     if (deleteTask) {
-      await runProducer(ActivityProducerTopic.taskDeleted, task_id);
+      await runProducer(activityProducerTopic.taskDeleted, task_id);
       await runProducer(assignmentProducerTopic.taskDeleted, task_id);
       return true;
     }
@@ -179,7 +180,7 @@ class TaskService {
       where: { task_id: { in: taskIds } },
     });
     if (multipleDeleteTask) {
-      await runProducer(ActivityProducerTopic.taskDeletedMultiple, taskIds);
+      await runProducer(activityProducerTopic.taskDeletedMultiple, taskIds);
       return true;
     }
     throw new BadRequestError("Delete multiple tasks failed");
@@ -238,11 +239,15 @@ class TaskService {
         createdAt: "desc",
       },
     });
-    const taskPromises = tasks.map(async (task, index) => {
-      const result = await TotalActivity(task.task_id);
-      task.total_activities = result;
-    });
-    await Promise.all(taskPromises);
+    try {
+      const taskPromises = tasks.map(async (task, index) => {
+        const result = await TotalActivity(task.task_id);
+        task.total_activities = result;
+      });
+      await Promise.all(taskPromises);
+    } catch (e) {
+      console.log("Activity service maybe close:::", e);
+    }
     const lastPage = Math.ceil(total / itemsPerPage);
     const nextPageNumber = currentPage + 1 > lastPage ? null : currentPage + 1;
     const previousPageNumber = currentPage - 1 < 1 ? null : currentPage - 1;
