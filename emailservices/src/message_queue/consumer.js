@@ -37,7 +37,6 @@ const continuousConsumer = async () => {
             console.log("Unhandled topic:", topic);
         }
 
-        // Call heartbeat to keep Kafka informed that the consumer is still processing
         await heartbeat();
       } catch (error) {
         // Log the error details

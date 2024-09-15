@@ -57,5 +57,32 @@ async function GetDetailManagerAndTotalStaffInDepartment(call, callback) {
     });
   }
 }
-
-module.exports = { GetUser, GetDetailManagerAndTotalStaffInDepartment };
+async function GetListStaffInDepartment(call, callback) {
+  const { department_id } = call.request;
+  try {
+    const listStaffInDepartment =
+      await UserServices.getListStaffIdsInDepartment(department_id);
+    const response = {
+      ids: listStaffInDepartment,
+    };
+    console.log("LIST:::", listStaffInDepartment);
+    if (listStaffInDepartment) {
+      callback(null, response);
+    } else {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        details: "User not found",
+      });
+    }
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      details: "Internal server error",
+    });
+  }
+}
+module.exports = {
+  GetUser,
+  GetDetailManagerAndTotalStaffInDepartment,
+  GetListStaffInDepartment,
+};

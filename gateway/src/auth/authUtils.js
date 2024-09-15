@@ -64,12 +64,16 @@ const authentication = asyncHandler(async (req, res, next) => {
     throw error;
   }
 });
-const verifyJWT = async (token, keySecret) => {
-  return await JWT.verify(token, keySecret);
+const verifyJWT = (token, keySecret) => {
+  return JWT.verify(token, keySecret);
+};
+const getUserId = (token, keySecret) => {
+  return JWT.decode(token, keySecret, { complete: true }).userId;
 };
 module.exports = {
   createTokenPair,
   generateAccessToken,
   authentication,
   verifyJWT,
+  getUserId,
 };

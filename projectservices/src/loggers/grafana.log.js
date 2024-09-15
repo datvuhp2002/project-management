@@ -1,6 +1,5 @@
 // pinoLogger.js
 const pino = require("pino");
-const pinoLoki = require("pino-loki");
 
 const transport = pino.transport({
   target: "pino-loki",

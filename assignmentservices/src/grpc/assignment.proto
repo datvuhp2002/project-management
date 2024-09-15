@@ -8,7 +8,6 @@ service AssignmentService {
   rpc getAllUserFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
   rpc getTotalTaskWithStatusFromProjectAndTotalStaff(getTotalTaskWithStatusFromProjectAndTotalStaffRequest) returns (getTotalTaskWithStatusFromProjectAndTotalStaffResponse);
   rpc getAllUserProject(getAllUserProjectRequest) returns (getAllUserProjectResponse); 
-
 }
 
 
