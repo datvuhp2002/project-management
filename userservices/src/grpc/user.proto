@@ -5,6 +5,9 @@ package user;
 service UserService {
   rpc GetUser(UserRequest) returns (UserResponse);
   rpc GetDetailManagerAndTotalStaffInDepartment(detailManagerAndTotalStaffInDepartmentRequest) returns (detailManagerAndTotalStaffInDepartmentResponse);
+  rpc GetListStaffInDepartment(GetListStaffInDepartmentRequest) returns (GetListStaffInDepartmentResponse); 
+  rpc GetListAllAdministrators(GetListAllAdministratorsRequest) returns (GetListAllAdministResponse);
+
 }
 
 message UserRequest {
@@ -29,4 +32,15 @@ message detailManagerAndTotalStaffInDepartmentRequest{
 message detailManagerAndTotalStaffInDepartmentResponse{
   int64 total_staff = 1;
   UserResponse manager = 2;
+}
+message GetListStaffInDepartmentRequest{
+  string department_id = 1;
+}
+message GetListStaffInDepartmentResponse{
+  repeated string ids = 1;
+}
+message GetListAllAdministratorsRequest{
+}
+message GetListAllAdministResponse{
+  repeated string ids = 1;
 }

@@ -12,12 +12,10 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-ENV DATABASE_URL=mongodb://mongoadmin:secret@mongodb:27017/userServices?authSource=admin
 # Copy the rest of the application to the working directory
 COPY . .
 RUN npx prisma generate
 # RUN npx prisma db push
-
 # Expose the port the app runs on
 EXPOSE 3056
 

@@ -340,6 +340,14 @@ class UserService {
     });
   };
   // }
+  static getListStaffIdsInDepartment = async (department_id) => {
+    const userIds = await prisma.user.findMany({
+      where: { department_id },
+      select: { user_id: true },
+    });
+    // Sử dụng map để chỉ trả về mảng các user_id
+    return userIds.map((user) => user.user_id);
+  };
   //
   // do not have department
   static getListOfStaffDoNotHaveDepartment = async ({
@@ -557,7 +565,6 @@ class UserService {
       where: { user_id: id },
       select: this.select,
     });
-    console.log(detailUser);
     if (detailUser.avatar) {
       try {
         const avatar = await GetAvatar(detailUser.avatar);

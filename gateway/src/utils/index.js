@@ -3,6 +3,9 @@ const _ = require("lodash");
 const axios = require("axios");
 const { BadRequestError } = require("../core/error.response");
 
+const convertObjectToArray = (obj) => {
+  return Object.keys(obj).map((key) => obj[key]);
+};
 const getInfoData = ({ fields = [], object = {} }) => {
   return _.pick(object, fields);
 };
@@ -204,4 +207,5 @@ module.exports = {
   addTasksToProjects,
   detailProject,
   addTasksToProject,
+  convertObjectToArray,
 };

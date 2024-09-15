@@ -14,13 +14,13 @@ datasource db {
 }
 
 model Activity {
-  activity_id      String            @id @default(auto()) @map("_id") @db.ObjectId
-  description      String?
-  createdBy        String?           @db.ObjectId
-  modifiedBy       String?           @db.ObjectId
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime?         @updatedAt
-  deletedAt        DateTime?
-  deletedMark      Boolean           @default(false)
+  activity_id String    @id @default(auto()) @map("_id") @db.ObjectId
+  description String?
+  createdBy   String?   @db.ObjectId
+  modifiedBy  String?   @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  deletedAt   DateTime?
+  deletedMark Boolean   @default(false)
   task_id     String    @db.ObjectId
 }

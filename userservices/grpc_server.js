@@ -4,6 +4,7 @@ const protoLoader = require("@grpc/proto-loader");
 const {
   GetUser,
   GetDetailManagerAndTotalStaffInDepartment,
+  GetListStaffInDepartment,
 } = require("./src/services/grpc.service");
 const path = require("path");
 
@@ -24,6 +25,7 @@ function startGrpcServer() {
   server.addService(userProto.user.UserService.service, {
     GetUser,
     GetDetailManagerAndTotalStaffInDepartment,
+    GetListStaffInDepartment,
   });
   const host = "0.0.0.0";
   const port = process.env.GRPC_PORT;

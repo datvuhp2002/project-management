@@ -53,7 +53,13 @@ class AssignmentService {
         throw new BadRequestError("Task does not exist");
       }
     }
-
+    if (user_id) {
+      try {
+        await getTask(user_id);
+      } catch (e) {
+        throw new BadRequestError("User does not exist");
+      }
+    }
     // Kiểm tra tính hợp lệ của thời gian
     if (startAt && endAt) {
       const startDateAssignment = new Date(startAt);

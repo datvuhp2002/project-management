@@ -38,7 +38,7 @@ const departmentServicesRoutes = {
   "/update": {
     target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/update`,
     authRequired: true,
-    permissions: ["SUPER_ADMIN", "ADMIN"],
+    permissions: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
   },
   "/detail": {
     target: `${process.env.DEPARTMENT_SERVICES_REQUEST_URL}/detail`,

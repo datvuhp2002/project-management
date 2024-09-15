@@ -26,11 +26,6 @@ app.use((req, res, next) => {
   ]);
   next();
 });
-
-// init db
-require(`./dbs/init.dbs`);
-// init routes
-app.use("", require("./routes"));
 // handle errors
 app.use((err, req, res, next) => {
   const status = err.status || 500;
@@ -53,5 +48,9 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
+// init db
+require(`./dbs/init.dbs`);
+// init routes
+app.use("", require("./routes"));
 continuousConsumer().catch(console.error());
 module.exports = app;

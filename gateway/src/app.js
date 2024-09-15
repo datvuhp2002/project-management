@@ -4,7 +4,6 @@ const compression = require("compression");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const initElasticsearch = require("./dbs/init.elasticsearch");
 const { router, registerRouterServices } = require("./routes");
 const {
   emailServices,
@@ -13,7 +12,6 @@ const {
   departmentServicesRoutes,
   assignmentServicesRoutes,
   projectServicesRoutes,
-  clientRoutes,
   taskServicesRoutes,
   activityServicesRoutes,
   uploadServicesRoutes,
@@ -31,11 +29,6 @@ app.use(compression());
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-
-// init elasticsearch
-// initElasticsearch.init({
-//   ELASTICSEARCH_IS_ENABLED: true,
-// });
 // init routes
 app.use(router);
 registerRouterServices("/departments", departmentServicesRoutes, app);
@@ -47,7 +40,6 @@ registerRouterServices("/projects", projectServicesRoutes, app);
 registerRouterServices("/tasks", taskServicesRoutes, app);
 registerRouterServices("/activities", activityServicesRoutes, app);
 registerRouterServices("/upload", uploadServicesRoutes, app);
-
 app.use((req, res, next) => {
   const requestId = req.user;
   req.requestId = requestId ? requestId : uuidv4();
@@ -73,7 +65,6 @@ app.use((err, req, res, next) => {
     },
   ]);
   // init logger
-
   return res.status(status).json({
     status: "Error",
     code: status,

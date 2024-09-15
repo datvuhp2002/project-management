@@ -13,6 +13,6 @@ sleep 10
 
 docker start kafkaMQ debezium kafka-ui
 
-sleep 20
+sleep 10
 
-docker start userservices departmentservices assignmentservices activityservices projectservices taskservices emailservices gateway uploadservices
+docker restart userservices departmentservices assignmentservices activityservices projectservices taskservices emailservices gateway uploadservices

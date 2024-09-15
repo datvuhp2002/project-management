@@ -6,9 +6,69 @@
     "auditLog": "src/logs/.dcdd9996cd8815e5b2ec673297d6223ce0bda8be-audit.json",
     "files": [
         {
-            "date": 1724381784576,
-            "name": "src/logs/userServices-2024-08-23-09-56.error.log",
-            "hash": "fd431791093eb8cd43339c85316d5d616c41a56d9656257666af1bb0fa3652e9"
+            "date": 1725506436681,
+            "name": "src/logs/userServices-2024-09-05-10-20.error.log",
+            "hash": "ef4dc456f2edf6380717be846b7a194e11814212c3fa0061383521806cc06201"
+        },
+        {
+            "date": 1726039376901,
+            "name": "src/logs/userServices-2024-09-11-14-22.error.log",
+            "hash": "e3d0fbf4a757db1d1bbb234533c37d967c62ac7c7d57f7bb051b90a3d5b87e66"
+        },
+        {
+            "date": 1726039386599,
+            "name": "src/logs/userServices-2024-09-11-14-23.error.log",
+            "hash": "c54548677e2464f5c5d6edf7ab383864553ced755ab4862bd20c57bafd0f26d9"
+        },
+        {
+            "date": 1726366043156,
+            "name": "src/logs/userServices-2024-09-15-09-07.error.log",
+            "hash": "1904d65e224e31bad37b5dd38bd192f1a8278429c11352f836fb3d0d7cf6b2e9"
+        },
+        {
+            "date": 1726367093651,
+            "name": "src/logs/userServices-2024-09-15-09-24.error.log",
+            "hash": "d61cfd18df3c4cf2f1d42056ad6be9a94c223478293aaf1bb4043685ffdc7d4b"
+        },
+        {
+            "date": 1726367124431,
+            "name": "src/logs/userServices-2024-09-15-09-25.error.log",
+            "hash": "d61856d573995e1ab8551d0ec2c496f7cd4184ee7457b3badccbb0374d3f026f"
+        },
+        {
+            "date": 1726367167644,
+            "name": "src/logs/userServices-2024-09-15-09-26.error.log",
+            "hash": "6de6cfd9450d5940755dda313214f5fd40ab72d65c79bd0b6ca4791364e16003"
+        },
+        {
+            "date": 1726367234367,
+            "name": "src/logs/userServices-2024-09-15-09-27.error.log",
+            "hash": "a29d44ce02bb3f015d33a3543b92d0517693ccfeb33464b4560a8ffee1dac42c"
+        },
+        {
+            "date": 1726367326001,
+            "name": "src/logs/userServices-2024-09-15-09-28.error.log",
+            "hash": "a75926901e01fc45146fc107429880bb822c4ae1ea1a365ff370e9c0777561f8"
+        },
+        {
+            "date": 1726367387584,
+            "name": "src/logs/userServices-2024-09-15-09-29.error.log",
+            "hash": "d3442d49b1f703e7c1951a38222a5cd00a6d67ff94a2669a98bdca40d8de7245"
+        },
+        {
+            "date": 1726367403784,
+            "name": "src/logs/userServices-2024-09-15-09-30.error.log",
+            "hash": "bd6ff518059efc1a36464bd6b1a4d644ffcf0351c66f434a250c7428e372ea6f"
+        },
+        {
+            "date": 1726367751996,
+            "name": "src/logs/userServices-2024-09-15-09-35.error.log",
+            "hash": "9fc3db44cb9cfbed02fb00d1d4f6936fd715be8ad6f88dd89235393fc038028c"
+        },
+        {
+            "date": 1726367825284,
+            "name": "src/logs/userServices-2024-09-15-09-37.error.log",
+            "hash": "782cf39543fa9e34a173729e0da27c91bb0637b8a16db81603e84a8e2e36d685"
         }
     ],
     "hashType": "sha256"
