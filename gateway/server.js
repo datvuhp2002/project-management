@@ -1,7 +1,7 @@
 const app = require("./src/app");
 const port = process.env.PORT || 3050;
 const hostname = "0.0.0.0";
-const { getUserId } = require("./src/auth/authUtils");
+const { verifyJWT } = require("./src/auth/authUtils");
 const { continuousConsumer } = require("./src/message_queue/consumer");
 
 const server = app.listen(port, hostname, () => {
@@ -15,37 +15,45 @@ const io = require("socket.io")(server, {
 });
 
 // Khai báo Map để lưu trữ thông tin kết nối người dùng
-var userSockets = [];
+let userSockets = new Map();
 
-io.on("connection", async (socket) => {
-  // Sửa "connect" thành "connection"
-  console.log("A user connected", socket.id);
+// Middleware xác thực trước khi tiếp tục kết nối
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth.token; // Nhận token từ client
+  if (!token) {
+    return next(new Error("Authentication error")); // Ngắt kết nối nếu không có token
+  }
+  try {
+    // Xác thực token và lấy user_id
+    const payload = await verifyJWT(token, process.env.PUBLIC_KEY);
+    // Gán userId vào socket
+    socket.userId = payload.userId;
+    userSockets.set(payload.userId, socket.id);
+    // Xác thực thành công
+    next();
+  } catch (error) {
+    console.error("Authentication failed:", error.message);
+    next(new Error("Authentication failed")); // Ngắt kết nối nếu token không hợp lệ
+  }
+});
 
-  // Đăng ký ID người dùng khi họ gửi sự kiện 'register'
-  socket.on("register", async (userId) => {
-    if (userId) {
-      console.log(`User ${userId} registered with socket ID ${socket.id}`);
-      try {
-        const user_id = await getUserId(userId, process.env.PUBLIC_KEY);
-        socket.userId = user_id;
-        userSockets.push(socket.userId);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  });
-
-  socket.on("chat message", (msg) => {
-    console.log("Message received:", JSON.stringify(msg));
-    io.emit("chat message", msg);
-  });
+io.on("connection", (socket) => {
+  console.log(
+    `User ${JSON.stringify(socket.userId)} connected with socket ID ${
+      socket.id
+    }`
+  );
 
   socket.on("disconnect", () => {
-    console.log("User disconnected", socket.id);
-    userSockets.splice(userSockets.indexOf(socket.userId), 1);
-    console.log("list user:::", userSockets);
+    console.log(
+      `User ${JSON.stringify(socket.userId)} disconnected`,
+      socket.id
+    );
+    userSockets.delete(socket.userId);
+    // console.log("USER:::", userSockets);
+    // console.log("Active users:", Array.from(userSockets.keys()));
   });
 });
 
 // Truyền io vào Kafka consumer
-continuousConsumer(io).catch(console.error);
+continuousConsumer(io, userSockets).catch(console.error);

@@ -6,24 +6,24 @@
     "auditLog": "src/logs/.c4c9f8e40a5436ef60cc4fb4d33eee86bdb3af8a-audit.json",
     "files": [
         {
-            "date": 1723784972934,
-            "name": "src/logs/assignmentServices-2024-08-16-12-09.error.log",
-            "hash": "343f7bf158ff4c7ea28ed01705042501dade4b25db84a3bd4fda1a2318fc332f"
+            "date": 1726417806506,
+            "name": "src/logs/assignmentServices-2024-09-15-23-30.error.log",
+            "hash": "013a6f922e5c92fea6df4510d786a40d9eefe86edcf7af3d80657f2f6c947028"
         },
         {
-            "date": 1723917280991,
-            "name": "src/logs/assignmentServices-2024-08-18-00-54.error.log",
-            "hash": "f685639858562013b287d1a918ab02d715f4390e46ab9c664e6a7d67543ef80f"
+            "date": 1726419877496,
+            "name": "src/logs/assignmentServices-2024-09-16-00-04.error.log",
+            "hash": "ce750d2039dca24332e25b19ebbab499338974e1ab2885e38e2962bbcb9089f6"
         },
         {
-            "date": 1723963142641,
-            "name": "src/logs/assignmentServices-2024-08-18-13-39.error.log",
-            "hash": "1457659a6e3d0b6cd24bbf8b0397ff5a35198e8fc4d3ab004c4bf1365da7711a"
+            "date": 1726419917022,
+            "name": "src/logs/assignmentServices-2024-09-16-00-05.error.log",
+            "hash": "ff7ed25fcae7796d264e3bfe923ce4f29111286a78e450b3b1f096b64da1c6ec"
         },
         {
-            "date": 1724122953629,
-            "name": "src/logs/assignmentServices-2024-08-20-10-02.error.log",
-            "hash": "963f608192babfb74bb7e4ebf1edfbb43ae1dfa3de372a68c31e8099afdce8b9"
+            "date": 1726474707823,
+            "name": "src/logs/assignmentServices-2024-09-16-15-18.error.log",
+            "hash": "df6658f60159977096f80090f56b82f9c7af9e75936f8ed71599c135b91c6f2f"
         }
     ],
     "hashType": "sha256"

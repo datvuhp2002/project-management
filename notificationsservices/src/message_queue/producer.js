@@ -2,7 +2,7 @@
 const { Kafka } = require("kafkajs");
 
 const kafka = new Kafka({
-  clientId: "activity-services",
+  clientId: "notification-services",
   brokers: [process.env.KAFKA_BROKER],
 });
 

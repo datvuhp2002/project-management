@@ -15,7 +15,7 @@ const continuousConsumer = async () => {
   await consumer.connect();
   await consumer.subscribe({
     topics: convertObjectToArray(userTopicsContinuous),
-    fromBeginning: false,
+    fromBeginning: true,
   });
 
   await consumer.run({

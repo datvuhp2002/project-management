@@ -7,7 +7,6 @@ service UserService {
   rpc GetDetailManagerAndTotalStaffInDepartment(detailManagerAndTotalStaffInDepartmentRequest) returns (detailManagerAndTotalStaffInDepartmentResponse);
   rpc GetListStaffInDepartment(GetListStaffInDepartmentRequest) returns (GetListStaffInDepartmentResponse); 
   rpc GetListAllAdministrators(GetListAllAdministratorsRequest) returns (GetListAllAdministResponse);
-
 }
 
 message UserRequest {

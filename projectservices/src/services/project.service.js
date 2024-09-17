@@ -10,6 +10,9 @@ const {
 } = require("../core/error.response");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
 const { userProducerTopic } = require("../configs/kafkaUserTopic");
+const {
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic");
 const { runProducer } = require("../message_queue/producer");
 const {
   getTotalTaskWithStatusFromProjectAndTotalStaff,
@@ -57,8 +60,31 @@ class ProjectService {
     // Create the project
     try {
       const newProject = await prisma.project.create({ data });
+      if (newProject && newProject.department_ids.length > 0) {
+        const departmentPromises = newProject.department_ids.map((id) =>
+          GetDepartment(id)
+        );
+        const departments = await Promise.all(departmentPromises);
+        const departmentNames = departments.map((dept) => dept.name);
+        const message =
+          departmentNames.length === 1
+            ? `Project ${newProject.name} has been created in the ${departmentNames[0]} department`
+            : `Project ${
+                newProject.name
+              } has been created in the ${departmentNames
+                .slice(0, -1)
+                .join(", ")} and ${
+                departmentNames[departmentNames.length - 1]
+              } departments`;
+        runProducer(notificationProducerTopic.createProject, {
+          department_ids: newProject.department_ids,
+          message,
+          createdBy,
+        });
+      }
       return newProject;
     } catch (error) {
+      console.error("Error creating project:", error);
       throw new BadRequestError(
         "Failed to create the project, please try again."
       );
@@ -269,6 +295,7 @@ class ProjectService {
     if (!department_id) {
       throw new BadRequestError("department_id is required");
     }
+    const department = await GetDepartment(department_id);
     // Lấy danh sách tất cả các dự án có department_ids chứa department_id này
     const projects = await prisma.project.findMany({
       where: {
@@ -278,6 +305,7 @@ class ProjectService {
       },
       select: {
         project_id: true,
+        name: true,
         department_ids: true,
       },
     });
@@ -293,34 +321,109 @@ class ProjectService {
     });
     // Thực hiện tất cả các cập nhật
     await Promise.all(updatePromises);
+    await runProducer(notificationProducerTopic.removeProjectsFromDepartment, {
+      project_ids: projects.map((project) => ({
+        project_id: project.project_id,
+        name: project.name,
+      })),
+      department_name: department.name,
+    });
     return { message: "Projects updated successfully" };
   };
   // update project
   static update = async ({ id, data }, modifiedBy) => {
-    const findProjects = await prisma.project.findUnique({
-      where: { project_id: id },
-      select: { department_ids: true, project_manager_id: true },
-    });
-    const userInfo = await getUser(modifiedBy);
-    if (
-      userInfo.role_name === "STAFF" &&
-      modifiedBy !== findProjects.project_manager_id
-    )
-      throw new BadRequestError(
-        "You do not have permission to update this project"
-      );
-    data.department_ids = data.department_ids || findProjects.department_ids;
-    const updateProject = await prisma.project.update({
-      where: { project_id: id },
-      data: { ...data, modifiedBy },
-      select: this.select,
-    });
-    if (updateProject) {
-      return updateProject;
-    }
-    throw new BadRequestError("Update project failed");
-  };
+    try {
+      // Lấy thông tin của dự án trước khi cập nhật
+      const findProjects = await prisma.project.findUnique({
+        where: { project_id: id },
+        select: { department_ids: true, project_manager_id: true },
+      });
 
+      // Lấy thông tin người dùng
+      const userInfo = await getUser(modifiedBy);
+
+      // Kiểm tra quyền hạn của người dùng
+      if (
+        userInfo.role_name === "STAFF" &&
+        modifiedBy !== findProjects.project_manager_id
+      ) {
+        throw new BadRequestError(
+          "You do not have permission to update this project"
+        );
+      }
+
+      // Cập nhật department_ids nếu có
+      data.department_ids = data.department_ids || findProjects.department_ids;
+
+      // Cập nhật dự án
+      const updateProject = await prisma.project.update({
+        where: { project_id: id },
+        data: { ...data, modifiedBy },
+        select: this.select,
+      });
+
+      if (updateProject) {
+        // So sánh department_ids
+        const oldDepartmentIds = new Set(findProjects.department_ids || []);
+        const newDepartmentIds = new Set(updateProject.department_ids || []);
+
+        // Tìm các phòng ban mới được thêm vào và các phòng ban đã bị xóa
+        const addedDepartments = [...newDepartmentIds].filter(
+          (id) => !oldDepartmentIds.has(id)
+        );
+        const removedDepartments = [...oldDepartmentIds].filter(
+          (id) => !newDepartmentIds.has(id)
+        );
+
+        if (addedDepartments.length > 0 || removedDepartments.length > 0) {
+          if (addedDepartments.length > 0) {
+            // Gửi thông báo cho các phòng ban mà dự án được thêm vào
+            await Promise.all(
+              addedDepartments.map(async (id) => {
+                const department = await GetDepartment(id);
+                const message = `Project ${updateProject.name} has been added to department ${department.name}`;
+                await runProducer(notificationProducerTopic.updateProject, {
+                  project_id: updateProject.project_id,
+                  message,
+                  modifiedBy,
+                });
+              })
+            );
+          }
+          if (removedDepartments.length > 0) {
+            // Gửi thông báo cho các phòng ban mà dự án đã bị xóa
+            await Promise.all(
+              removedDepartments.map(async (id) => {
+                const department = await GetDepartment(id);
+                const message = `Project ${updateProject.name} has been removed from department ${department.name}`;
+                await runProducer(notificationProducerTopic.updateProject, {
+                  project_id: updateProject.project_id,
+                  message,
+                  modifiedBy,
+                });
+              })
+            );
+          }
+        } else {
+          // Nếu không có thay đổi về department_ids, gửi thông báo cập nhật chung
+          await runProducer(notificationProducerTopic.updateProject, {
+            project_id: updateProject.project_id,
+            message: `Project ${updateProject.name} has been updated`,
+            modifiedBy,
+          });
+        }
+
+        return updateProject;
+      }
+
+      throw new BadRequestError("Update project failed");
+    } catch (error) {
+      console.error("Error updating project:", error);
+      throw new BadRequestError(
+        "Failed to update the project, please try again."
+      );
+    }
+  };
   // delete project
   static delete = async (project_id, modifiedBy = null) => {
     const findProject = await prisma.project.findUnique({
@@ -347,9 +450,15 @@ class ProjectService {
       },
     });
     if (deleteProject) {
+      runProducer(notificationProducerTopic.deleteProject, {
+        department_ids: deleteProject.department_ids,
+        project_id,
+        message: `Project ${deleteProject.name} has been deleted`,
+        createdBy: modifiedBy,
+      });
       return true;
     }
-    await this.restore(project_id);
+    await this.restore(project_id, modifiedBy);
     throw new BadRequestError("Xoá dự án không thành công");
   };
   static softDeleteMultipleProjects = async (projectIds) => {
@@ -365,14 +474,14 @@ class ProjectService {
   static forceDeleteMultipleProjects = async (projectIds) => {
     try {
       await Promise.all(
-        projectIds.map((project_id) => this.forceDelete(project_id))
+        projectIds.map((project_id) => this.forceDelete(project_id, null))
       );
       return true;
     } catch (e) {
       throw new BadRequestError(e);
     }
   };
-  static forceDelete = async (project_id) => {
+  static forceDelete = async (project_id, modifiedBy) => {
     const deleteProject = await prisma.project.delete({
       where: { project_id },
     });
@@ -380,17 +489,23 @@ class ProjectService {
       throw new BadRequestError("Xoá dự án không thành công");
     }
     try {
-      await runProducer(
+      runProducer(
         assignmentProducerTopic.forceDeleteProjectAssignment,
         project_id
       );
+      runProducer(notificationProducerTopic.deleteProject, {
+        department_ids: deleteProject.department_ids,
+        project_id,
+        message: `Project ${deleteProject.name} has been deleted`,
+        createdBy: modifiedBy,
+      });
     } catch (err) {
       throw new BadRequestError(err);
     }
     return true;
   };
   // restore project
-  static restore = async (project_id) => {
+  static restore = async (project_id, modifiedBy) => {
     const restoreProject = await prisma.project.update({
       where: { project_id },
       select: this.select,
@@ -399,6 +514,12 @@ class ProjectService {
       },
     });
     if (restoreProject) {
+      await runProducer(notificationProducerTopic.restoreProject, {
+        department_ids: restoreProject.department_ids,
+        project_id,
+        message: `Project ${restoreProject.name} has been restored`,
+        createdBy: modifiedBy,
+      });
       return true;
     }
     await this.delete(project_id, null);
@@ -407,7 +528,7 @@ class ProjectService {
   static multipleRestoreProject = async (projectIds) => {
     try {
       await Promise.all(
-        projectIds.map((project_id) => this.restore(project_id))
+        projectIds.map((project_id) => this.restore(project_id, null))
       );
       return true;
     } catch (e) {
@@ -426,7 +547,7 @@ class ProjectService {
     if (!updateProject) throw new BadRequestError("Can not delete this file");
     return true;
   };
-  // upload file to cloud and store it in db
+  // store file in db
   static uploadFile = async (project_id, filename) => {
     const existingProject = await prisma.project.findUnique({
       where: { project_id },

@@ -348,6 +348,13 @@ class UserService {
     // Sử dụng map để chỉ trả về mảng các user_id
     return userIds.map((user) => user.user_id);
   };
+  static getListAllAdministrators = async () => {
+    const adminIds = [
+      ...(await this.findUserByRole("ADMIN")),
+      ...(await this.findUserByRole("SUPER_ADMIN")),
+    ];
+    return [...new Set(adminIds)];
+  };
   //
   // do not have department
   static getListOfStaffDoNotHaveDepartment = async ({

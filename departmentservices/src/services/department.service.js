@@ -23,6 +23,7 @@ class DepartmentService {
     description: true,
     createdBy: true,
     createdAt: true,
+    updatedAt: true,
     manager_id: true,
   };
   // create new department
@@ -191,21 +192,19 @@ class DepartmentService {
         await prisma.department.update({
           where: {
             department_id: department_data_old.department_id,
-            modifiedBy: userId,
           },
-          data: { manager_id: null },
+          data: { manager_id: null, modifiedBy: userId },
         });
       }
     }
     const result = await prisma.department.update({
       where: { department_id: id },
-      modifiedBy: userId,
       data: { ...data, modifiedBy: userId },
       select: this.select,
     });
     if (result) {
       await runProducer(notificationProducerTopic.updateDepartment, {
-        message: `Department ${result.name} has just been updated.`,
+        message: `Department ${result.name} has just been updated`,
         department_id: result.department_id,
         modifiedBy: userId,
       });

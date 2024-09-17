@@ -15,6 +15,8 @@ const {
   taskServicesRoutes,
   activityServicesRoutes,
   uploadServicesRoutes,
+  notificationsServicesRouter,
+  userNotificationsServicesRouter,
 } = require("./config");
 const cors = require("cors");
 const app = express();
@@ -40,6 +42,12 @@ registerRouterServices("/projects", projectServicesRoutes, app);
 registerRouterServices("/tasks", taskServicesRoutes, app);
 registerRouterServices("/activities", activityServicesRoutes, app);
 registerRouterServices("/upload", uploadServicesRoutes, app);
+registerRouterServices("/notifications", notificationsServicesRouter, app);
+registerRouterServices(
+  "/user-notifications",
+  userNotificationsServicesRouter,
+  app
+);
 app.use((req, res, next) => {
   const requestId = req.user;
   req.requestId = requestId ? requestId : uuidv4();

@@ -1,30 +1,53 @@
 const { Kafka } = require("kafkajs");
+const {
+  notificationProducerTopic,
+  notificationTopicsContinuous,
+} = require("../config/kafkaNotificationTopic");
+const { convertObjectToArray } = require("../utils/index");
 
 const kafka = new Kafka({
   clientId: "gateway-services",
   brokers: [process.env.KAFKA_BROKER],
 });
 
-const continuousConsumer = async (io) => {
+const batchSize = 10; // Chỉ định kích thước của mỗi batch
+
+const continuousConsumer = async (io, userSockets) => {
   const consumer = kafka.consumer({ groupId: "gateway-continuous-group" });
   await consumer.connect();
+  await consumer.subscribe({
+    topics: convertObjectToArray(notificationTopicsContinuous),
+    fromBeginning: false,
+  });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
       try {
         const parsedMessage = JSON.parse(message.value.toString());
-        console.log("Received message:", topic, parsedMessage);
-        // Phát thông báo tới tất cả các client qua Socket.io
-        io.emit("newNotification", {
-          topic,
-          message: parsedMessage,
-        });
-        // Xử lý thông báo theo topic (nếu cần)
+        console.log("Received message:", parsedMessage);
+
         switch (topic) {
-          case "department-updated":
-            // Phát thông báo đặc biệt chỉ cho các phòng ban liên quan
-            io.emit("departmentUpdated", parsedMessage);
+          case notificationTopicsContinuous.newNoti: {
+            const { user_list, ...notificationData } = parsedMessage;
+
+            // Tách user_list thành các batch
+            for (let i = 0; i < user_list.length; i += batchSize) {
+              const batch = user_list.slice(i, i + batchSize);
+              batch.forEach((userId) => {
+                const socketId = userSockets.get(userId);
+                if (socketId) {
+                  io.to(socketId).emit("new-noti", notificationData);
+                  console.log(`Sent notification to user ${userId}`);
+                } else {
+                  console.log(`User ${userId} is not connected`);
+                }
+              });
+
+              // Có thể sử dụng setTimeout để gửi batch tiếp theo sau một khoảng thời gian nhỏ, nếu cần
+              await new Promise((resolve) => setTimeout(resolve, 100)); // 100ms delay
+            }
             break;
+          }
           default:
             break;
         }

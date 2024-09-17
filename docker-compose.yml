@@ -150,6 +150,8 @@ services:
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - EMAIL_SERVICES_REQUEST_URL=http://emailservices:3069/services/api/email
       - UPLOAD_SERVICES_REQUEST_URL=http://uploadservices:3068/services/api/upload
+      - NOTIFICATIONS_SERVICES_REQUEST_URL =http://notificationsservices:3070/services/api/notifications
+      - USER_NOTIFICATIONS_SERVICES_REQUEST_URL =http://notificationsservices:3070/services/api/user-notifications
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - PUBLIC_KEY=abcdefgh123

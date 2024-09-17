@@ -8,6 +8,8 @@ const assignmentServicesRoutes = require("./assignment.config");
 const taskServicesRoutes = require("./task.config");
 const activityServicesRoutes = require("./activity.config");
 const uploadServicesRoutes = require("./upload.config");
+const userNotificationsServicesRouter = require("./user_notifications.config");
+const notificationsServicesRouter = require("./notifications.config");
 module.exports = {
   emailServices,
   roleRoutes,
@@ -18,4 +20,6 @@ module.exports = {
   taskServicesRoutes,
   activityServicesRoutes,
   uploadServicesRoutes,
+  notificationsServicesRouter,
+  userNotificationsServicesRouter,
 };

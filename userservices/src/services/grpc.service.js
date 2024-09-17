@@ -65,8 +65,29 @@ async function GetListStaffInDepartment(call, callback) {
     const response = {
       ids: listStaffInDepartment,
     };
-    console.log("LIST:::", listStaffInDepartment);
     if (listStaffInDepartment) {
+      callback(null, response);
+    } else {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        details: "User not found",
+      });
+    }
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      details: "Internal server error",
+    });
+  }
+}
+async function GetListAllAdministrators(call, callback) {
+  try {
+    const listAllAdministrators = await UserServices.getListAllAdministrators();
+    const response = {
+      ids: listAllAdministrators,
+    };
+    console.log(listAllAdministrators);
+    if (listAllAdministrators) {
       callback(null, response);
     } else {
       callback({
@@ -85,4 +106,5 @@ module.exports = {
   GetUser,
   GetDetailManagerAndTotalStaffInDepartment,
   GetListStaffInDepartment,
+  GetListAllAdministrators,
 };
