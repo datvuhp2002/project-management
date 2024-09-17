@@ -19,29 +19,95 @@
   </head>
   <body>
     <div id="messages"></div>
-    <form id="form">
-      <input id="userId" placeholder="User ID" autocomplete="off" />
-      <input id="input" placeholder="Message" autocomplete="off" />
-      <button>Send</button>
+
+    <!-- Token Login Form -->
+    <form id="tokenForm">
+      <input id="tokenInput" placeholder="Access Token" autocomplete="off" />
+      <button id="connectButton">Connect</button>
+    </form>
+
+    <!-- Form to Update Department -->
+    <form id="updateDepartmentForm" style="margin-top: 10px; display: none">
+      <input id="nameInput" placeholder="Department Name" autocomplete="off" />
+      <button id="updateButton">Update Department</button>
     </form>
 
     <script>
-      const socket = io("http://localhost:3050"); // Kết nối đến server
+      let socket;
+      let accessToken;
 
-      // Gửi ID người dùng và tin nhắn khi form được submit
-      document.getElementById("form").addEventListener("submit", (event) => {
-        event.preventDefault();
-        const userId = document.getElementById("userId").value;
-        const msg = document.getElementById("input").value;
-        if (userId && msg) {
-          socket.emit("register", userId); // Đăng ký userId
-          socket.emit("chat message", { userId, msg }); // Gửi tin nhắn và ID người dùng đến server
-          document.getElementById("input").value = "";
-        }
-      });
+      document
+        .getElementById("tokenForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          accessToken = document.getElementById("tokenInput").value;
+          if (accessToken) {
+            socket = io("http://localhost:3050", {
+              auth: {
+                token: accessToken,
+              },
+            });
 
-      // Nhận tin nhắn từ server và hiển thị lên giao diện
-      socket.on("chat message", ({ userId, msg }) => {
+            socket.on("connect", () => {
+              console.log("Connected to server");
+              document.getElementById("tokenForm").style.display = "none";
+              document.getElementById("updateDepartmentForm").style.display =
+                "block";
+            });
+
+            socket.on("connect_error", (error) => {
+              console.error("Connection failed:", error.message);
+              alert("Connection failed: " + error.message);
+            });
+
+            socket.on("new-noti", (msg) => {
+              console.log("Received notification:", msg);
+              const item = document.createElement("div");
+              item.textContent = `Notification: ${JSON.stringify(msg)}`;
+              document.getElementById("messages").appendChild(item);
+            });
+          }
+        });
+
+      document
+        .getElementById("updateDepartmentForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const name = document.getElementById("nameInput").value;
+          if (name) {
+            try {
+              const response = await fetch(
+                "http://localhost:3050/departments/admin/update/666d56ef15136fb8b7501356",
+                {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    authorization: `${accessToken}`,
+                  },
+                  body: JSON.stringify({ name }),
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+
+              const result = await response.json();
+              console.log("Department updated:", result);
+              // Optionally, you can display a message to the user
+              const item = document.createElement("div");
+              item.textContent = `Department updated successfully!`;
+              document.getElementById("messages").appendChild(item);
+            } catch (error) {
+              console.error("Error updating department:", error.message);
+              const item = document.createElement("div");
+              item.textContent = `Error updating department: ${error.message}`;
+              document.getElementById("messages").appendChild(item);
+            }
+          }
+        });
+
+      socket.on("chat message", (msg) => {
         const item = document.createElement("div");
         item.textContent = `User: ${msg}`;
         document.getElementById("messages").appendChild(item);

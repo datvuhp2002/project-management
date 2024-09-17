@@ -6,13 +6,18 @@ const {
 } = require("http-proxy-middleware");
 const { authentication } = require("../auth/authUtils");
 const { permissionsAuthentication } = require("../auth/checkAuth");
+
 const router = express.Router();
+
 router.use("/gateway/api/access", require("./access"));
 router.use("/report", require("./report"));
+
 const registerRouterServices = (basePath, routes, app) => {
   for (const route in routes) {
     const { target, authRequired, permissions } = routes[route];
     const middlewareChain = [];
+
+    // Xác thực middleware nếu cần
     if (authRequired) {
       middlewareChain.push(authentication);
       middlewareChain.push((req, res, next) => {
@@ -22,13 +27,13 @@ const registerRouterServices = (basePath, routes, app) => {
         next();
       });
     }
+
+    // Phân quyền middleware nếu cần
     if (permissions) {
       middlewareChain.push(permissionsAuthentication(permissions));
     }
-    middlewareChain.push((req, res, next) => {
-      console.log(`Proxy request for ${basePath}${route} to ${target}`);
-      next();
-    });
+
+    // Proxy middleware
     middlewareChain.push(
       createProxyMiddleware({
         target,
@@ -36,8 +41,14 @@ const registerRouterServices = (basePath, routes, app) => {
         on: {
           proxyReq: fixRequestBody,
         },
+        onError: (err, req, res) => {
+          console.error(`Proxy error: ${err.message}`);
+          res.status(500).send("Proxy error");
+        },
       })
     );
+
+    // Thêm middleware chain vào app
     app.use(`${basePath}${route}`, middlewareChain);
   }
 };

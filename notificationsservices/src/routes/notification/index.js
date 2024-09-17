@@ -4,4 +4,6 @@ const NotificationController = require("../../controllers/notification.controlle
 const asyncHandler = require("../../helpers/asyncHandler");
 const router = express.Router();
 
+router.get("/get-notifications", asyncHandler(NotificationController.getAll));
+
 module.exports = router;

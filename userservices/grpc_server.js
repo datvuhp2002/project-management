@@ -5,6 +5,7 @@ const {
   GetUser,
   GetDetailManagerAndTotalStaffInDepartment,
   GetListStaffInDepartment,
+  GetListAllAdministrators,
 } = require("./src/services/grpc.service");
 const path = require("path");
 
@@ -26,6 +27,7 @@ function startGrpcServer() {
     GetUser,
     GetDetailManagerAndTotalStaffInDepartment,
     GetListStaffInDepartment,
+    GetListAllAdministrators,
   });
   const host = "0.0.0.0";
   const port = process.env.GRPC_PORT;

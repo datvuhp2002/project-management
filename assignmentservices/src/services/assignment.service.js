@@ -55,7 +55,7 @@ class AssignmentService {
     }
     if (user_id) {
       try {
-        await getTask(user_id);
+        await getUser(user_id);
       } catch (e) {
         throw new BadRequestError("User does not exist");
       }

@@ -1,12 +1,14 @@
 "use strict";
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
-const { totalActivity } = require("./src/services/grpc.service");
 const path = require("path");
 
-const ACTIVITY_PROTO_PATH = path.join(__dirname, "src/grpc/activity.proto");
+const NOTIFICATION_PROTO_PATH = path.join(
+  __dirname,
+  "src/grpc/notifications.proto"
+);
 
-const packageDefinition = protoLoader.loadSync(ACTIVITY_PROTO_PATH, {
+const packageDefinition = protoLoader.loadSync(NOTIFICATION_PROTO_PATH, {
   keepCase: true,
   longs: String,
   enums: String,
@@ -14,13 +16,14 @@ const packageDefinition = protoLoader.loadSync(ACTIVITY_PROTO_PATH, {
   oneofs: true,
 });
 
-const activityProto = grpc.loadPackageDefinition(packageDefinition);
+const notificationProto = grpc.loadPackageDefinition(packageDefinition);
 
 function startGrpcServer() {
   const server = new grpc.Server();
-  server.addService(activityProto.activity.ActivityService.service, {
-    totalActivity,
-  });
+  server.addService(
+    notificationProto.notification.NotificationService.service,
+    {}
+  );
   const host = "0.0.0.0";
   const port = process.env.GRPC_PORT;
   server.bindAsync(

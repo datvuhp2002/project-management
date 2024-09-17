@@ -80,14 +80,14 @@ class ProjectController {
   forceDelete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công dự án",
-      data: await ProjectService.forceDelete(req.params.id),
+      data: await ProjectService.forceDelete(req.params.id, req.headers.user),
     }).send(res);
   };
 
   restore = async (req, res, next) => {
     new SuccessResponse({
       message: "Khôi phục thành công dự án",
-      data: await ProjectService.restore(req.params.id),
+      data: await ProjectService.restore(req.params.id, req.headers.user),
     }).send(res);
   };
 }
