@@ -43,7 +43,6 @@ const continuousConsumer = async (io, userSockets) => {
                 }
               });
 
-              // Có thể sử dụng setTimeout để gửi batch tiếp theo sau một khoảng thời gian nhỏ, nếu cần
               await new Promise((resolve) => setTimeout(resolve, 100)); // 100ms delay
             }
             break;

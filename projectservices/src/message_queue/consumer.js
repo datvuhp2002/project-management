@@ -6,6 +6,10 @@ const {
 const { convertObjectToArray } = require("../utils");
 const ProjectService = require("../services/project.service");
 const { userTopicsContinuous } = require("../configs/kafkaUserTopic");
+const { runProducer } = require("./producer");
+const {
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic");
 
 const kafka = new Kafka({
   clientId: "project-services",

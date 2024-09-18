@@ -60,28 +60,38 @@ class ProjectService {
     // Create the project
     try {
       const newProject = await prisma.project.create({ data });
-      if (newProject && newProject.department_ids.length > 0) {
-        const departmentPromises = newProject.department_ids.map((id) =>
-          GetDepartment(id)
-        );
-        const departments = await Promise.all(departmentPromises);
-        const departmentNames = departments.map((dept) => dept.name);
-        const message =
-          departmentNames.length === 1
-            ? `Project ${newProject.name} has been created in the ${departmentNames[0]} department`
-            : `Project ${
-                newProject.name
-              } has been created in the ${departmentNames
-                .slice(0, -1)
-                .join(", ")} and ${
-                departmentNames[departmentNames.length - 1]
-              } departments`;
-        runProducer(notificationProducerTopic.createProject, {
-          department_ids: newProject.department_ids,
-          message,
-          createdBy,
-        });
+      if (newProject) {
+        if (newProject.department_ids.length > 0) {
+          const departmentPromises = newProject.department_ids.map((id) =>
+            GetDepartment(id)
+          );
+          const departments = await Promise.all(departmentPromises);
+          const departmentNames = departments.map((dept) => dept.name);
+          const message =
+            departmentNames.length === 1
+              ? `Project ${newProject.name} has been created in the ${departmentNames[0]} department`
+              : `Project ${
+                  newProject.name
+                } has been created in the ${departmentNames
+                  .slice(0, -1)
+                  .join(", ")} and ${
+                  departmentNames[departmentNames.length - 1]
+                } departments`;
+          runProducer(notificationProducerTopic.createProject, {
+            department_ids: newProject.department_ids,
+            message,
+            createdBy,
+          });
+        } else {
+          const message = `Project ${newProject.name} has been created`;
+          runProducer(notificationProducerTopic.createProject, {
+            department_ids: [],
+            message,
+            createdBy,
+          });
+        }
       }
+
       return newProject;
     } catch (error) {
       console.error("Error creating project:", error);
@@ -291,11 +301,13 @@ class ProjectService {
     }
     return project;
   };
-  static removeProjectsFromDepartment = async (department_id) => {
+  static removeProjectsFromDepartment = async ({
+    department_id,
+    department_name,
+  }) => {
     if (!department_id) {
       throw new BadRequestError("department_id is required");
     }
-    const department = await GetDepartment(department_id);
     // Lấy danh sách tất cả các dự án có department_ids chứa department_id này
     const projects = await prisma.project.findMany({
       where: {
@@ -326,7 +338,7 @@ class ProjectService {
         project_id: project.project_id,
         name: project.name,
       })),
-      department_name: department.name,
+      department_name,
     });
     return { message: "Projects updated successfully" };
   };

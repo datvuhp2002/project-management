@@ -6,6 +6,10 @@ const UserService = require("../services/user.service");
 const { convertObjectToArray } = require("../utils");
 const { uploadTopicsContinuous } = require("../configs/kafkaUploadTopic");
 const { projectTopicsContinuous } = require("../configs/kafkaProjectTopic");
+const { runProducer } = require("./producer");
+const {
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic/producer/notification.producer.topic.config");
 const kafka = new Kafka({
   clientId: "user-services",
   brokers: [process.env.KAFKA_BROKER],
@@ -43,12 +47,23 @@ const continuousConsumer = async () => {
                 id: old_manager_id,
                 data: { department_id: null },
               });
+              await runProducer(notificationProducerTopic.removeManager, {
+                user_id: old_manager_id,
+                message: `Your manager are removed from department ${data.department_name}`,
+                modifiedBy: parsedMessage.modifiedBy,
+              });
             }
-
             if (id !== null) {
-              await UserService.updateWithoutModified({ id, data });
+              await UserService.updateWithoutModified({
+                id,
+                data: { department_id: data.department_id },
+              });
+              await runProducer(notificationProducerTopic.addManager, {
+                user_id: old_manager_id,
+                message: `You have become the manager of ${data.department_name} department`,
+                modifiedBy: parsedMessage.modifiedBy,
+              });
             }
-
             break;
 
           case uploadTopicsContinuous.uploadAvatarFromLocal: {
@@ -63,21 +78,41 @@ const continuousConsumer = async () => {
             break;
           }
 
-          case departmentTopicsContinuous.addStaffIntoDepartment:
-            console.log(
-              `${departmentTopicsContinuous.addStaffIntoDepartment}`,
-              parsedMessage
-            );
-            const { list_user_ids, department_id } = parsedMessage;
-            await UserService.addUserIntoDepartment(
-              { list_user_ids },
+          case departmentTopicsContinuous.addStaffIntoDepartment: {
+            const { list_user_ids, department_id, department_name, createdBy } =
+              parsedMessage;
+            const addUserIntoDepartment =
+              await UserService.addUserIntoDepartment(
+                { list_user_ids },
+                department_id
+              );
+            if (addUserIntoDepartment) {
+              await runProducer(
+                notificationProducerTopic.notiForAddStaffIntoDepartment,
+                {
+                  user_list: list_user_ids,
+                  message: `Your are added to department ${department_name}`,
+                  createdBy,
+                }
+              );
+            }
+            break;
+          }
+          case departmentTopicsContinuous.removeStaffOutOfDepartment: {
+            const { department_id, department_name, modifiedBy } =
+              parsedMessage;
+            const list_user_ids_in_department =
+              await UserService.getListStaffIdsInDepartment(department_id);
+            await UserService.removeStaffFromDepartmentHasBeenDeleted(
               department_id
             );
-            break;
-
-          case departmentTopicsContinuous.removeStaffOutOfDepartment: {
-            await UserService.removeStaffFromDepartmentHasBeenDeleted(
-              parsedMessage
+            await runProducer(
+              notificationProducerTopic.notiForRemoveStaffFromDepartment,
+              {
+                user_list: list_user_ids_in_department,
+                message: `Your are removed from department ${department_name}`,
+                createdBy: modifiedBy,
+              }
             );
             break;
           }

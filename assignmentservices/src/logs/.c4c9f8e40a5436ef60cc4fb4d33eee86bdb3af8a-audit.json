@@ -24,6 +24,16 @@
             "date": 1726474707823,
             "name": "src/logs/assignmentServices-2024-09-16-15-18.error.log",
             "hash": "df6658f60159977096f80090f56b82f9c7af9e75936f8ed71599c135b91c6f2f"
+        },
+        {
+            "date": 1726536635550,
+            "name": "src/logs/assignmentServices-2024-09-17-08-30.error.log",
+            "hash": "9c3ac28c1963950837c4f579a48aae9e1eb04b02d360c1b83dfbcac8404a56aa"
+        },
+        {
+            "date": 1726538541493,
+            "name": "src/logs/assignmentServices-2024-09-17-09-02.error.log",
+            "hash": "cf8eb4a7ee05a0940b86141b727eed90642cadc83c9cc48fe9e86a072acb94f3"
         }
     ],
     "hashType": "sha256"

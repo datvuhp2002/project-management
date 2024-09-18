@@ -20,6 +20,15 @@ class UserNotificationController {
       ),
     }).send(res);
   };
+  markAsRead = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Read notification successfully",
+      data: await UserNotificationService.markAsRead(
+        req.headers.user,
+        req.params.id
+      ),
+    }).send(res);
+  };
 }
 
 module.exports = new UserNotificationController();

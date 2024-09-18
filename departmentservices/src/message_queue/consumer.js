@@ -27,22 +27,16 @@ const continuousConsumer = async () => {
         console.log("Message content:", parsedMessage);
 
         switch (topic) {
-          case userTopicsContinuous.deleteUser: {
-            if (parsedMessage && parsedMessage.managerId) {
-              await DepartmentService.deleteManagerId(parsedMessage.managerId);
-              console.log(
-                `Processed deleteUser with managerId: ${parsedMessage.managerId}`
-              );
+          case (userTopicsContinuous.deleteUser,
+          userTopicsContinuous.removeManager): {
+            if (parsedMessage) {
+              await DepartmentService.deleteManagerId(parsedMessage);
             } else {
               console.warn(
                 "Received deleteUser message with invalid data:",
                 parsedMessage
               );
             }
-            break;
-          }
-          case userTopicsContinuous.removeManager: {
-            await DepartmentService.deleteManagerId(parsedMessage);
             break;
           }
           default:
