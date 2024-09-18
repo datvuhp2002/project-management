@@ -3,14 +3,8 @@ const prisma = require("../prisma");
 const RoleService = require("./role.service");
 // const { sendEmailToken } = require("../message_queue/producer.email");
 const bcrypt = require("bcrypt");
-const {
-  BadRequestError,
-  AuthFailureError,
-  ForbiddenError,
-  NotFoundError,
-} = require("../core/error.response");
+const { BadRequestError, NotFoundError } = require("../core/error.response");
 const crypto = require("crypto");
-const cloudinary = require("../configs/cloudinary.config");
 const { runProducer } = require("../message_queue/producer");
 const { departmentProducerTopic } = require("../configs/kafkaDepartmentTopic");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
@@ -18,9 +12,8 @@ const {
   emailProducerTopic,
 } = require("../configs/kafkaEmailTopic/producer/email.producer.topic.config");
 const {
-  uploadProducerTopic,
-} = require("../configs/kafkaUploadTopic/producer/upload.producer.topic.config");
-
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic/producer/notification.producer.topic.config");
 const { genAvatarColor, removeAccents } = require("../utils");
 const {
   GetAllUserFromProject,
@@ -99,6 +92,12 @@ class UserService {
       password: password,
     };
     await runProducer(emailProducerTopic.createUser, message);
+    await runProducer(notificationProducerTopic.notiForCreateUser, {
+      message_admin: `User ${newUser.username} is created`,
+      message_user: `Welcome ${newUser.username} to the company.`,
+      user_id: newUser.user_id,
+      createdBy,
+    });
     return newUser;
   };
   static async forgetPassword({ email = null, captcha = null }) {
@@ -171,12 +170,17 @@ class UserService {
   // remove user out of department
   static removeStaffFromDepartment = async (
     { list_user_ids },
-    department_id
+    department_id,
+    modifiedBy
   ) => {
+    if (!department_id) {
+      throw new BadRequestError("Invalid department");
+    }
+    const department = GetDepartment(department_id);
     const operations = list_user_ids.map(async (item) => {
       const user = await prisma.user.findUnique({
         where: { user_id: item },
-        select: { role: { select: { name: true } } },
+        select: { username: true, role: { select: { name: true } } },
       });
       if (!user) {
         console.warn(`User with ID ${item} not found.`);
@@ -184,16 +188,34 @@ class UserService {
       }
       if (user.role.name === "MANAGER") {
         await runProducer(departmentProducerTopic.removeManager, department_id);
+        await runProducer(notificationProducerTopic.notiForRemoveManager, {
+          user_id,
+          message: `Manager ${user.username} are removed from department ${department.name}`,
+          modifiedBy,
+          department_name: department.name,
+          department_id,
+        });
       }
-      await prisma.user.updateMany({
+      const removeStaff = await prisma.user.updateMany({
         where: {
           department_id,
           user_id: item,
         },
         data: {
+          modifiedBy,
           department_id: null,
         },
       });
+      if (removeStaff) {
+        await runProducer(
+          notificationProducerTopic.notiForRemoveStaffFromDepartment,
+          {
+            user_list: list_user_ids,
+            message: `You are removed from department ${department.name}`,
+            createdBy: modifiedBy,
+          }
+        );
+      }
     });
     try {
       await Promise.all(operations);
@@ -205,13 +227,17 @@ class UserService {
 
     return true; // Hoặc giá trị phù hợp với yêu cầu của bạn
   };
-  static removeStaffFromDepartmentHasBeenDeleted = async (department_id) => {
+  static removeStaffFromDepartmentHasBeenDeleted = async (
+    department_id,
+    modifiedBy
+  ) => {
     return await prisma.user.updateMany({
       where: {
         department_id,
       },
       data: {
         department_id: null,
+        modifiedBy,
       },
     });
   };
@@ -647,6 +673,14 @@ class UserService {
           departmentProducerTopic.removeManager,
           findUpdatedUser.department_id
         );
+        const department = GetDepartment(findUpdatedUser.department_id);
+        await runProducer(notificationProducerTopic.notiForRemoveManager, {
+          user_id: id,
+          message: `Manager ${findUpdatedUser.username} are removed from department ${department.name}`,
+          modifiedBy,
+          department_name: department.name,
+          department_id: findUpdatedUser.department_id,
+        });
         await this.updateWithoutModified({ id, data: { department_id: null } });
       }
       updateUserData.role_id = role_data.role_id;
@@ -656,7 +690,14 @@ class UserService {
       data: updateUserData,
       select: this.select,
     });
-    if (updatedUser) return updatedUser;
+    if (updatedUser) {
+      await runProducer(notificationProducerTopic.notiForUpdateUser, {
+        message: `Your Account is updated`,
+        user_id: id,
+        modifiedBy,
+      });
+      return updatedUser;
+    }
     throw new BadRequestError("Update failed");
   };
   //update user information [for consumer]
@@ -668,7 +709,7 @@ class UserService {
         if (!role_data) throw new BadRequestError("Role not found");
         updateUserData.role_id = role_data.role_id;
       }
-      await prisma.user.update({
+      return await prisma.user.update({
         where: { user_id: id },
         data: updateUserData,
       });
@@ -677,13 +718,14 @@ class UserService {
     }
   };
   // delete user account
-  static delete = async (user_id) => {
+  static delete = async (user_id, modifiedBy) => {
     const deleteUser = await prisma.user.update({
       where: { user_id },
       select: this.select,
       data: {
         department_id: null,
         deletedMark: true,
+        modifiedBy,
         deletedAt: new Date(),
       },
     });
@@ -697,16 +739,26 @@ class UserService {
       throw new BadRequestError("Can't delete this account");
     }
     if (roleUser === "ADMIN" || roleUser === "MANAGER") {
-      await runProducer(
-        departmentProducerTopic.deleteUser,
-        deleteUser.department_id
-      );
+      if (deleteUser.department_id) {
+        await runProducer(
+          departmentProducerTopic.deleteUser,
+          deleteUser.department_id
+        );
+        const department = GetDepartment(deleteUser.department_id);
+        await runProducer(notificationProducerTopic.notiForRemoveManager, {
+          user_id,
+          message: `Manager ${deleteUser.username} are removed from department ${department.name}`,
+          modifiedBy,
+          department_name: department.name,
+          department_id: deleteUser.department_id,
+        });
+      }
+      await runProducer();
       return true;
     }
-    // Xử lý các vai trò khác hoặc không có vai trò cụ thể
-    throw new BadRequestError("Delete user failed");
+    return true;
   };
-  static forceDelete = async (user_id) => {
+  static forceDelete = async (user_id, modifiedBy) => {
     const findDeletedUser = await prisma.user.findUnique({
       where: { user_id },
       select: this.select,
@@ -717,24 +769,46 @@ class UserService {
     if (findDeletedUser.role.name === "SUPER_ADMIN") {
       throw new BadRequestError("Can't force delete this account");
     }
+    if (
+      findDeletedUser.role.name === "ADMIN" ||
+      findDeletedUser.role.name === "MANAGER"
+    ) {
+      if (findDeletedUser.department_id) {
+        await runProducer(
+          departmentProducerTopic.deleteUser,
+          findDeletedUser.department_id
+        );
+        const department = GetDepartment(findDeletedUser.department_id);
+        await runProducer(notificationProducerTopic.notiForRemoveManager, {
+          user_id,
+          message: `Manager ${findDeletedUser.username} are removed from department ${department.name}`,
+          modifiedBy,
+          department_name: department.name,
+          department_id: findDeletedUser.department_id,
+        });
+      }
+      await runProducer();
+      return true;
+    }
     const forceDeleteUser = await prisma.user.delete({ where: { user_id } });
     if (!forceDeleteUser) throw new BadRequestError("Delete user failed");
     await runProducer(assignmentProducerTopic.deletedUser, user_id);
     return true;
   };
   // restore user account
-  static restore = async (user_id) => {
+  static restore = async (user_id, modifiedBy) => {
     const restoreUser = await prisma.user.update({
       where: { user_id },
       select: this.select,
       data: {
         deletedMark: false,
+        modifiedBy,
       },
     });
     if (restoreUser) {
       return restoreUser;
     }
-    await this.delete(user_id);
+    await this.delete(user_id, modifiedBy);
     return null;
   };
   // get list user do not have project

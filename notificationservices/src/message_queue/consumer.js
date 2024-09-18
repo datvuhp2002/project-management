@@ -65,39 +65,32 @@ const continuousConsumer = async () => {
                   ),
                 ]
               );
-
               if (notification_admin) {
                 // Lấy danh sách quản trị viên và lưu thông báo vào cơ sở dữ liệu
                 const admin_ids = await GetListAllAdministrators();
-
-                await Promise.all(
-                  admin_ids.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification_admin.notification_id
-                    )
-                  )
+                await UserNotificationService.createMany(
+                  admin_ids.map((user_id) => ({
+                    user_id,
+                    notification_id: notification_admin.notification_id,
+                  }))
                 );
-
                 // Gửi tin nhắn thông báo đến Kafka
-                await runProducer(gatewayProducerTopic.newNoti, {
-                  content: notification_admin.content,
-                  noti_id: notification_admin.notification_id,
-                  user_list: parsedMessage.admin_ids,
-                });
+                if (admin_ids.length > 0) {
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification_admin.content,
+                    noti_id: notification_admin.notification_id,
+                    user_list: admin_ids,
+                  });
+                }
               }
-
-              if (notification_user) {
+              if (notification_user && parsedMessage.list_user_ids.length > 0) {
                 // Lưu thông báo cho người dùng vào cơ sở dữ liệu
-                await Promise.all(
-                  parsedMessage.list_user_ids.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification_user.notification_id
-                    )
-                  )
+                await UserNotificationService.createMany(
+                  parsedMessage.list_user_ids.map((user_id) => ({
+                    user_id,
+                    notification_id: notification_user.notification_id,
+                  }))
                 );
-
                 // Gửi tin nhắn thông báo đến Kafka
                 await runProducer(gatewayProducerTopic.newNoti, {
                   content: notification_user.content,
@@ -114,9 +107,9 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case (departmentTopicsContinuous.updateDepartment,
-          departmentTopicsContinuous.deleteDepartment,
-          departmentTopicsContinuous.restoreDepartment): {
+          case departmentTopicsContinuous.updateDepartment:
+          case departmentTopicsContinuous.deleteDepartment:
+          case departmentTopicsContinuous.restoreDepartment: {
             try {
               // Tạo thông báo
               const notification = await NotificationService.create(
@@ -135,21 +128,20 @@ const continuousConsumer = async () => {
                   ...new Set([...user_ids, ...admin_ids]),
                 ];
                 // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
-                await Promise.all(
-                  unique_list_user_ids.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification.notification_id
-                    )
-                  )
-                );
-
-                // Gửi tin nhắn thông báo đến Kafka
-                await runProducer(gatewayProducerTopic.newNoti, {
-                  content: notification.content,
-                  noti_id: notification.notification_id,
-                  user_list: unique_list_user_ids,
-                });
+                if (unique_list_user_ids.length > 0) {
+                  await UserNotificationService.createMany(
+                    unique_list_user_ids.map((user_id) => ({
+                      user_id,
+                      notification_id: notification.notification_id,
+                    }))
+                  );
+                  // Gửi tin nhắn thông báo đến Kafka
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification.content,
+                    noti_id: notification.notification_id,
+                    user_list: unique_list_user_ids,
+                  });
+                }
               }
             } catch (error) {
               console.error(
@@ -179,23 +171,22 @@ const continuousConsumer = async () => {
                 const unique_list_user_ids = [
                   ...new Set([...user_ids, ...admin_ids]),
                 ];
+                if (unique_list_user_ids.length > 0) {
+                  // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
+                  await UserNotificationService.createMany(
+                    unique_list_user_ids.map((user_id) => ({
+                      user_id,
+                      notification_id: notification.notification_id,
+                    }))
+                  );
 
-                // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
-                await Promise.all(
-                  unique_list_user_ids.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification.notification_id
-                    )
-                  )
-                );
-
-                // Gửi tin nhắn thông báo đến Kafka
-                await runProducer(gatewayProducerTopic.newNoti, {
-                  content: notification.content,
-                  noti_id: notification.notification_id,
-                  user_list: unique_list_user_ids,
-                });
+                  // Gửi tin nhắn thông báo đến Kafka
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification.content,
+                    noti_id: notification.notification_id,
+                    user_list: unique_list_user_ids,
+                  });
+                }
               }
             } catch (error) {
               console.error(
@@ -206,8 +197,8 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case (projectTopicsContinuous.deleteProject,
-          projectTopicsContinuous.restoreProject): {
+          case projectTopicsContinuous.deleteProject:
+          case projectTopicsContinuous.restoreProject: {
             try {
               // Tạo thông báo
               const notification = await NotificationService.create(
@@ -237,21 +228,21 @@ const continuousConsumer = async () => {
                 ];
 
                 // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
-                await Promise.all(
-                  unique_list_user_ids.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification.notification_id
-                    )
-                  )
-                );
+                if (unique_list_user_ids.length > 0) {
+                  await UserNotificationService.createMany(
+                    unique_list_user_ids.map((user_id) => ({
+                      user_id,
+                      notification_id: notification.notification_id,
+                    }))
+                  );
 
-                // Gửi tin nhắn thông báo đến Kafka
-                await runProducer(gatewayProducerTopic.newNoti, {
-                  content: notification.content,
-                  noti_id: notification.notification_id,
-                  user_list: unique_list_user_ids,
-                });
+                  // Gửi tin nhắn thông báo đến Kafka
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification.content,
+                    noti_id: notification.notification_id,
+                    user_list: unique_list_user_ids,
+                  });
+                }
               }
             } catch (error) {
               console.error(
@@ -287,21 +278,21 @@ const continuousConsumer = async () => {
                 ];
 
                 // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
-                await Promise.all(
-                  unique_list_user_ids.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification.notification_id
-                    )
-                  )
-                );
+                if (unique_list_user_ids.length > 0) {
+                  await UserNotificationService.createMany(
+                    unique_list_user_ids.map((user_id) => ({
+                      user_id,
+                      notification_id: notification.notification_id,
+                    }))
+                  );
 
-                // Gửi tin nhắn thông báo đến Kafka
-                await runProducer(gatewayProducerTopic.newNoti, {
-                  content: notification.content,
-                  noti_id: notification.notification_id,
-                  user_list: unique_list_user_ids,
-                });
+                  // Gửi tin nhắn thông báo đến Kafka
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification.content,
+                    noti_id: notification.notification_id,
+                    user_list: unique_list_user_ids,
+                  });
+                }
               }
             } catch (error) {
               console.error(
@@ -331,20 +322,20 @@ const continuousConsumer = async () => {
                       ...new Set([...user_ids, ...admin_ids]),
                     ];
                     // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
-                    await Promise.all(
-                      unique_list_user_ids.map((userId) =>
-                        UserNotificationService.create(
-                          userId,
-                          notification.notification_id
-                        )
-                      )
-                    );
-                    // Gửi tin nhắn thông báo đến Kafka
-                    await runProducer(gatewayProducerTopic.newNoti, {
-                      content: notification.content,
-                      noti_id: notification.notification_id,
-                      user_list: unique_list_user_ids,
-                    });
+                    if (unique_list_user_ids.length > 0) {
+                      await UserNotificationService.createMany(
+                        unique_list_user_ids.map((user_id) => ({
+                          user_id,
+                          notification_id: notification.notification_id,
+                        }))
+                      );
+                      // Gửi tin nhắn thông báo đến Kafka
+                      await runProducer(gatewayProducerTopic.newNoti, {
+                        content: notification.content,
+                        noti_id: notification.notification_id,
+                        user_list: unique_list_user_ids,
+                      });
+                    }
                   }
                 })
               );
@@ -357,43 +348,91 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case userTopicsContinuous.removeManager:
-          case userTopicsContinuous.addManager: {
+
+          case userTopicsContinuous.notiForRemoveManager:
+          case userTopicsContinuous.notiForAddManager: {
             try {
-              // Tạo thông báo
+              // Create notification for the manager's action
+              const notificationMessage = parsedMessage.message;
               const notification = await NotificationService.create(
-                parsedMessage.message,
+                notificationMessage,
                 parsedMessage.modifiedBy
               );
 
-              // Kiểm tra nếu thông báo được tạo thành công
-              if (notification) {
-                // Chạy song song để tối ưu hóa thời gian
-                await Promise.all([
-                  // Lưu thông báo cho từng user_id
-                  UserNotificationService.create(
-                    parsedMessage.user_id,
-                    notification.notification_id
-                  ),
-                  // Gửi thông báo tới Kafka
-                  runProducer(gatewayProducerTopic.newNoti, {
-                    content: notification.content,
-                    noti_id: notification.notification_id,
-                    user_list: [parsedMessage.user_id],
-                  }),
-                ]);
-              } else {
-                console.error("Failed to create notification");
+              if (!notification) {
+                console.error("Failed to create main notification");
+                break;
               }
+
+              // Create a user-specific notification for the manager
+              const userMessage =
+                topic === userTopicsContinuous.notiForRemoveManager
+                  ? `You are removed from department ${parsedMessage.department_name}`
+                  : `You have become the manager of department ${parsedMessage.department_name}`;
+
+              const notificationForUser = await NotificationService.create(
+                userMessage,
+                null
+              );
+
+              if (notificationForUser) {
+                // Create the notification record for the specific user
+                const userNotification = await UserNotificationService.create(
+                  parsedMessage.user_id,
+                  notificationForUser.notification_id
+                );
+
+                if (userNotification) {
+                  // Send the notification to Kafka for the user
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notificationForUser.content,
+                    noti_id: notificationForUser.notification_id,
+                    user_list: [parsedMessage.user_id],
+                  });
+                } else {
+                  console.error(
+                    `Failed to create user notification for userId: ${parsedMessage.user_id}`
+                  );
+                }
+              }
+
+              // Fetch staff and admin lists in parallel
+              const [staffIds, adminIds] = await Promise.all([
+                Promise.all(
+                  GetListStaffInDepartment(parsedMessage.department_id)
+                ).then((results) => results.flat()),
+                GetListAllAdministrators(),
+              ]);
+
+              // Merge and deduplicate user IDs
+              const uniqueUserIds = [...new Set([...staffIds, ...adminIds])];
+
+              // Create notifications for all users in parallel
+              await Promise.all(
+                uniqueUserIds.map((userId) =>
+                  UserNotificationService.create(
+                    userId,
+                    notification.notification_id
+                  )
+                )
+              );
+
+              // Send notification to Kafka for all relevant users
+              await runProducer(gatewayProducerTopic.newNoti, {
+                content: notification.content,
+                noti_id: notification.notification_id,
+                user_list: uniqueUserIds,
+              });
             } catch (error) {
               console.error(
-                `[Error] Failed to process manager update: ${error.message}`
+                `[Error] Failed to process manager update: ${error.message}`,
+                error
               );
             }
             break;
           }
-          case (userTopicsContinuous.notiForAddStaffIntoDepartment,
-          userProducerTopic.notiForRemoveStaffFromDepartment): {
+          case userTopicsContinuous.notiForAddStaffIntoDepartment:
+          case userProducerTopic.notiForRemoveStaffFromDepartment: {
             try {
               const { user_list, message, createdBy } = parsedMessage;
 
@@ -403,31 +442,105 @@ const continuousConsumer = async () => {
                 createdBy
               );
 
-              if (notification) {
+              if (notification && user_list.length > 0) {
+                await UserNotificationService.createMany(
+                  user_list.map((user_id) => ({
+                    user_id,
+                    notification_id: notification.notification_id,
+                  }))
+                );
+                await runProducer(gatewayProducerTopic.newNoti, {
+                  content: notification.content,
+                  noti_id: notification.notification_id,
+                  user_list,
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case userTopicsContinuous.notiForCreateUser: {
+            try {
+              const { message_admin, message_user, user_id, createdBy } =
+                parsedMessage;
+
+              // Tạo thông báo
+              const notification_admin = await NotificationService.create(
+                message_admin,
+                createdBy
+              );
+              const notification_user = await NotificationService.create(
+                message_user,
+                null
+              );
+              if (notification_admin) {
                 // Tạo các promise cho việc lưu thông báo và gửi tin nhắn Kafka
-                const userNotificationsPromise = Promise.all(
-                  user_list.map((userId) =>
-                    UserNotificationService.create(
-                      userId,
-                      notification.notification_id
-                    )
-                  )
-                );
+                // Lấy danh sách nhân viên từ các department và admin
+                const admin_ids = await GetListAllAdministrators();
 
-                const kafkaNotificationPromise = runProducer(
-                  gatewayProducerTopic.newNoti,
-                  {
-                    content: notification.content,
-                    noti_id: notification.notification_id,
+                // Kết hợp và loại bỏ các ID trùng lặp
+                const unique_list_user_admin_ids = [...new Set([...admin_ids])];
+
+                // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
+                if (unique_list_user_admin_ids.length > 0) {
+                  await UserNotificationService.createMany(
+                    unique_list_user_admin_ids.map((user_id) => ({
+                      user_id,
+                      notification_id: notification_admin.notification_id,
+                    }))
+                  );
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification_admin.content,
+                    noti_id: notification_admin.notification_id,
                     user_list,
-                  }
+                  });
+                }
+              }
+              if (notification_user) {
+                await UserNotificationService.create(
+                  user_id,
+                  notification_user.notification_id
                 );
-
-                // Chờ cho cả hai tác vụ hoàn tất
-                await Promise.all([
-                  userNotificationsPromise,
-                  kafkaNotificationPromise,
-                ]);
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case userTopicsContinuous.notiForUpdateUser: {
+            try {
+              const {
+                message,
+                user_id,
+                modifiedBy: initialModifiedBy,
+              } = parsedMessage;
+              const modifiedBy =
+                initialModifiedBy === user_id ? null : initialModifiedBy;
+              // Tạo thông báo
+              const notification = await NotificationService.create(
+                message,
+                modifiedBy
+              );
+              if (notification) {
+                // Lưu tất cả thông báo vào cơ sở dữ liệu cho từng userId
+                await UserNotificationService.create(
+                  user_id,
+                  notification.notification_id
+                );
+                await runProducer(gatewayProducerTopic.newNoti, {
+                  content: notification.content,
+                  noti_id: notification.notification_id,
+                  user_list: [user_id],
+                });
               }
             } catch (error) {
               console.error(
@@ -448,5 +561,4 @@ const continuousConsumer = async () => {
     },
   });
 };
-
 module.exports = { continuousConsumer };

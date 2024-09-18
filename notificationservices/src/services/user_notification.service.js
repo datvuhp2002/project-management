@@ -28,6 +28,15 @@ class UserNotificationService {
     });
     return user_notifications;
   };
+  static createMany = async (notifications) => {
+    if (notifications.length === 0) {
+      return { count: 0 };
+    }
+    const user_notifications = await prisma.userNotifications.createMany({
+      data: notifications,
+    });
+    return user_notifications;
+  };
   static markAsRead = async (user_id, notification_id) => {
     const user_notification = await prisma.userNotifications.findFirst({
       where: { user_id, notification_id },
