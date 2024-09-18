@@ -40,7 +40,11 @@ class DepartmentService {
         await runProducer(userProducerTopic.selectManagerToDepartment, {
           old_manager_id: null,
           id: manager_id,
-          data: { department_id: department.department_id },
+          data: {
+            department_id: department.department_id,
+            department_name: department.name,
+            modifiedBy: createdBy,
+          },
         });
         const department_for_delete_old_manager_id =
           await prisma.department.findFirst({
@@ -60,12 +64,21 @@ class DepartmentService {
           });
         }
       }
+      const listUserIds = [...new Set([...list_user_ids])];
       if (list_user_ids) {
         await runProducer(userProducerTopic.addStaffIntoDepartment, {
-          list_user_ids: list_user_ids,
+          list_user_ids: listUserIds,
           department_id: department.department_id,
+          department_name: department.name,
+          createdBy,
         });
       }
+      await runProducer(notificationProducerTopic.createDepartment, {
+        message_admin: `Department ${department.name} is created`,
+        message_user: `You have been added to department ${department.name}`,
+        list_user_ids: listUserIds,
+        modifiedBy: createdBy,
+      });
       return department;
     }
     throw new BadRequestError("Tạo phòng ban không thành công");
@@ -183,7 +196,11 @@ class DepartmentService {
       await runProducer(userProducerTopic.selectManagerToDepartment, {
         old_manager_id: department.manager_id,
         id: data.manager_id,
-        data: { department_id: id },
+        data: {
+          department_id: id,
+          department_name: department.name,
+          modifiedBy: userId,
+        },
       });
       const department_data_old = await prisma.department.findFirst({
         where: { manager_id: data.manager_id },
@@ -204,7 +221,7 @@ class DepartmentService {
     });
     if (result) {
       await runProducer(notificationProducerTopic.updateDepartment, {
-        message: `Department ${result.name} has just been updated`,
+        message: `Department ${result.name} is updated`,
         department_id: result.department_id,
         modifiedBy: userId,
       });
@@ -218,11 +235,13 @@ class DepartmentService {
       where: { department_id },
       data: { manager_id: null },
     });
-    if (deleteManagerId) return true;
+    if (deleteManagerId) {
+      return true;
+    }
     return false;
   };
   // delete department
-  static delete = async (department_id) => {
+  static delete = async (department_id, modifiedBy) => {
     const get_department = await prisma.department.findUnique({
       where: {
         department_id,
@@ -238,27 +257,37 @@ class DepartmentService {
       select: this.select,
     });
     if (!delete_department) {
-      await this.restore(department_id);
+      await this.restore(department_id, modifiedBy);
       throw new BadRequestError("Xóa phòng ban không thành công");
     } else {
-      await runProducer(
-        projectProducerTopic.removeProjectFromDepartment,
-        department_id
-      );
+      await runProducer(notificationProducerTopic.deleteDepartment, {
+        message: `Department ${get_department.name} is deleted`,
+        department_id,
+        modifiedBy,
+      });
+      await runProducer(projectProducerTopic.removeProjectFromDepartment, {
+        department_id,
+        department_name: get_department.name,
+      });
       if (get_department.manager_id) {
         await runProducer(userProducerTopic.selectManagerToDepartment, {
           old_manager_id: get_department.manager_id,
           id: null,
-          data: null,
+          data: { department_name: get_department.name, modifiedBy },
         });
       }
       await runProducer(userProducerTopic.removeStaffOutOfDepartment, {
-        department_id: get_department.department_id,
+        department_id: department_id,
+        department_name: get_department.name,
+        createdBy: modifiedBy,
       });
       return true;
     }
   };
-  static forceDelete = async (department_id) => {
+  static forceDelete = async (department_id, modifiedBy) => {
+    const department = await prisma.department.findUnique({
+      where: { department_id },
+    });
     const forceDeleteDepartment = await prisma.department.delete({
       where: { department_id },
     });
@@ -269,10 +298,23 @@ class DepartmentService {
       projectProducerTopic.removeProjectFromDepartment,
       department_id
     );
+    await runProducer(userProducerTopic.removeStaffOutOfDepartment, {
+      department_id,
+      department_name: department.name,
+      createdBy: modifiedBy,
+    });
+    await runProducer(notificationProducerTopic.deleteDepartment, {
+      message: `Department ${department.name} is deleted`,
+      department_id,
+      modifiedBy,
+    });
     return true;
   };
   // restore department
-  static restore = async (department_id) => {
+  static restore = async (department_id, modifiedBy) => {
+    const department = await prisma.department.findUnique({
+      where: { department_id },
+    });
     const restoreDepartment = await prisma.department.update({
       where: { department_id },
       data: {
@@ -281,9 +323,14 @@ class DepartmentService {
       select: this.select,
     });
     if (!restoreDepartment) {
-      await this.delete(department_id);
+      await this.delete(department_id, modifiedBy);
       throw new BadRequestError("Khôi phục phòng ban không thành công");
     }
+    await runProducer(notificationProducerTopic.restoreDepartment, {
+      message: `Department ${department.name} is restored`,
+      department_id,
+      modifiedBy,
+    });
     return true;
   };
   static queryDepartment = async (

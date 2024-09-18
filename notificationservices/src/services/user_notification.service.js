@@ -28,6 +28,20 @@ class UserNotificationService {
     });
     return user_notifications;
   };
+  static markAsRead = async (user_id, notification_id) => {
+    const user_notification = await prisma.userNotifications.findFirst({
+      where: { user_id, notification_id },
+      select: this.select,
+    });
+    if (!user_notification)
+      throw new AuthFailureError("Notification not found");
+    if (user_notification.is_read) return user_notification;
+    return await prisma.userNotifications.update({
+      where: { user_notifications_id: user_notification.user_notifications_id },
+      data: { is_read: true, read_at: new Date() },
+      select: this.select,
+    });
+  };
   static getAllNotificationsOfUser = async (
     { items_per_page, page },
     user_id
@@ -47,49 +61,49 @@ class UserNotificationService {
   };
   // query Notifications
   static queryUserNotifications = async ({ query, items_per_page, page }) => {
-    // setup (whereClause)
-    let whereClause = {
+    // Setup whereClause
+    const whereClause = {
       AND: [],
     };
 
-    // if have conditions for searching add them to whereClause
+    // Add conditions to whereClause if they exist
     if (query && query.length > 0) {
       whereClause.AND.push(...query);
     }
 
-    // calculator total of noti
-    const total = await prisma.userNotifications.count({
-      where: whereClause,
-    });
+    // Calculate total notifications and total unread notifications
+    const [total, total_unread_noti] = await Promise.all([
+      prisma.userNotifications.count({ where: whereClause }),
+      prisma.userNotifications.count({
+        where: { ...whereClause, is_read: false },
+      }),
+    ]);
 
-    // set up item per page and current page
+    // Setup pagination
     const itemsPerPage =
       items_per_page === "ALL" ? total : Number(items_per_page) || 10;
     const currentPage = Number(page) || 1;
     const skip = (currentPage - 1) * itemsPerPage;
 
-    // Get list noti of user
+    // Get notifications for the current page
     const notifications = await prisma.userNotifications.findMany({
       take: itemsPerPage,
       skip,
       where: whereClause,
       orderBy: { createdAt: "desc" },
-      select: {
-        user_notifications_id: true,
-        is_read: true,
-        notifications: true, // Bao gồm thông tin từ bảng Notifications
-      },
+      select: this.select,
     });
 
-    // calculator last page (lastPage)
+    // Calculate pagination details
     const lastPage = Math.ceil(total / itemsPerPage);
 
-    // return results
+    // Return results
     return {
       notifications,
       total,
-      nextPage: currentPage + 1 > lastPage ? null : currentPage + 1,
-      previousPage: currentPage - 1 < 1 ? null : currentPage - 1,
+      total_unread_noti,
+      nextPage: currentPage < lastPage ? currentPage + 1 : null,
+      previousPage: currentPage > 1 ? currentPage - 1 : null,
       lastPage,
       currentPage,
       itemsPerPage,

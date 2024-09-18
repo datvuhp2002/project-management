@@ -65,19 +65,22 @@ class DepartmentController {
   delete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công phòng ban",
-      data: await DepartmentService.delete(req.params.id),
+      data: await DepartmentService.delete(req.params.id, req.headers.user),
     }).send(res);
   };
   forceDelete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công phòng ban",
-      data: await DepartmentService.forceDelete(req.params.id),
+      data: await DepartmentService.forceDelete(
+        req.params.id,
+        req.headers.user
+      ),
     }).send(res);
   };
   restore = async (req, res, next) => {
     new SuccessResponse({
       message: "Khôi phục thànœh công phòng ban",
-      data: await DepartmentService.restore(req.params.id),
+      data: await DepartmentService.restore(req.params.id, req.headers.user),
     }).send(res);
   };
 }

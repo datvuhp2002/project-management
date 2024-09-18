@@ -8,5 +8,9 @@ router.get(
   "/get-user-notifications",
   asyncHandler(UserNotificationController.getAllNotificationsOfUser)
 );
+router.put(
+  "/mark-as-read/:id",
+  asyncHandler(UserNotificationController.markAsRead)
+);
 
 module.exports = router;

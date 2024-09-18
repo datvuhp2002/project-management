@@ -19,6 +19,11 @@
             "date": 1726474705708,
             "name": "src/logs/emailServices-2024-09-16-15-18.error.log",
             "hash": "19e9193b8f720588f1b1979445bce4b7297cc6fb35c79c1687c595db35d891d1"
+        },
+        {
+            "date": 1726538539421,
+            "name": "src/logs/emailServices-2024-09-17-09-02.error.log",
+            "hash": "ff6928e41943fda40b03015035cfd9ee21827b641611d3f0613f2faea779c9f7"
         }
     ],
     "hashType": "sha256"

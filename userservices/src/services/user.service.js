@@ -48,7 +48,6 @@ class UserService {
       },
     },
   };
-
   // create new user
   static create = async (
     { username, email, role, department_id, ...rest },
@@ -111,7 +110,6 @@ class UserService {
     await runProducer(emailProducerTopic.sendEmailToken, holderUser.email);
     return true;
   }
-
   static changePassword = async ({ password, email }) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const changePassword = await prisma.user.update({
@@ -207,9 +205,7 @@ class UserService {
 
     return true; // Hoặc giá trị phù hợp với yêu cầu của bạn
   };
-  static removeStaffFromDepartmentHasBeenDeleted = async ({
-    department_id,
-  }) => {
+  static removeStaffFromDepartmentHasBeenDeleted = async (department_id) => {
     return await prisma.user.updateMany({
       where: {
         department_id,

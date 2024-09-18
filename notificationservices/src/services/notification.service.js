@@ -52,7 +52,7 @@ class NotificationService {
       items_per_page === "ALL" ? total : Number(items_per_page) || 10;
     const currentPage = Number(page) || 1;
     const skip = (currentPage - 1) * itemsPerPage;
-    const notifications = await prisma.user.findMany({
+    const notifications = await prisma.notifications.findMany({
       take: itemsPerPage,
       skip,
       select: this.select,

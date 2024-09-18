@@ -150,8 +150,8 @@ services:
       - ACTIVITY_SERVICES_REQUEST_URL=http://activityservices:3061/services/api/activity
       - EMAIL_SERVICES_REQUEST_URL=http://emailservices:3069/services/api/email
       - UPLOAD_SERVICES_REQUEST_URL=http://uploadservices:3068/services/api/upload
-      - NOTIFICATIONS_SERVICES_REQUEST_URL =http://notificationsservices:3070/services/api/notifications
-      - USER_NOTIFICATIONS_SERVICES_REQUEST_URL =http://notificationsservices:3070/services/api/user-notifications
+      - NOTIFICATIONS_SERVICES_REQUEST_URL=http://notificationservices:3070/services/api/notifications
+      - USER_NOTIFICATIONS_SERVICES_REQUEST_URL=http://notificationservices:3070/services/api/user-notifications
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - PUBLIC_KEY=abcdefgh123
@@ -167,6 +167,7 @@ services:
       - activityservices
       - departmentservices
       - taskservices
+      - notificationservices
     networks:
       - kafka-network
     restart: always
@@ -380,7 +381,35 @@ services:
     networks:
       - kafka-network
     restart: always
-
+  notificationservices:
+    build:
+      context: ./notificationservices
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: datvudinhtrong/notificationservices
+    container_name: notificationservices
+    environment:
+      - PORT=3070
+      - KAFKA_BROKER=kafkaMQ:9092
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/notificationService?replicaSet=dbrs
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GRPC_PORT=50060
+      - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - USER_GRPC_PORT=userservices:50053
+      - ACTIVITY_GRPC_PORT=activityservices:50058
+      - LOKI_HOST=http://loki:3100
+    volumes:
+      - ./logs/notificationservices:/app/src/log
+    ports:
+      - "3070:3070"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+    restart: always
   # Activity Services
   activityservices:
     build:
