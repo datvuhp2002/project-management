@@ -4,7 +4,6 @@ const UserService = require("../services/user.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response");
 // const { uploadImageFromUrl } = require("../services/upload.services");
 const { BadRequestError } = require("../core/error.response");
-const cloudinary = require("../configs/cloudinary.config");
 const { getInfoData } = require("../utils/index");
 
 class UserController {
@@ -148,19 +147,19 @@ class UserController {
   delete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công nhân viên",
-      data: await UserService.delete(req.params.id),
+      data: await UserService.delete(req.params.id, req.headers.user),
     }).send(res);
   };
   forceDelete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công nhân viên",
-      data: await UserService.forceDelete(req.params.id),
+      data: await UserService.forceDelete(req.params.id, req.headers.user),
     }).send(res);
   };
   restore = async (req, res, next) => {
     new SuccessResponse({
       message: "Khôi phục thành công nhân viên",
-      data: await UserService.restore(req.params.id),
+      data: await UserService.restore(req.params.id, req.headers.user),
     }).send(res);
   };
   /**
@@ -178,7 +177,8 @@ class UserController {
       message: "Xoá thành công nhân viên ra khỏi phòng ban",
       data: await UserService.removeStaffFromDepartment(
         req.body,
-        req.params.id
+        req.params.id,
+        req.headers.user
       ),
     }).send(res);
   };

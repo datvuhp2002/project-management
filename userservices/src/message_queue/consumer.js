@@ -43,25 +43,32 @@ const continuousConsumer = async () => {
           case departmentTopicsContinuous.selectManagerToDepartment:
             const { old_manager_id, id, data } = parsedMessage;
             if (old_manager_id !== null) {
-              await UserService.updateWithoutModified({
+              const user = await UserService.updateWithoutModified({
                 id: old_manager_id,
                 data: { department_id: null },
               });
-              await runProducer(notificationProducerTopic.removeManager, {
-                user_id: old_manager_id,
-                message: `Your manager are removed from department ${data.department_name}`,
-                modifiedBy: parsedMessage.modifiedBy,
-              });
+              await runProducer(
+                notificationProducerTopic.notiForRemoveManager,
+                {
+                  user_id: old_manager_id,
+                  message: `Manager ${user.username} are removed from department ${data.department_name}`,
+                  modifiedBy: parsedMessage.modifiedBy,
+                  department_name: data.department_name,
+                  department_id: data.department_id,
+                }
+              );
             }
             if (id !== null) {
-              await UserService.updateWithoutModified({
+              const user = await UserService.updateWithoutModified({
                 id,
                 data: { department_id: data.department_id },
               });
-              await runProducer(notificationProducerTopic.addManager, {
-                user_id: old_manager_id,
-                message: `You have become the manager of ${data.department_name} department`,
+              await runProducer(notificationProducerTopic.notiForAddManager, {
+                user_id: id,
+                message: `${user.username} have become the manager of ${data.department_name} department`,
                 modifiedBy: parsedMessage.modifiedBy,
+                department_name: data.department_name,
+                department_id: data.department_id,
               });
             }
             break;
@@ -77,7 +84,6 @@ const continuousConsumer = async () => {
             }
             break;
           }
-
           case departmentTopicsContinuous.addStaffIntoDepartment: {
             const { list_user_ids, department_id, department_name, createdBy } =
               parsedMessage;
@@ -91,7 +97,7 @@ const continuousConsumer = async () => {
                 notificationProducerTopic.notiForAddStaffIntoDepartment,
                 {
                   user_list: list_user_ids,
-                  message: `Your are added to department ${department_name}`,
+                  message: `You are added to department ${department_name}`,
                   createdBy,
                 }
               );
@@ -104,13 +110,14 @@ const continuousConsumer = async () => {
             const list_user_ids_in_department =
               await UserService.getListStaffIdsInDepartment(department_id);
             await UserService.removeStaffFromDepartmentHasBeenDeleted(
-              department_id
+              department_id,
+              modifiedBy
             );
             await runProducer(
               notificationProducerTopic.notiForRemoveStaffFromDepartment,
               {
                 user_list: list_user_ids_in_department,
-                message: `Your are removed from department ${department_name}`,
+                message: `You are removed from department ${department_name}`,
                 createdBy: modifiedBy,
               }
             );

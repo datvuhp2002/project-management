@@ -64,7 +64,7 @@ class DepartmentService {
           });
         }
       }
-      const listUserIds = [...new Set([...list_user_ids])];
+      const listUserIds = list_user_ids ? [...new Set(list_user_ids)] : [];
       if (list_user_ids) {
         await runProducer(userProducerTopic.addStaffIntoDepartment, {
           list_user_ids: listUserIds,
@@ -279,7 +279,7 @@ class DepartmentService {
       await runProducer(userProducerTopic.removeStaffOutOfDepartment, {
         department_id: department_id,
         department_name: get_department.name,
-        createdBy: modifiedBy,
+        modifiedBy,
       });
       return true;
     }
