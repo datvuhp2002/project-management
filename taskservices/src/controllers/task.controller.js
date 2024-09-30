@@ -54,7 +54,7 @@ class TaskController {
   delete = async (req, res, next) => {
     new SuccessResponse({
       message: "Xoá thành công nhiệm vụ",
-      data: await TaskService.delete(req.params.id),
+      data: await TaskService.delete(req.params.id, req.headers.user),
     }).send(res);
   };
   restore = async (req, res, next) => {

@@ -4,6 +4,7 @@ package assignment;
 
 service AssignmentService {
   rpc GetAssignment(AssignmentRequest) returns (AssignmentResponse);
+  rpc getUserAssignedToTask (getUserAssignedToTaskRequest) returns (getUserAssignedToTaskResponse);
   rpc getAllTaskFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
   rpc getAllUserFromProject(getAllTaskOrUserFromProjectRequest) returns (getAllTaskOrUserFromProjectResponse);
   rpc getTotalTaskWithStatusFromProjectAndTotalStaff(getTotalTaskWithStatusFromProjectAndTotalStaffRequest) returns (getTotalTaskWithStatusFromProjectAndTotalStaffResponse);
@@ -18,7 +19,12 @@ message AssignmentRequest {
 message getAllUserProjectRequest {
   string user_id = 1;
 }
-
+message getUserAssignedToTaskRequest {
+  string task_id = 1;
+}
+message getUserAssignedToTaskResponse{
+  string user_id = 1;
+}
 message getAllUserProjectResponse {
   repeated string ids = 1;
 }

@@ -14,18 +14,25 @@ class NotificationService {
     createdBy: true,
     modifiedBy: true,
     createdAt: true,
+    target_id: true,
+    targetFor: true,
+    username: true,
   };
   // create a new activity
-  static create = async (content, createdBy) => {
+  static create = async (content, createdBy, target) => {
     if (createdBy) {
       const user = await getUser(createdBy);
-      const message = `${content} by ${user.username}`;
       return await prisma.notifications.create({
-        data: { content: message, createdBy },
+        data: {
+          content,
+          createdBy,
+          username: user.username,
+          ...target,
+        },
       });
     }
     return await prisma.notifications.create({
-      data: { content },
+      data: { content, ...target },
     });
   };
   // get all staffs

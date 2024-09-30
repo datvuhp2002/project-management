@@ -6,71 +6,6 @@
     "auditLog": "src/logs/.6b371f63b3598cc97056c95609c1302510349b2f-audit.json",
     "files": [
         {
-            "date": 1725399269496,
-            "name": "src/logs/departmentServices-2024-09-03-21-34.info.log",
-            "hash": "e224cc40d92e769540f4293e53f1fa5817a42e9935091ee9b56297278f83f6b8"
-        },
-        {
-            "date": 1725399377331,
-            "name": "src/logs/departmentServices-2024-09-03-21-36.info.log",
-            "hash": "c03ad28f9de4def32065b9062074cb9dae66eaaaf2d31f9a45d44185da28d140"
-        },
-        {
-            "date": 1725507872974,
-            "name": "src/logs/departmentServices-2024-09-05-03-44.info.log",
-            "hash": "9615170d4425ca96178fe2a5683aa9be24af84f1a7adc2e0605ff164b6247098"
-        },
-        {
-            "date": 1725508219944,
-            "name": "src/logs/departmentServices-2024-09-05-03-50.info.log",
-            "hash": "c06d7c05245d8646b122470414c35c51127b7b9dfaee170dbe5991446319fd57"
-        },
-        {
-            "date": 1725508617645,
-            "name": "src/logs/departmentServices-2024-09-05-03-56.info.log",
-            "hash": "c4dc0c98514c770a672b87733aebcadb9db775f76e1693b1cc6fa0b5788d929a"
-        },
-        {
-            "date": 1725508701302,
-            "name": "src/logs/departmentServices-2024-09-05-03-58.info.log",
-            "hash": "a14c7c7dc07e15473b1f4ef47436716bc3ffef9ec86eb498d7be6e80a71f7440"
-        },
-        {
-            "date": 1725509871875,
-            "name": "src/logs/departmentServices-2024-09-05-04-17.info.log",
-            "hash": "e71a481fee6fd3b5cf40ff63a9c950c3a2d4866c15a65c99205443d432d2df9f"
-        },
-        {
-            "date": 1725510116850,
-            "name": "src/logs/departmentServices-2024-09-05-04-21.info.log",
-            "hash": "b76243690d25ac3fd71c61f59f4f8d2d689fbd3b5f3db9178083a60691be16db"
-        },
-        {
-            "date": 1725511128012,
-            "name": "src/logs/departmentServices-2024-09-05-04-38.info.log",
-            "hash": "cc7729d6d51a68a42170e6315b5e58f53b07bf1883306d45cdf9a42cbbeffe85"
-        },
-        {
-            "date": 1725511344060,
-            "name": "src/logs/departmentServices-2024-09-05-04-42.info.log",
-            "hash": "08ea86f69639ed638b3e3b578d81087284ddccdcbc3457df51ec520a7a3aca58"
-        },
-        {
-            "date": 1725512162152,
-            "name": "src/logs/departmentServices-2024-09-05-04-56.info.log",
-            "hash": "a340b6e37735562151dc007f6f801c3775976ab779c55a5e50d2ba835b9905cc"
-        },
-        {
-            "date": 1725512407815,
-            "name": "src/logs/departmentServices-2024-09-05-05-00.info.log",
-            "hash": "737efb6123458cef9bf48fd2ca9bb4ec81e5c55bf49b97777cdf6e29751faba7"
-        },
-        {
-            "date": 1725777642784,
-            "name": "src/logs/departmentServices-2024-09-08-06-40.info.log",
-            "hash": "fd7b96c79344e06a5350010749c11b6e8a49baf3762ada8660f0786e627246e2"
-        },
-        {
             "date": 1726330193106,
             "name": "src/logs/departmentServices-2024-09-14-16-09.info.log",
             "hash": "656989412e3f6a9fc080a419270643dd06078aa4f5004be277483a8ebc3d7d19"
@@ -114,6 +49,106 @@
             "date": 1726596415235,
             "name": "src/logs/departmentServices-2024-09-17-18-06.info.log",
             "hash": "22924e0002b0eb089bcbc498f92253358cbb998105d92506fb70a2c361596b84"
+        },
+        {
+            "date": 1726663743801,
+            "name": "src/logs/departmentServices-2024-09-18-12-49.info.log",
+            "hash": "9817669c756a77a384fe9f27725ca1b6f67f51fd6e922413acf336b01a8d2aca"
+        },
+        {
+            "date": 1726710087891,
+            "name": "src/logs/departmentServices-2024-09-19-01-41.info.log",
+            "hash": "df1db0c9b9cabfa4188e8fd85b7d93d85ccd391ae0475d60015ea184750514ea"
+        },
+        {
+            "date": 1726722009713,
+            "name": "src/logs/departmentServices-2024-09-19-05-00.info.log",
+            "hash": "39f314a874476283b531904f3c115d21f85bf4a3172c6771d15722a44db83d68"
+        },
+        {
+            "date": 1727169075339,
+            "name": "src/logs/departmentServices-2024-09-24-09-11.info.log",
+            "hash": "8e8e94941559d2fa68cc3a56caa6d297a7f6f362a62431e28ff5fbe7f3ad70f3"
+        },
+        {
+            "date": 1727272260644,
+            "name": "src/logs/departmentServices-2024-09-25-13-51.info.log",
+            "hash": "58b743ef078a5e9df7c010a9d31a94bf713981a9cbfc48789dd282c7b65591d0"
+        },
+        {
+            "date": 1727400081884,
+            "name": "src/logs/departmentServices-2024-09-27-01-21.info.log",
+            "hash": "3bab7af91c494312f5cff7594fe68e5fb2ab6071084d98e7ab6313712aed76f1"
+        },
+        {
+            "date": 1727407236217,
+            "name": "src/logs/departmentServices-2024-09-27-03-20.info.log",
+            "hash": "f08b8c63b08923e37414dfe684724ce6fb748e86b60dd6546dc8f00843f6d50e"
+        },
+        {
+            "date": 1727407789465,
+            "name": "src/logs/departmentServices-2024-09-27-03-29.info.log",
+            "hash": "62fcfd56633071860dbfdab1eaa715f869adefaf3e5cd18422e6e12dc0291ad6"
+        },
+        {
+            "date": 1727407884815,
+            "name": "src/logs/departmentServices-2024-09-27-03-31.info.log",
+            "hash": "80c9c99714a29629696631306e5b61ebbbb0b7f8e53a9394f535c1ae2b131215"
+        },
+        {
+            "date": 1727408771976,
+            "name": "src/logs/departmentServices-2024-09-27-03-46.info.log",
+            "hash": "8a83e0ff0bb45e6b18ab825e66187d77962c64b128b663b88c0a3e1660a308df"
+        },
+        {
+            "date": 1727409886227,
+            "name": "src/logs/departmentServices-2024-09-27-04-04.info.log",
+            "hash": "a877ab7f3bc741b012fb06bef7be19739f68e7845c76adfd07a7b9f259bd28d2"
+        },
+        {
+            "date": 1727409986261,
+            "name": "src/logs/departmentServices-2024-09-27-04-06.info.log",
+            "hash": "28923fe170b924a11fb7e74268ecb105338f8a03f90f436865bedeb7ef9166a5"
+        },
+        {
+            "date": 1727410024590,
+            "name": "src/logs/departmentServices-2024-09-27-04-07.info.log",
+            "hash": "92927be216155627d0bb59ede6466c4c93311b93063c8cd3f547bfdfe48be9bc"
+        },
+        {
+            "date": 1727410146890,
+            "name": "src/logs/departmentServices-2024-09-27-04-09.info.log",
+            "hash": "e3cad278165b931f2c7caba8600e961ab49893bc73770246e93d8d35e34a0f92"
+        },
+        {
+            "date": 1727410220311,
+            "name": "src/logs/departmentServices-2024-09-27-04-10.info.log",
+            "hash": "f092b586367bcb98133c21f72f3554f256eb7dcdea5d179d2f3e03c96c58ff8b"
+        },
+        {
+            "date": 1727410287312,
+            "name": "src/logs/departmentServices-2024-09-27-04-11.info.log",
+            "hash": "a192493f0d2480fcd787380a807076d5b94f21c6c1772e54718f9ad4773306d3"
+        },
+        {
+            "date": 1727410531120,
+            "name": "src/logs/departmentServices-2024-09-27-04-15.info.log",
+            "hash": "a2dc64b62d1c605d583f9abaa81f4b02e8ad0f8b409b754b84a173a3588a4974"
+        },
+        {
+            "date": 1727410611082,
+            "name": "src/logs/departmentServices-2024-09-27-04-16.info.log",
+            "hash": "7f40d010dec966b5c8db4137b6fd6f68b0d0124a73f78bcf586c2405c1debb61"
+        },
+        {
+            "date": 1727410720188,
+            "name": "src/logs/departmentServices-2024-09-27-04-18.info.log",
+            "hash": "3470d1bddf2e19af863772a7a05c3c3fc03c587db9d4db728cd66dacf6c3af3d"
+        },
+        {
+            "date": 1727410747100,
+            "name": "src/logs/departmentServices-2024-09-27-04-19.info.log",
+            "hash": "b7d47f8800df1a76d8fb78f32956ca123dd21fa40836fbb9531c731c09d3c022"
         }
     ],
     "hashType": "sha256"

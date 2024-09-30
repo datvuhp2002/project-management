@@ -29,6 +29,21 @@ class UserNotificationController {
       ),
     }).send(res);
   };
+  delete = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Read notification successfully",
+      data: await UserNotificationService.delete(
+        req.headers.user,
+        req.params.id
+      ),
+    }).send(res);
+  };
+  readMany = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Read notifications successfully",
+      data: await UserNotificationService.readMany(req.headers.user),
+    }).send(res);
+  };
 }
 
 module.exports = new UserNotificationController();

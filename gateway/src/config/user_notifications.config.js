@@ -10,5 +10,15 @@ const userNotificationsServicesRouter = {
     authRequired: true,
     permissions: null,
   },
+  "/read-many": {
+    target: `${process.env.USER_NOTIFICATIONS_SERVICES_REQUEST_URL}/read-many`,
+    authRequired: true,
+    permissions: null,
+  },
+  "/delete": {
+    target: `${process.env.USER_NOTIFICATIONS_SERVICES_REQUEST_URL}/delete`,
+    authRequired: true,
+    permissions: null,
+  },
 };
 module.exports = userNotificationsServicesRouter;

@@ -51,6 +51,25 @@ async function getAllUserFromProject(call, callback) {
   }
 }
 
+async function getUserAssignedToTask(call, callback) {
+  const { task_id } = call.request;
+  try {
+    const result = await AssignmentService.getUserAssignedToTask(task_id);
+    if (result) {
+      callback(null, result);
+    } else {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        details: "Assignment not found",
+      });
+    }
+  } catch (error) {
+    callback({
+      code: grpc.status.INTERNAL,
+      details: "Internal server error",
+    });
+  }
+}
 async function getTotalTaskWithStatusFromProjectAndTotalStaff(call, callback) {
   const { project_id } = call.request;
   try {
@@ -98,6 +117,7 @@ async function getAllUserProject(call, callback) {
 module.exports = {
   getAllTaskFromProject,
   getAllUserFromProject,
+  getUserAssignedToTask,
   getTotalTaskWithStatusFromProjectAndTotalStaff,
   getAllUserProject,
 };

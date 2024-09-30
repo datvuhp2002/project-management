@@ -13,6 +13,9 @@ const { taskProducerTopic } = require("../configs/kafkaTaskTopic");
 const {
   activityProducerTopic,
 } = require("../configs/kafkaActivityTopic/producer/activity.producer.topic.config");
+const {
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic");
 class AssignmentService {
   static select = {
     assignment_id: true,
@@ -29,6 +32,7 @@ class AssignmentService {
   static create = async (data, createdBy) => {
     const { project_id, task_id, user_id, startAt, endAt } = data;
     const projectInfo = await getProject(project_id);
+    let taskAssigned, userAssigned;
     const userInfo = await getUser(createdBy);
     if (
       userInfo.role_name === "STAFF" &&
@@ -48,14 +52,14 @@ class AssignmentService {
     // Kiểm tra nếu có task_id
     if (task_id) {
       try {
-        await getTask(task_id);
+        taskAssigned = await getTask(task_id);
       } catch (e) {
         throw new BadRequestError("Task does not exist");
       }
     }
     if (user_id) {
       try {
-        await getUser(user_id);
+        userAssigned = await getUser(user_id);
       } catch (e) {
         throw new BadRequestError("User does not exist");
       }
@@ -70,7 +74,7 @@ class AssignmentService {
         );
       }
     }
-
+    const list_user_in_project = await this.getAllUserFromProject(project_id);
     // 2. Xử lý các trường hợp tạo assignment
 
     // Trường hợp 1: Chỉ có project_id và task_id
@@ -99,7 +103,18 @@ class AssignmentService {
         },
         select: this.select,
       });
-      return assignment;
+      if (assignment && taskAssigned) {
+        await runProducer(
+          notificationProducerTopic.notifyAssignmentTaskForProject,
+          {
+            message: `Task ${taskAssigned.name} is assigned to the project ${projectInfo.name}`,
+            list_user_in_project,
+            createdBy,
+          }
+        );
+        return assignment;
+      }
+      throw new BadRequestError("Can't create assignment");
     }
 
     // Trường hợp 2: Chỉ có project_id và user_id
@@ -127,42 +142,55 @@ class AssignmentService {
         },
         select: this.select,
       });
-      return assignment;
+      if (assignment) {
+        await runProducer(
+          notificationProducerTopic.notifyAssignmentUserForProject,
+          {
+            message: `${userAssigned.username} are added to project ${projectInfo.name}`,
+            user_id,
+            project_name: projectInfo.name,
+            list_user_in_project,
+            createdBy,
+          }
+        );
+        return assignment;
+      }
     }
 
     // Trường hợp 3: Có cả project_id, task_id và user_id
     if (project_id && task_id && user_id) {
-      const existingAssignment = await prisma.assignment.findFirst({
-        where: {
-          project_id,
-          task_id,
-          deletedMark: false,
-        },
-      });
+      // const existingAssignment = await prisma.assignment.findFirst({
+      //   where: {
+      //     project_id,
+      //     task_id,
+      //     deletedMark: false,
+      //   },
+      // });
 
-      if (existingAssignment) {
-        // Nếu assignment đã tồn tại, chỉ cần cập nhật user_id
-        const updatedAssignment = await prisma.assignment.update({
-          where: { assignment_id: existingAssignment.assignment_id },
-          data: { user_id, modifiedBy: createdBy },
-          select: this.select,
-        });
-        return updatedAssignment;
-      }
+      // if (existingAssignment) {
+      //   // Nếu assignment đã tồn tại, chỉ cần cập nhật user_id
+      //   const updatedAssignment = await prisma.assignment.update({
+      //     where: { assignment_id: existingAssignment.assignment_id },
+      //     data: { user_id, modifiedBy: createdBy },
+      //     select: this.select,
+      //   });
+      //   return updatedAssignment;
+      // }
 
-      // Nếu chưa tồn tại assignment, tạo mới
-      const newAssignment = await prisma.assignment.create({
-        data: {
-          project_id,
-          task_id,
-          user_id,
-          startAt,
-          endAt,
-          createdBy,
-        },
-        select: this.select,
-      });
-      return newAssignment;
+      // // Nếu chưa tồn tại assignment, tạo mới
+      // const newAssignment = await prisma.assignment.create({
+      //   data: {
+      //     project_id,
+      //     task_id,
+      //     user_id,
+      //     startAt,
+      //     endAt,
+      //     createdBy,
+      //   },
+      //   select: this.select,
+      // });
+      // return newAssignment;
+      throw new BadRequestError("Can't create assignment");
     }
 
     // Nếu không khớp trường hợp nào, trả về lỗi
@@ -379,6 +407,14 @@ class AssignmentService {
 
       // Kiểm tra nếu có bản ghi bị xóa hoặc cập nhật
       if (removeStaff.count > 0 || updateAssignment.count > 0) {
+        await runProducer(
+          notificationProducerTopic.notifyRemoveStaffFromProject,
+          {
+            message: `You are removed from project ${projectInfo.name}`,
+            list_user_ids: filterUser_ids,
+            modifiedBy,
+          }
+        );
         return true;
       }
 
@@ -402,6 +438,12 @@ class AssignmentService {
       return uniqueUserIds;
     }
     return null;
+  };
+  static getUserAssignedToTask = async (task_id) => {
+    const assignment = await prisma.assignment.findFirst({
+      where: { task_id },
+    });
+    return assignment.user_id;
   };
   // list of task from project
   static getAllTaskFromProject = async (project_id, status = null) => {
@@ -538,7 +580,28 @@ class AssignmentService {
         status: status,
       };
       await runProducer(activityProducerTopic.updatedStatusAssignment, message);
+      if (data.user_id) {
+        await runProducer(
+          notificationProducerTopic.notifyAssignmentUserForTask,
+          {
+            message: `You are assigned to ${task.name}`,
+            createdBy: modifiedBy,
+            user_id: data.user_id,
+          }
+        );
+      }
+      if (findAssignment.user_id) {
+        await runProducer(
+          notificationProducerTopic.notifyUnAssignmentUserForTask,
+          {
+            message: `You are un-assign to ${task.name}`,
+            createdBy: modifiedBy,
+            user_id: data.user_id,
+          }
+        );
+      }
     }
+
     return updateAssignment;
   };
   // soft delete assignment
@@ -552,23 +615,43 @@ class AssignmentService {
       select: this.select,
     });
   };
-  static forceDeleteProjectAssignment = async (project_id) => {
-    const listDataByProject = await this.getAllTaskFromProject(
-      project_id,
-      null
-    );
+  static forceDeleteProjectAssignment = async ({ project_id, modifiedBy }) => {
+    const taskIds = await this.getAllTaskFromProject(project_id, null);
     const forceDeleteAssignment = await prisma.assignment.deleteMany({
       where: { project_id },
     });
     if (!forceDeleteAssignment) {
       throw new BadRequestError("Can't delete project assignment");
     }
-    await runProducer(taskProducerTopic.forceDeleteProject, listDataByProject);
+    await runProducer(taskProducerTopic.forceDeleteProject, {
+      taskIds,
+      modifiedBy,
+    });
   };
-  static forceDeleteTaskAssignment = async (task_id) => {
-    return await prisma.assignment.deleteMany({
+  static forceDeleteTaskAssignment = async ({
+    task_id,
+    modifiedBy,
+    task_name,
+  }) => {
+    const findTaskProject = await prisma.assignment.findFirst({
+      where: { task_id },
+      select: { project_id: true, user_id: true },
+    });
+    const deleteAssignment = await prisma.assignment.deleteMany({
       where: { task_id },
     });
+    if (deleteAssignment) {
+      const list_user_ids = await this.getAllUserFromProject(
+        findTaskProject.project_id
+      );
+      await runProducer(notificationProducerTopic.notiForDeleteTask, {
+        message: `Task ${task_name} is deleted`,
+        modifiedBy,
+        list_user_ids,
+        user_id: findTaskProject.user_id,
+        task_name,
+      });
+    }
   };
   static forceDeleteUserAssignment = async (user_id) => {
     return await prisma.assignment.deleteMany({

@@ -484,6 +484,11 @@
             "date": 1726663583767,
             "name": "src/logs/userServices-2024-09-18-19-46.error.log",
             "hash": "9f6518b2640513d1093b517652ab45be3f567cb71f8520872b5cf29c8509aba4"
+        },
+        {
+            "date": 1726710259947,
+            "name": "src/logs/userServices-2024-09-19-08-44.error.log",
+            "hash": "c5755a05d189f06374f1957eec5c32cb70c839bde53875474dbf6a2db0295fb2"
         }
     ],
     "hashType": "sha256"

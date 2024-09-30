@@ -13,12 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum NotiFor {
+  DEPARTMENT
+  PROJECT
+  USER
+  ASSIGNMENT
+  ACTIVITY
+  UNKNOWN
+}
+
 model Notifications {
   notification_id   String              @id @default(auto()) @map("_id") @db.ObjectId
   content           String
   createdBy         String?             @db.ObjectId
   modifiedBy        String?             @db.ObjectId
   createdAt         DateTime            @default(now())
+  targetFor         NotiFor             @default(UNKNOWN)
+  target_id         String?             @db.ObjectId
+  target_name       String?
+  username          String?
   UserNotifications UserNotifications[]
 }
 

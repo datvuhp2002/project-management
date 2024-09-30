@@ -8,7 +8,9 @@ SOURCE_DATABASE="activityService"
 # Destination Database Name (where backup will be restored)
 BACKUPS_DIR="/var/backups"
 # MongoDB Atlas connection string for destination
-DESTINATION_MONGO_URI="mongodb+srv://datvuhp2002:ZRsh0pm9oxwNuVjB@databasebackup.4o9hedq.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=databasebackup"
+# DESTINATION_MONGO_URI="mongodb+srv://datvuhp2002:ZRsh0pm9oxwNuVjB@databasebackup.4o9hedq.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=databasebackup"
+DESTINATION_MONGO_URI="mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=Cluster0"
+
 #=====================================================================
 
 # List the backup archive files in the backup directory
