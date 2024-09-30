@@ -1,0 +1,9 @@
+docker push datvudinhtrong/activityservices
+docker push datvudinhtrong/assignmentservices
+docker push datvudinhtrong/departmentservices
+docker push datvudinhtrong/gateway
+docker push datvudinhtrong/notificationservices
+docker push datvudinhtrong/projectservices
+docker push datvudinhtrong/taskservices
+docker push datvudinhtrong/uploadservices
+docker push datvudinhtrong/userservices

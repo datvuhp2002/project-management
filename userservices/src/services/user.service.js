@@ -190,7 +190,7 @@ class UserService {
         await runProducer(departmentProducerTopic.removeManager, department_id);
         await runProducer(notificationProducerTopic.notiForRemoveManager, {
           user_id,
-          message: `Manager ${user.username} are removed from department ${department.name}`,
+          message: `Manager ${user.username} are removed from department`,
           modifiedBy,
           department_name: department.name,
           department_id,
@@ -676,7 +676,7 @@ class UserService {
         const department = GetDepartment(findUpdatedUser.department_id);
         await runProducer(notificationProducerTopic.notiForRemoveManager, {
           user_id: id,
-          message: `Manager ${findUpdatedUser.username} are removed from department ${department.name}`,
+          message: `Manager ${findUpdatedUser.username} are removed from department`,
           modifiedBy,
           department_name: department.name,
           department_id: findUpdatedUser.department_id,
@@ -747,7 +747,7 @@ class UserService {
         const department = GetDepartment(deleteUser.department_id);
         await runProducer(notificationProducerTopic.notiForRemoveManager, {
           user_id,
-          message: `Manager ${deleteUser.username} are removed from department ${department.name}`,
+          message: `Manager ${deleteUser.username} are removed from department`,
           modifiedBy,
           department_name: department.name,
           department_id: deleteUser.department_id,
@@ -781,7 +781,7 @@ class UserService {
         const department = GetDepartment(findDeletedUser.department_id);
         await runProducer(notificationProducerTopic.notiForRemoveManager, {
           user_id,
-          message: `Manager ${findDeletedUser.username} are removed from department ${department.name}`,
+          message: `Manager ${findDeletedUser.username} are removed from department`,
           modifiedBy,
           department_name: department.name,
           department_id: findDeletedUser.department_id,

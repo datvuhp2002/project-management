@@ -1,9 +1,9 @@
 "use strict";
 const notificationProducerTopic = {
-  createDepartment: "create-department",
-  updateDepartment: "update-department",
-  deleteDepartment: "delete-department",
-  restoreDepartment: "restore-department",
+  notiForCreateDepartment: "noti-for-create-department",
+  notiForUpdateDepartment: "noti-for-update-department",
+  notiFordeleteDepartment: "noti-for-delete-department",
+  notiForRestoreDepartment: "noti-for-restore-department",
 };
 
 module.exports = { notificationProducerTopic };

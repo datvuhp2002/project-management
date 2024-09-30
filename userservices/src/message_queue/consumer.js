@@ -65,7 +65,7 @@ const continuousConsumer = async () => {
               });
               await runProducer(notificationProducerTopic.notiForAddManager, {
                 user_id: id,
-                message: `${user.username} have become the manager of ${data.department_name} department`,
+                message: `${user.username} have become the manager of department`,
                 modifiedBy: parsedMessage.modifiedBy,
                 department_name: data.department_name,
                 department_id: data.department_id,

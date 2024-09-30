@@ -73,15 +73,18 @@ class DepartmentService {
           createdBy,
         });
       }
-      await runProducer(notificationProducerTopic.createDepartment, {
-        message_admin: `Department ${department.name} is created`,
-        message_user: `You have been added to department ${department.name}`,
+      await runProducer(notificationProducerTopic.notiForCreateDepartment, {
+        message_admin: `department is created`,
+        message_user: `You have been added to department`,
         list_user_ids: listUserIds,
-        modifiedBy: createdBy,
+        createdBy,
+        target_id: department.department_id,
+        target_name: department.name,
+        targetFor: "DEPARTMENT",
       });
       return department;
     }
-    throw new BadRequestError("Tạo phòng ban không thành công");
+    throw new BadRequestError("Department create failed");
   };
   // get all department instances
   static getAll = async ({
@@ -220,10 +223,12 @@ class DepartmentService {
       select: this.select,
     });
     if (result) {
-      await runProducer(notificationProducerTopic.updateDepartment, {
-        message: `Department ${result.name} is updated`,
-        department_id: result.department_id,
+      await runProducer(notificationProducerTopic.notiForUpdateDepartment, {
+        message: `department is updated`,
         modifiedBy: userId,
+        department_id: result.department_id,
+        department_name: result.name,
+        targetFor: "DEPARTMENT",
       });
       return result;
     }
@@ -260,10 +265,12 @@ class DepartmentService {
       await this.restore(department_id, modifiedBy);
       throw new BadRequestError("Xóa phòng ban không thành công");
     } else {
-      await runProducer(notificationProducerTopic.deleteDepartment, {
-        message: `Department ${get_department.name} is deleted`,
-        department_id,
+      await runProducer(notificationProducerTopic.notiFordeleteDepartment, {
+        message: `department is deleted`,
         modifiedBy,
+        department_id,
+        department_name: get_department.name,
+        targetFor: "DEPARTMENT",
       });
       await runProducer(projectProducerTopic.removeProjectFromDepartment, {
         department_id,
@@ -303,10 +310,12 @@ class DepartmentService {
       department_name: department.name,
       createdBy: modifiedBy,
     });
-    await runProducer(notificationProducerTopic.deleteDepartment, {
-      message: `Department ${department.name} is deleted`,
-      department_id,
+    await runProducer(notificationProducerTopic.notiFordeleteDepartment, {
+      message: `department is deleted`,
       modifiedBy,
+      department_id,
+      department_name: department.name,
+      targetFor: "DEPARTMENT",
     });
     return true;
   };
@@ -326,10 +335,12 @@ class DepartmentService {
       await this.delete(department_id, modifiedBy);
       throw new BadRequestError("Khôi phục phòng ban không thành công");
     }
-    await runProducer(notificationProducerTopic.restoreDepartment, {
-      message: `Department ${department.name} is restored`,
-      department_id,
+    await runProducer(notificationProducerTopic.notiForRestoreDepartment, {
+      message: `department is restored`,
       modifiedBy,
+      department_id,
+      department_name: department.name,
+      targetFor: "DEPARTMENT",
     });
     return true;
   };

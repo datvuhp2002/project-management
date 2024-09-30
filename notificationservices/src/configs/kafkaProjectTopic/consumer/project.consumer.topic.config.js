@@ -1,9 +1,10 @@
 "use strict";
 const projectTopicsContinuous = {
-  createProject: "create-project",
-  updateProject: "update-project",
-  restoreProject: "restore-project",
-  deleteProject: "delete-project",
-  removeProjectsFromDepartment: "remove-projects-from-department",
+  notiForCreateProject: "noti-for-create-project",
+  notiForUpdateProject: "noti-for-update-project",
+  notiForRestoreProject: "noti-for-restore-project",
+  notiForDeleteProject: "noti-for-delete-project",
+  notiForRemoveProjectsFromDepartment:
+    "noti-for-remove-projects-from-department",
 };
 module.exports = { projectTopicsContinuous };

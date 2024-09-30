@@ -77,17 +77,23 @@ class ProjectService {
                   .join(", ")} and ${
                   departmentNames[departmentNames.length - 1]
                 } departments`;
-          runProducer(notificationProducerTopic.createProject, {
+          runProducer(notificationProducerTopic.notiForCreateProject, {
             department_ids: newProject.department_ids,
             message,
             createdBy,
+            target_id: newProject.project_id,
+            target_name: newProject.name,
+            targetFor: "PROJECT",
           });
         } else {
           const message = `Project ${newProject.name} has been created`;
-          runProducer(notificationProducerTopic.createProject, {
+          runProducer(notificationProducerTopic.notiForCreateProject, {
             department_ids: [],
             message,
             createdBy,
+            target_id: newProject.project_id,
+            target_name: newProject.name,
+            targetFor: "PROJECT",
           });
         }
       }
@@ -333,13 +339,16 @@ class ProjectService {
     });
     // Thực hiện tất cả các cập nhật
     await Promise.all(updatePromises);
-    await runProducer(notificationProducerTopic.removeProjectsFromDepartment, {
-      project_ids: projects.map((project) => ({
-        project_id: project.project_id,
-        name: project.name,
-      })),
-      department_name,
-    });
+    await runProducer(
+      notificationProducerTopic.notiForRemoveProjectsFromDepartment,
+      {
+        project_ids: projects.map((project) => ({
+          project_id: project.project_id,
+          name: project.name,
+        })),
+        department_name,
+      }
+    );
     return { message: "Projects updated successfully" };
   };
   // update project
@@ -393,12 +402,17 @@ class ProjectService {
             await Promise.all(
               addedDepartments.map(async (id) => {
                 const department = await GetDepartment(id);
-                const message = `Project ${updateProject.name} has been added to department ${department.name}`;
-                await runProducer(notificationProducerTopic.updateProject, {
-                  project_id: updateProject.project_id,
-                  message,
-                  modifiedBy,
-                });
+                const message = `project has been added to department ${department.name}`;
+                await runProducer(
+                  notificationProducerTopic.notiForUpdateProject,
+                  {
+                    message,
+                    modifiedBy,
+                    project_id: updateProject.project_id,
+                    target_name: updateProject.name,
+                    targetFor: "PROJECT",
+                  }
+                );
               })
             );
           }
@@ -407,18 +421,23 @@ class ProjectService {
             await Promise.all(
               removedDepartments.map(async (id) => {
                 const department = await GetDepartment(id);
-                const message = `Project ${updateProject.name} has been removed from department ${department.name}`;
-                await runProducer(notificationProducerTopic.updateProject, {
-                  project_id: updateProject.project_id,
-                  message,
-                  modifiedBy,
-                });
+                const message = `project has been removed from department ${department.name}`;
+                await runProducer(
+                  notificationProducerTopic.notiForUpdateProject,
+                  {
+                    project_id: updateProject.project_id,
+                    message,
+                    modifiedBy,
+                    target_name: updateProject.name,
+                    targetFor: "PROJECT",
+                  }
+                );
               })
             );
           }
         } else {
           // Nếu không có thay đổi về department_ids, gửi thông báo cập nhật chung
-          await runProducer(notificationProducerTopic.updateProject, {
+          await runProducer(notificationProducerTopic.notiForUpdateProject, {
             project_id: updateProject.project_id,
             message: `Project ${updateProject.name} has been updated`,
             modifiedBy,
@@ -462,11 +481,13 @@ class ProjectService {
       },
     });
     if (deleteProject) {
-      runProducer(notificationProducerTopic.deleteProject, {
+      runProducer(notificationProducerTopic.notiForDeleteProject, {
         department_ids: deleteProject.department_ids,
         project_id,
-        message: `Project ${deleteProject.name} has been deleted`,
+        message: `project has been deleted`,
         createdBy: modifiedBy,
+        targetFor: "PROJECT",
+        target_name: deleteProject.name,
       });
       return true;
     }
@@ -501,15 +522,17 @@ class ProjectService {
       throw new BadRequestError("Xoá dự án không thành công");
     }
     try {
-      runProducer(
-        assignmentProducerTopic.forceDeleteProjectAssignment,
-        project_id
-      );
-      runProducer(notificationProducerTopic.deleteProject, {
+      runProducer(assignmentProducerTopic.forceDeleteProjectAssignment, {
+        project_id,
+        modifiedBy,
+      });
+      runProducer(notificationProducerTopic.notiForDeleteProject, {
         department_ids: deleteProject.department_ids,
         project_id,
-        message: `Project ${deleteProject.name} has been deleted`,
+        message: `project has been deleted`,
         createdBy: modifiedBy,
+        targetFor: "PROJECT",
+        target_name: deleteProject.name,
       });
     } catch (err) {
       throw new BadRequestError(err);
@@ -526,10 +549,10 @@ class ProjectService {
       },
     });
     if (restoreProject) {
-      await runProducer(notificationProducerTopic.restoreProject, {
+      await runProducer(notificationProducerTopic.notiForRestoreProject, {
         department_ids: restoreProject.department_ids,
         project_id,
-        message: `Project ${restoreProject.name} has been restored`,
+        message: `project ${restoreProject.name} has been restored`,
         createdBy: modifiedBy,
       });
       return true;

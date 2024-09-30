@@ -398,6 +398,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GRPC_PORT=50060
       - ASSIGNMENT_GRPC_PORT=assignmentservices:50056
+      - TASK_GRPC_PORT=taskservices:50054
       - USER_GRPC_PORT=userservices:50053
       - ACTIVITY_GRPC_PORT=activityservices:50058
       - LOKI_HOST=http://loki:3100
@@ -427,6 +428,7 @@ services:
       - DOCKER_DEFAULT_PLATFORM=linux/amd64
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - USER_GRPC_PORT=userservices:50053
+      - TASK_GRPC_PORT=taskservices:50054
       - LOKI_HOST=http://loki:3100
       - GRPC_PORT=50058
     volumes:

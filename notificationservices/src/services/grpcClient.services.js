@@ -30,6 +30,20 @@ const assignmentProto = grpc.loadPackageDefinition(
   packageAssignmentDefinition
 ).assignment;
 
+// Initialize the Task Service
+const TASK_PROTO_PATH = path.join(__dirname, "../grpc/task.proto");
+const packageTaskDefinition = protoLoader.loadSync(TASK_PROTO_PATH, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const taskProto = grpc.loadPackageDefinition(packageTaskDefinition).task;
+const taskClient = new taskProto.TaskService(
+  process.env.TASK_GRPC_PORT,
+  grpc.credentials.createInsecure()
+);
 // User gRPC server
 const userClient = new userProto.UserService(
   process.env.USER_GRPC_PORT,
@@ -48,6 +62,7 @@ async function getUser(user_id) {
     });
   });
 }
+
 async function GetListStaffInDepartment(department_id) {
   if (!department_id) return null;
   return new Promise((resolve, reject) => {
@@ -60,6 +75,7 @@ async function GetListStaffInDepartment(department_id) {
     });
   });
 }
+
 async function GetListAllAdministrators() {
   return new Promise((resolve, reject) => {
     userClient.GetListAllAdministrators({}, (err, response) => {
@@ -77,6 +93,19 @@ const assignmentClient = new assignmentProto.AssignmentService(
   process.env.ASSIGNMENT_GRPC_PORT,
   grpc.credentials.createInsecure()
 );
+async function GetUserAssignedToTask(task_id) {
+  if (!task_id) return null;
+  return new Promise((resolve, reject) => {
+    assignmentClient.getUserAssignedToTask({ task_id }, (err, response) => {
+      if (err) {
+        resolve(null);
+        reject(err);
+      } else {
+        resolve(response);
+      }
+    });
+  });
+}
 async function GetAllUserFromProject(project_id) {
   if (project_id == null) return null;
   return new Promise((resolve, reject) => {
@@ -89,9 +118,25 @@ async function GetAllUserFromProject(project_id) {
     });
   });
 }
+
+// Task gRPC server
+async function GetTask(task_id) {
+  if (task_id == null) return null;
+  return new Promise((resolve, reject) => {
+    taskClient.getTask({ task_id }, (err, response) => {
+      if (err) {
+        reject(err.message);
+      } else {
+        resolve(response);
+      }
+    });
+  });
+}
 module.exports = {
   getUser,
   GetListStaffInDepartment,
   GetListAllAdministrators,
   GetAllUserFromProject,
+  GetUserAssignedToTask,
+  GetTask,
 };

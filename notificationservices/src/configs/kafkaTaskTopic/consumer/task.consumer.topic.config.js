@@ -1,10 +1,6 @@
 "use strict";
-const taskTopicsOnDemand = {};
 const taskTopicsContinuous = {
-  taskCreated: "task-created",
-  taskUpdated: "task-updated",
-  taskDeleted: "task-deleted",
-  taskDeletedMultiple: "task-deleted-multiple",
+  notiForDeleteTask: "noti-for-delete-task",
 };
 
-module.exports = { taskTopicsOnDemand, taskTopicsContinuous };
+module.exports = { taskTopicsContinuous };

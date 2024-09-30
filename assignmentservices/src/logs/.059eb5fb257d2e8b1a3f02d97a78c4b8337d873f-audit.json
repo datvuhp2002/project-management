@@ -39,6 +39,211 @@
             "date": 1726538541490,
             "name": "src/logs/assignmentServices-2024-09-17-09-02.info.log",
             "hash": "a8aa8f12c6089027f90bb38fe16bc86c9a2c27fbb6074174f1c5e0b3b296c8e3"
+        },
+        {
+            "date": 1726713915876,
+            "name": "src/logs/assignmentServices-2024-09-19-09-45.info.log",
+            "hash": "adfa3ff3eed3221fe0c0a3b59cbab160709151cce19c7fc626929a3aecd01261"
+        },
+        {
+            "date": 1726714095155,
+            "name": "src/logs/assignmentServices-2024-09-19-09-48.info.log",
+            "hash": "48b6e0aacbd20192d0d4cd04d4ecf53e78cc8fa315f7309d71be5d73874ee9da"
+        },
+        {
+            "date": 1726714213052,
+            "name": "src/logs/assignmentServices-2024-09-19-09-50.info.log",
+            "hash": "2657f6e0b25196761030aedaaa0fb296f5714c804c7126fa0a504ef3305d5bf9"
+        },
+        {
+            "date": 1726714264816,
+            "name": "src/logs/assignmentServices-2024-09-19-09-51.info.log",
+            "hash": "365940da80ecc290822f069db5d16c22c121370f81e337bfa7b5f017119020fd"
+        },
+        {
+            "date": 1726714329667,
+            "name": "src/logs/assignmentServices-2024-09-19-09-52.info.log",
+            "hash": "438991d73dfdb18ae7c5bef4a26dbdf844356afea4d5da85e3e7428e912afe94"
+        },
+        {
+            "date": 1726714387928,
+            "name": "src/logs/assignmentServices-2024-09-19-09-53.info.log",
+            "hash": "f21ae633a965db00174d09325f519dc531921340e57a5ba1546603dbda1ee1a8"
+        },
+        {
+            "date": 1726714520083,
+            "name": "src/logs/assignmentServices-2024-09-19-09-55.info.log",
+            "hash": "a65edbfd3ac61d112c49fa30fdedab7af8dc67524fa99528009f712b69eaa9d2"
+        },
+        {
+            "date": 1726714573520,
+            "name": "src/logs/assignmentServices-2024-09-19-09-56.info.log",
+            "hash": "e1b8a81f0b7621265ca54a269b6a8596eb349233a3f298d5edafbfe7182f5629"
+        },
+        {
+            "date": 1726714666604,
+            "name": "src/logs/assignmentServices-2024-09-19-09-57.info.log",
+            "hash": "b6fba001a351f179a7e5c768aedc44ec8b261ca084047e45e017bc2a54013942"
+        },
+        {
+            "date": 1726714711855,
+            "name": "src/logs/assignmentServices-2024-09-19-09-58.info.log",
+            "hash": "4b13058e938596ca2ffae733052b4163acc74cff2f0ec4d04d3e5ebca9f98afd"
+        },
+        {
+            "date": 1726714750976,
+            "name": "src/logs/assignmentServices-2024-09-19-09-59.info.log",
+            "hash": "9442b406bfec1cbc21bda5dcdc3adc15a0c0034bbcd984df18850f44af241f82"
+        },
+        {
+            "date": 1726714898027,
+            "name": "src/logs/assignmentServices-2024-09-19-10-01.info.log",
+            "hash": "ec8240d1313a74eb3f9f210251018624960ec7861f7c2ffb2d981a7dffec0c41"
+        },
+        {
+            "date": 1726715085245,
+            "name": "src/logs/assignmentServices-2024-09-19-10-04.info.log",
+            "hash": "dac8f67a24b72b95719b7b274df64891cdb600fdeae4817188fb6942c87303c7"
+        },
+        {
+            "date": 1726715130473,
+            "name": "src/logs/assignmentServices-2024-09-19-10-05.info.log",
+            "hash": "66a052abf2cdcfb07c7018cd9c5db11ee6bd889cdeb2591292e346e0fee10384"
+        },
+        {
+            "date": 1726715162713,
+            "name": "src/logs/assignmentServices-2024-09-19-10-06.info.log",
+            "hash": "faa761186fb553b23fb94a7e35803cd78ad612fd286568d50b51dec8ad679ddf"
+        },
+        {
+            "date": 1726715225162,
+            "name": "src/logs/assignmentServices-2024-09-19-10-07.info.log",
+            "hash": "eb26a500799141558b91fb28d18bb91503a8bd88babdbef67d8ef6d1d11dff70"
+        },
+        {
+            "date": 1726715297224,
+            "name": "src/logs/assignmentServices-2024-09-19-10-08.info.log",
+            "hash": "fc700b764a298ca07a49afab1f652ed23ee8206fe99b5ff3e967c9cf4c594fe7"
+        },
+        {
+            "date": 1726715352697,
+            "name": "src/logs/assignmentServices-2024-09-19-10-09.info.log",
+            "hash": "75e13145b00fc4c4229c1a6be9d0d6b75c2e9f1471771acb7603a22619138f4b"
+        },
+        {
+            "date": 1726715419251,
+            "name": "src/logs/assignmentServices-2024-09-19-10-10.info.log",
+            "hash": "3a5b12eb2d8a1c79ce6249f945c753878262ff7b7efae6c3b6ca5d2157d44488"
+        },
+        {
+            "date": 1726715483717,
+            "name": "src/logs/assignmentServices-2024-09-19-10-11.info.log",
+            "hash": "3b81d6c13aa98e3b9e9f5d53553bf8264edf145792aed855e66c91763459b17e"
+        },
+        {
+            "date": 1726715604376,
+            "name": "src/logs/assignmentServices-2024-09-19-10-13.info.log",
+            "hash": "6f54c10f8c2519fe4d66fa3be253ecfb13d14b628323ecced743df3eb2201547"
+        },
+        {
+            "date": 1726716138430,
+            "name": "src/logs/assignmentServices-2024-09-19-10-22.info.log",
+            "hash": "b6adfbf48c82f0a8c1addf7ddc6b995a4f09149d586921b2d3a1bccd0ae58a29"
+        },
+        {
+            "date": 1726716229752,
+            "name": "src/logs/assignmentServices-2024-09-19-10-23.info.log",
+            "hash": "c79e5b6a6dbfb6892dce20e37dba4bc782f442f07c84a856aafadcb9d6f2d491"
+        },
+        {
+            "date": 1726716290207,
+            "name": "src/logs/assignmentServices-2024-09-19-10-24.info.log",
+            "hash": "430085902ba1750b237c701099e88a9a26bc5015c5dac0c35eac87d3ec5cb3b1"
+        },
+        {
+            "date": 1726716815936,
+            "name": "src/logs/assignmentServices-2024-09-19-10-33.info.log",
+            "hash": "7d817c819797491701240c514eecf3b3b7a711d6b80bd90881dd4636718cb515"
+        },
+        {
+            "date": 1726716845889,
+            "name": "src/logs/assignmentServices-2024-09-19-10-34.info.log",
+            "hash": "e944081270bf778272ad7e1c2661b3c24878bc5417cc9b50023c1fe3e29e755a"
+        },
+        {
+            "date": 1726716971356,
+            "name": "src/logs/assignmentServices-2024-09-19-10-36.info.log",
+            "hash": "b3b0588d520664f1d3706313d2bd9619c131c6a1038102aeaedb2c2a6b843b1c"
+        },
+        {
+            "date": 1726717084141,
+            "name": "src/logs/assignmentServices-2024-09-19-10-38.info.log",
+            "hash": "d408b5114c27790fc6ea7612bad1dd46b104aa037da2716425602a280d3b3659"
+        },
+        {
+            "date": 1726717157320,
+            "name": "src/logs/assignmentServices-2024-09-19-10-39.info.log",
+            "hash": "1594acf60e2006030c42f9cd9955b1fef535a48b3088af2cdd71c94c16df0261"
+        },
+        {
+            "date": 1726717205823,
+            "name": "src/logs/assignmentServices-2024-09-19-10-40.info.log",
+            "hash": "64708c499fdfd5ba0bb5b05213590b7ce837c829daff97baca2222925f8f2b49"
+        },
+        {
+            "date": 1726717287305,
+            "name": "src/logs/assignmentServices-2024-09-19-10-41.info.log",
+            "hash": "d7a524f6e7952d42885853dbab2908bdbfd4ca456d451cb8e7271a8db56386b5"
+        },
+        {
+            "date": 1726717571465,
+            "name": "src/logs/assignmentServices-2024-09-19-10-46.info.log",
+            "hash": "5a258b9781a9799381fae1f68da313af5249e5e19d11b13617fbe99032d93792"
+        },
+        {
+            "date": 1726717717593,
+            "name": "src/logs/assignmentServices-2024-09-19-10-48.info.log",
+            "hash": "db3cfa6a95ff78f040ff9f8df9113267111378af736103e2d442584ab25eaae2"
+        },
+        {
+            "date": 1726717778959,
+            "name": "src/logs/assignmentServices-2024-09-19-10-49.info.log",
+            "hash": "b9a9b708d891f15ce9f8a41fb9d4174d33ee3454362ca8520bd1f925320cbcee"
+        },
+        {
+            "date": 1726717800330,
+            "name": "src/logs/assignmentServices-2024-09-19-10-50.info.log",
+            "hash": "4bd7f5cbbeb874cf611ffa813d782c2fd241bd61d3c4448b0aa93acad7ede436"
+        },
+        {
+            "date": 1726718021847,
+            "name": "src/logs/assignmentServices-2024-09-19-10-53.info.log",
+            "hash": "8fc75ebf13b5a63fc9f0de72de47a74f016d924094e3a0668a49891f9dddbdd8"
+        },
+        {
+            "date": 1726718052312,
+            "name": "src/logs/assignmentServices-2024-09-19-10-54.info.log",
+            "hash": "29cce2832defb6389bdcacc3887e2935132dba324b52b4f3c8185a37ca9977cf"
+        },
+        {
+            "date": 1726718115334,
+            "name": "src/logs/assignmentServices-2024-09-19-10-55.info.log",
+            "hash": "6639fc5e596ab7d53d85bcb3c268c646f2c3de238e1c8b54dbe09398032df7d2"
+        },
+        {
+            "date": 1726718165224,
+            "name": "src/logs/assignmentServices-2024-09-19-10-56.info.log",
+            "hash": "5edf80da9dd27d0e6f50acf2603e3344eae1a45253b807751234b8a6cc1acdaf"
+        },
+        {
+            "date": 1726720831296,
+            "name": "src/logs/assignmentServices-2024-09-19-11-40.info.log",
+            "hash": "92694b2abd87f6d5f3cb8b1e4135696c89b7eb2457568e714f2d81479d771a0e"
+        },
+        {
+            "date": 1726720873525,
+            "name": "src/logs/assignmentServices-2024-09-19-11-41.info.log",
+            "hash": "0a7eb111574370dea03180013335d0d9ce316019a339cfd6c5865cd50e7553d8"
         }
     ],
     "hashType": "sha256"

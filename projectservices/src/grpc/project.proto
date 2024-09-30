@@ -13,9 +13,10 @@ message ProjectRequeset {
 message ProjectResponse {
   string project_id = 1;
   string projectCode = 2;
-  string investor = 3;
-  string createdBy = 4;
-  string project_manager_id = 5;
+  string name = 3;
+  string investor = 4;
+  string createdBy = 5;
+  string project_manager_id = 6;
 }
 message GetListProjectInDepartmentRequest {
   string department_id = 1;

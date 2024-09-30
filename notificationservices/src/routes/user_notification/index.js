@@ -12,5 +12,7 @@ router.put(
   "/mark-as-read/:id",
   asyncHandler(UserNotificationController.markAsRead)
 );
+router.delete("/delete/:id", asyncHandler(UserNotificationController.delete));
+router.put("/read-many", asyncHandler(UserNotificationController.readMany));
 
 module.exports = router;

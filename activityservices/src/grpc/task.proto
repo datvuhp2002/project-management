@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package task;
+
+service TaskService {
+  rpc GetTask(TaskRequest) returns (TaskReponse);
+}
+
+message TaskRequest {
+  string task_id = 1;
+}
+
+message TaskReponse {
+  string task_id = 1;
+  string name = 2;
+  string description = 3;
+  string document = 4;
+  string createdBy = 5;
+  string createdAt = 6;
+}

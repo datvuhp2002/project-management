@@ -1,12 +1,12 @@
 "use strict";
 
 const prisma = require("../prisma");
-const {
-  BadRequestError,
-  AuthFailureError,
-  ForbiddenError,
-} = require("../core/error.response");
+const { BadRequestError } = require("../core/error.response");
 const { getUser } = require("./grpcClient.services");
+const { runProducer } = require("../message_queue/producer");
+const {
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic");
 class ActivityService {
   static select = {
     activity_id: true,
@@ -23,6 +23,10 @@ class ActivityService {
     if (!activity) {
       throw new BadRequestError("Create activity failed");
     }
+    await runProducer(notificationProducerTopic.notiForCreateActivity, {
+      task_id: data.task_id,
+      createdBy,
+    });
     return activity;
   };
   // get all activities

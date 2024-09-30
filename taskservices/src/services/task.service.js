@@ -14,6 +14,9 @@ const {
   TotalActivity,
 } = require("./grpcClient.services");
 const { assignmentProducerTopic } = require("../configs/kafkaAssignmentTopic");
+const {
+  notificationProducerTopic,
+} = require("../configs/kafkaNotificationTopic");
 class TaskService {
   static select = {
     task_id: true,
@@ -164,18 +167,24 @@ class TaskService {
     return false;
   };
   // delete task
-  static delete = async (task_id) => {
+  static delete = async (task_id, modifiedBy) => {
+    const task = await prisma.task.findUnique({ where: { task_id } });
     const deleteTask = await prisma.task.delete({
       where: { task_id },
     });
     if (deleteTask) {
       await runProducer(activityProducerTopic.taskDeleted, task_id);
-      await runProducer(assignmentProducerTopic.taskDeleted, task_id);
+      await runProducer(assignmentProducerTopic.taskDeleted, {
+        task_name: task.name,
+        task_id,
+        modifiedBy,
+      });
+
       return true;
     }
     throw new BadRequestError("Delete task failed");
   };
-  static deleteMultiple = async (taskIds) => {
+  static deleteMultiple = async ({ taskIds, modifiedBy }) => {
     const multipleDeleteTask = await prisma.task.deleteMany({
       where: { task_id: { in: taskIds } },
     });

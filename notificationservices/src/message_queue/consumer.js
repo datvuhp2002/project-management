@@ -11,6 +11,7 @@ const {
   GetListStaffInDepartment,
   GetListAllAdministrators,
   GetAllUserFromProject,
+  GetUserAssignedToTask,
 } = require("../services/grpcClient.services");
 const UserNotificationService = require("../services/user_notification.service");
 const { runProducer } = require("./producer");
@@ -18,6 +19,12 @@ const {
   userProducerTopic,
   userTopicsContinuous,
 } = require("../configs/kafkaUserTopic");
+const { taskTopicsContinuous } = require("../configs/kafkaTaskTopic");
+const { activityTopicsContinuous } = require("../configs/kafkaActivityTopic");
+const {
+  assignmentTopicsContinuous,
+} = require("../configs/kafkaAssignmentTopic");
+const { GetTask } = require("../services/grpcClient.services");
 
 const kafka = new Kafka({
   clientId: "notification-services",
@@ -40,6 +47,18 @@ const continuousConsumer = async () => {
     topics: convertObjectToArray(userTopicsContinuous),
     fromBeginning: false,
   });
+  await consumer.subscribe({
+    topics: convertObjectToArray(taskTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(assignmentTopicsContinuous),
+    fromBeginning: false,
+  });
+  await consumer.subscribe({
+    topics: convertObjectToArray(activityTopicsContinuous),
+    fromBeginning: false,
+  });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message, heartbeat }) => {
@@ -50,18 +69,28 @@ const continuousConsumer = async () => {
         );
         console.log("Message content:", parsedMessage);
         switch (topic) {
-          case departmentTopicsContinuous.createDepartment: {
+          case departmentTopicsContinuous.notiForCreateDepartment: {
             try {
               // Tạo thông báo cho quản trị viên và người dùng song song
               const [notification_admin, notification_user] = await Promise.all(
                 [
                   NotificationService.create(
                     parsedMessage.message_admin,
-                    parsedMessage.modifiedBy
+                    parsedMessage.createdBy,
+                    {
+                      target_id: parsedMessage.target_id,
+                      targetFor: parsedMessage.targetFor,
+                      target_name: parsedMessage.target_name,
+                    }
                   ),
                   NotificationService.create(
                     parsedMessage.message_user,
-                    parsedMessage.modifiedBy
+                    parsedMessage.createdBy,
+                    {
+                      target_id: parsedMessage.target_id,
+                      targetFor: parsedMessage.targetFor,
+                      target_name: parsedMessage.target_name,
+                    }
                   ),
                 ]
               );
@@ -80,6 +109,10 @@ const continuousConsumer = async () => {
                     content: notification_admin.content,
                     noti_id: notification_admin.notification_id,
                     user_list: admin_ids,
+                    username: notification_admin.username,
+                    target_name: parsedMessage.target_name,
+                    target_id: notification_admin.target_id,
+                    targetFor: parsedMessage.targetFor,
                   });
                 }
               }
@@ -96,6 +129,10 @@ const continuousConsumer = async () => {
                   content: notification_user.content,
                   noti_id: notification_user.notification_id,
                   user_list: parsedMessage.list_user_ids,
+                  username: notification_admin.username || null,
+                  target_name: parsedMessage.target_name,
+                  target_id: notification_user.target_id,
+                  targetFor: parsedMessage.targetFor,
                 });
               }
             } catch (error) {
@@ -107,16 +144,20 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case departmentTopicsContinuous.updateDepartment:
-          case departmentTopicsContinuous.deleteDepartment:
-          case departmentTopicsContinuous.restoreDepartment: {
+          case departmentTopicsContinuous.notiForUpdateDepartment:
+          case departmentTopicsContinuous.notiFordeleteDepartment:
+          case departmentTopicsContinuous.notiForRestoreDepartment: {
             try {
               // Tạo thông báo
               const notification = await NotificationService.create(
                 parsedMessage.message,
-                parsedMessage.modifiedBy
+                parsedMessage.modifiedBy,
+                {
+                  target_id: parsedMessage.department_id,
+                  targetFor: parsedMessage.targetFor,
+                  target_name: parsedMessage.department_name,
+                }
               );
-
               if (notification) {
                 // Lấy danh sách nhân viên và quản trị viên
                 const [user_ids, admin_ids] = await Promise.all([
@@ -140,6 +181,10 @@ const continuousConsumer = async () => {
                     content: notification.content,
                     noti_id: notification.notification_id,
                     user_list: unique_list_user_ids,
+                    username: notification.username || null,
+                    target_id: parsedMessage.department_id,
+                    targetFor: parsedMessage.targetFor,
+                    target_name: parsedMessage.department_name,
                   });
                 }
               }
@@ -152,12 +197,17 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case projectTopicsContinuous.updateProject: {
+          case projectTopicsContinuous.notiForUpdateProject: {
             try {
               // Tạo thông báo
               const notification = await NotificationService.create(
                 parsedMessage.message,
-                parsedMessage.modifiedBy
+                parsedMessage.modifiedBy,
+                {
+                  target_id: parsedMessage.project_id,
+                  targetFor: parsedMessage.targetFor,
+                  target_name: parsedMessage.target_name,
+                }
               );
 
               if (notification) {
@@ -185,6 +235,10 @@ const continuousConsumer = async () => {
                     content: notification.content,
                     noti_id: notification.notification_id,
                     user_list: unique_list_user_ids,
+                    username: notification.username || null,
+                    target_id: parsedMessage.project_id,
+                    targetFor: parsedMessage.targetFor,
+                    target_name: parsedMessage.target_name,
                   });
                 }
               }
@@ -197,13 +251,18 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case projectTopicsContinuous.deleteProject:
-          case projectTopicsContinuous.restoreProject: {
+          case projectTopicsContinuous.notiForDeleteProject:
+          case projectTopicsContinuous.notiForRestoreProject: {
             try {
               // Tạo thông báo
               const notification = await NotificationService.create(
                 parsedMessage.message,
-                parsedMessage.modifiedBy
+                parsedMessage.modifiedBy,
+                {
+                  target_id: parsedMessage.project_id,
+                  targetFor: parsedMessage.targetFor,
+                  target_name: parsedMessage.target_name,
+                }
               );
 
               if (notification) {
@@ -241,6 +300,10 @@ const continuousConsumer = async () => {
                     content: notification.content,
                     noti_id: notification.notification_id,
                     user_list: unique_list_user_ids,
+                    username: notification.username || null,
+                    target_id: parsedMessage.project_id,
+                    targetFor: parsedMessage.targetFor,
+                    target_name: parsedMessage.target_name,
                   });
                 }
               }
@@ -253,12 +316,17 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case projectTopicsContinuous.createProject: {
+          case projectTopicsContinuous.notiForCreateProject: {
             try {
               // Tạo thông báo
               const notification = await NotificationService.create(
                 parsedMessage.message,
-                parsedMessage.createdBy
+                parsedMessage.createdBy,
+                {
+                  target_id: parsedMessage.target_id,
+                  targetFor: parsedMessage.targetFor,
+                  target_name: parsedMessage.target_name,
+                }
               );
 
               if (notification) {
@@ -291,6 +359,10 @@ const continuousConsumer = async () => {
                     content: notification.content,
                     noti_id: notification.notification_id,
                     user_list: unique_list_user_ids,
+                    username: notification.username || null,
+                    target_id: parsedMessage.target_id,
+                    targetFor: parsedMessage.targetFor,
+                    target_name: parsedMessage.target_name,
                   });
                 }
               }
@@ -303,14 +375,19 @@ const continuousConsumer = async () => {
             }
             break;
           }
-          case projectTopicsContinuous.removeProjectsFromDepartment: {
+          case projectTopicsContinuous.notiForRemoveProjectsFromDepartment: {
             try {
               await Promise.all(
                 parsedMessage.project_ids.map(async (prj) => {
-                  const message = `Project ${prj.name} has been removed from department ${parsedMessage.department_name}`;
+                  const message = `project has been removed from department ${parsedMessage.department_name}`;
                   const notification = await NotificationService.create(
                     message,
-                    null
+                    null,
+                    {
+                      target_id: prj.project_id,
+                      targetFor: "PROJECT",
+                      target_name: prj.name,
+                    }
                   );
                   if (notification) {
                     const [user_ids, admin_ids] = await Promise.all([
@@ -334,6 +411,9 @@ const continuousConsumer = async () => {
                         content: notification.content,
                         noti_id: notification.notification_id,
                         user_list: unique_list_user_ids,
+                        target_id: prj.project_id,
+                        targetFor: "PROJECT",
+                        target_name: prj.name,
                       });
                     }
                   }
@@ -348,7 +428,6 @@ const continuousConsumer = async () => {
             }
             break;
           }
-
           case userTopicsContinuous.notiForRemoveManager:
           case userTopicsContinuous.notiForAddManager: {
             try {
@@ -356,7 +435,11 @@ const continuousConsumer = async () => {
               const notificationMessage = parsedMessage.message;
               const notification = await NotificationService.create(
                 notificationMessage,
-                parsedMessage.modifiedBy
+                parsedMessage.modifiedBy,
+                {
+                  target_name: parsedMessage.department_name,
+                  targetFor: "USER",
+                }
               );
 
               if (!notification) {
@@ -367,12 +450,16 @@ const continuousConsumer = async () => {
               // Create a user-specific notification for the manager
               const userMessage =
                 topic === userTopicsContinuous.notiForRemoveManager
-                  ? `You are removed from department ${parsedMessage.department_name}`
-                  : `You have become the manager of department ${parsedMessage.department_name}`;
+                  ? `You are removed from department`
+                  : `You have become the manager of department`;
 
               const notificationForUser = await NotificationService.create(
                 userMessage,
-                null
+                null,
+                {
+                  target_name: parsedMessage.department_name,
+                  targetFor: "USER",
+                }
               );
 
               if (notificationForUser) {
@@ -388,6 +475,9 @@ const continuousConsumer = async () => {
                     content: notificationForUser.content,
                     noti_id: notificationForUser.notification_id,
                     user_list: [parsedMessage.user_id],
+                    username: notification.username,
+                    target_name: parsedMessage.department_name,
+                    targetFor: "USER",
                   });
                 } else {
                   console.error(
@@ -431,6 +521,7 @@ const continuousConsumer = async () => {
             }
             break;
           }
+          // chưa sửa noti
           case userTopicsContinuous.notiForAddStaffIntoDepartment:
           case userProducerTopic.notiForRemoveStaffFromDepartment: {
             try {
@@ -550,6 +641,229 @@ const continuousConsumer = async () => {
               console.error(error.stack);
             }
             break;
+          }
+          case taskTopicsContinuous.notiForDeleteTask: {
+            try {
+              const { message, modifiedBy, list_user_ids, user_id, task_name } =
+                parsedMessage;
+              // Tạo thông báo
+              const notification_for_staff_in_project =
+                await NotificationService.create(message, modifiedBy);
+              if (notification_for_staff_in_project) {
+                // Lưu tất cả thông báo cho tất cả mọi người trong phòng ban của task
+                const adminIds = await GetListAllAdministrators();
+                const uniqueUserIds = [
+                  ...new Set([...list_user_ids, ...adminIds]),
+                ];
+                if (uniqueUserIds.length > 0) {
+                  await UserNotificationService.createMany(
+                    uniqueUserIds.map((user_id) => ({
+                      user_id,
+                      notification_id:
+                        notification_for_staff_in_project.notification_id,
+                    }))
+                  );
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification_for_staff_in_project.content,
+                    noti_id: notification_for_staff_in_project.notification_id,
+                    user_list: uniqueUserIds,
+                  });
+                }
+              }
+              const notify_assigned_staff = await NotificationService.create(
+                `The task ${task_name} you were assigned is deleted`,
+                modifiedBy
+              );
+              if (notify_assigned_staff && user_id) {
+                await UserNotificationService.create(
+                  user_id,
+                  notify_assigned_staff.notification_id
+                );
+                await runProducer(gatewayProducerTopic.newNoti, {
+                  content: notify_assigned_staff.content,
+                  noti_id: notify_assigned_staff.notification_id,
+                  user_list: [user_id],
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case assignmentTopicsContinuous.notifyAssignmentTaskForProject: {
+            try {
+              const { message, list_user_in_project, createdBy } =
+                parsedMessage;
+              // Tạo thông báo
+              const notification_for_staff_in_project =
+                await NotificationService.create(message, createdBy);
+              if (notification_for_staff_in_project) {
+                // Lưu tất cả thông báo cho tất cả mọi người trong phòng ban của task
+                if (list_user_in_project.length > 0) {
+                  await UserNotificationService.createMany(
+                    list_user_in_project.map((user_id) => ({
+                      user_id,
+                      notification_id:
+                        notification_for_staff_in_project.notification_id,
+                    }))
+                  );
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification_for_staff_in_project.content,
+                    noti_id: notification_for_staff_in_project.notification_id,
+                    user_list: list_user_in_project,
+                  });
+                }
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case assignmentTopicsContinuous.notifyRemoveStaffFromProject: {
+            try {
+              const { message, list_user_ids, modifiedBy } = parsedMessage;
+              // Tạo thông báo
+              const notification_for_staff = await NotificationService.create(
+                message,
+                modifiedBy
+              );
+              if (notification_for_staff) {
+                // Lưu tất cả thông báo cho tất cả mọi người trong phòng ban của task
+                if (list_user_ids.length > 0) {
+                  await UserNotificationService.createMany(
+                    list_user_ids.map((user_id) => ({
+                      user_id,
+                      notification_id: notification_for_staff.notification_id,
+                    }))
+                  );
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification_for_staff.content,
+                    noti_id: notification_for_staff.notification_id,
+                    user_list: list_user_in_project,
+                  });
+                }
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case assignmentTopicsContinuous.notifyAssignmentUserForProject: {
+            try {
+              const {
+                message,
+                user_id,
+                list_user_in_project,
+                project_name,
+                createdBy,
+              } = parsedMessage;
+              // Tạo thông báo
+              const notification_for_staff_in_project =
+                await NotificationService.create(message, createdBy);
+              if (notification_for_staff_in_project) {
+                // Lưu tất cả thông báo cho tất cả mọi người trong phòng ban của task
+                if (list_user_in_project.length > 0) {
+                  await UserNotificationService.createMany(
+                    list_user_in_project.map((user_id) => ({
+                      user_id,
+                      notification_id:
+                        notification_for_staff_in_project.notification_id,
+                    }))
+                  );
+                  await runProducer(gatewayProducerTopic.newNoti, {
+                    content: notification_for_staff_in_project.content,
+                    noti_id: notification_for_staff_in_project.notification_id,
+                    user_list: list_user_in_project,
+                  });
+                }
+              }
+              const notify_assigned_staff = await NotificationService.create(
+                `You are added to project ${project_name}`,
+                createdBy
+              );
+              if (notify_assigned_staff && user_id) {
+                await UserNotificationService.create(
+                  user_id,
+                  notify_assigned_staff.notification_id
+                );
+                await runProducer(gatewayProducerTopic.newNoti, {
+                  content: notify_assigned_staff.content,
+                  noti_id: notify_assigned_staff.notification_id,
+                  user_list: [user_id],
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case assignmentTopicsContinuous.notifyAssignmentUserForTask:
+          case assignmentTopicsContinuous.notifyUnAssignmentUserForTask: {
+            try {
+              const { message, user_id, createdBy } = parsedMessage;
+              // Tạo thông báo
+              const notify_assigned_staff = await NotificationService.create(
+                message,
+                createdBy
+              );
+              if (notify_assigned_staff && user_id) {
+                await UserNotificationService.create(
+                  user_id,
+                  notify_assigned_staff.notification_id
+                );
+                await runProducer(gatewayProducerTopic.newNoti, {
+                  content: notify_assigned_staff.content,
+                  noti_id: notify_assigned_staff.notification_id,
+                  user_list: [user_id],
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[Kafka] Error processing notification message:`,
+                error.message
+              );
+              console.error(error.stack);
+            }
+            break;
+          }
+          case activityTopicsContinuous.notiForCreateActivity: {
+            const { task_id, createdBy } = parsedMessage;
+            const task = await GetTask(task_id);
+            const message = `A new activity is created in task ${task.name}`;
+            const notification = await NotificationService.create(
+              message,
+              createdBy
+            );
+            if (notification) {
+              const userAssignedToTask = await GetUserAssignedToTask(task_id);
+              if (userAssignedToTask) {
+                await UserNotificationService.create(
+                  userAssignedToTask,
+                  notification.notification_id
+                );
+                await runProducer(gatewayProducerTopic.newNoti, {
+                  content: notification.content,
+                  noti_id: notification.notification_id,
+                  user_list: [userAssignedToTask],
+                });
+              }
+            }
           }
           default:
             console.log("Unhandled topic:", topic);

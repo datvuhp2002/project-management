@@ -9,7 +9,9 @@ SOURCE_DATABASE="assignmentService"
 BACKUPS_DIR="/var/backups"
 # MongoDB Atlas connection string for destination
 # DESTINATION_MONGO_URI="mongodb://mongoadmin:secret@10.100.1.153:27017/$SOURCE_DATABASE?authSource=admin"
-DESTINATION_MONGO_URI="mongodb://10.100.1.153:27021/$SOURCE_DATABASE?compressors=disabled&gssapiServiceName=mongodb"
+# DESTINATION_MONGO_URI="mongodb://10.100.1.153:27021/$SOURCE_DATABASE?compressors=disabled&gssapiServiceName=mongodb"
+DESTINATION_MONGO_URI="mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=Cluster0"
+
 #=====================================================================
 
 # List the backup archive files in the backup directory

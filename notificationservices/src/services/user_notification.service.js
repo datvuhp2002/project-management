@@ -37,6 +37,12 @@ class UserNotificationService {
     });
     return user_notifications;
   };
+  static readMany = async (user_id) => {
+    return await prisma.userNotifications.updateMany({
+      where: { user_id },
+      data: { is_read: true, read_at: new Date() },
+    });
+  };
   static markAsRead = async (user_id, notification_id) => {
     const user_notification = await prisma.userNotifications.findFirst({
       where: { user_id, notification_id },
@@ -49,6 +55,17 @@ class UserNotificationService {
       where: { user_notifications_id: user_notification.user_notifications_id },
       data: { is_read: true, read_at: new Date() },
       select: this.select,
+    });
+  };
+  static delete = async (user_id, notification_id) => {
+    const user_notification = await prisma.userNotifications.findFirst({
+      where: { user_id, notification_id },
+      select: this.select,
+    });
+    if (!user_notification)
+      throw new AuthFailureError("Notification not found");
+    return await prisma.userNotifications.delete({
+      where: { user_notifications_id: user_notification.user_notifications_id },
     });
   };
   static getAllNotificationsOfUser = async (

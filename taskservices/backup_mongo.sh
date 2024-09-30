@@ -7,7 +7,9 @@
 SOURCE_DATABASE="taskService"
 BACKUPS_DIR="/var/backups"
 # MongoDB Atlas connection string for source
-SOURCE_MONGO_URI="mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=Cluster0"
+# SOURCE_MONGO_URI="mongodb+srv://lachongtechintern:hNX6k0uzO4pDphtM@cluster0.vluhdw4.mongodb.net/$SOURCE_DATABASE?retryWrites=true&w=majority&appName=Cluster0"
+SOURCE_MONGO_URI="mongodb://10.100.1.160:27021/$SOURCE_DATABASE?compressors=disabled&gssapiServiceName=mongodb"
+
 #=====================================================================
 
 TIMESTAMP=$(date +%F-%H%M)
